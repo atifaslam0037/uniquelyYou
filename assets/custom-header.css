@@ -1,112 +1,52 @@
 /* ==============================================================
-   UNIQUELY YOU — Custom Header Stylesheet
-   All tokens from global-variables.css:
-     --primary-font, --color-mint, --color-deep-teal,
-     --color-vibrant-orange, --color-pale-peach,
-     --primary-accent, --secondary-accent, --background-soft
+   UNIQUELY YOU — Custom Header Stylesheet v3
+   Brand tokens (from global-variables.css):
+     --color-mint:           #5FBFB8
+     --color-deep-teal:      #0E5C66
+     --color-vibrant-orange: #E8612C
+     --color-pale-peach:     #FFE8DD
+     --primary-accent:       var(--color-deep-teal)
+     --secondary-accent:     var(--color-vibrant-orange)
+     --primary-font:         "Geist", sans-serif
    ============================================================== */
 
-/* ── Sidebar Drawer — always visible on all devices ── */
-.menu-drawer {
-  font-family: var(--primary-font, sans-serif);
+/* Solid sticky variant (when merchant selects "solid" in schema) */
+#header-component[data-sticky-style='solid'][data-sticky-state='active'] .uly-header__underlay--closed,
+.uly-header:not(.uly-header--transparent):not(.uly-header--glass)[data-sticky-state='active'] .uly-header__underlay--closed {
+  background: var(--color-background) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* Top-level drawer link typography */
-.menu-drawer__menu-item {
-  font-family: var(--primary-font, sans-serif);
-  font-weight: 600;
-  letter-spacing: 0.01em;
+/* ══════════════════════════════════════════════════════════════
+   1. ACCOUNT POPUP POSITION
+   shopify-account reads --account-offset-top for its panel Y pos.
+   Native theme sets this on .header; we set it on .uly-header.
+   ══════════════════════════════════════════════════════════════ */
+.uly-header {
+  --account-offset-top: calc(
+    var(--header-group-height, 64px)
+    + (var(--header-height, 64px) * var(--transparent-header-offset-boolean, 0))
+  );
 }
 
-/* Active nav link accent */
-.menu-drawer__menu-item--active {
-  color: var(--primary-accent, #0E5C66);
+.uly-header[data-sticky-state='active'] {
+  --account-offset-top: calc(var(--header-height, 64px) - 1px);
 }
 
-/* Caret / expand icon color */
-.menu-drawer .icon-caret svg,
-.menu-drawer .icon-plus svg {
-  color: var(--primary-accent, #0E5C66);
-}
-
-/* Close button */
-.menu-drawer__close-button {
-  color: var(--color-foreground);
-}
-
-/* ── Localization (Avera-style) ── */
-
-/* Dropdown panel border */
-.uly-localization .localization-wrapper {
-  border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  overflow: hidden;
-  background-color: var(--color-background);
-}
-
-/* Selected / hovered country row */
-.uly-localization .localization-form__list-item[aria-current='true'] .language-selector {
-  color: var(--primary-accent, #0E5C66);
-  font-weight: 600;
-}
-
-.uly-localization .localization-form__select:hover {
-  background-color: rgba(95, 191, 184, 0.1); /* --color-mint at 10% */
-}
-
-/* ── Logo ── */
-.uly-logo {
-  transition: opacity 0.2s ease;
-}
-
-.uly-logo:hover {
-  opacity: 0.8;
-}
-
-/* ── Search icon — match brand ── */
-.uly-header__col--right .search-action button svg,
-.uly-header__col--right .header-actions__action svg {
-  stroke: var(--color-foreground);
-  transition: stroke 0.2s ease;
-}
-
-.uly-header__col--right .search-action button:hover svg,
-.uly-header__col--right .header-actions__action:hover svg {
-  stroke: var(--primary-accent, #0E5C66);
-}
-
-/* ── Cart bubble — brand orange ── */
-.cart-bubble__background {
-  background-color: var(--secondary-accent, #E8612C) !important;
-}
-
-.cart-bubble__text {
-  color: #fff !important;
-}
-
-/* ── Hamburger icon color ── */
-.header-drawer-icon svg {
-  stroke: var(--color-foreground);
-  transition: stroke 0.2s ease;
-}
-
-.menu-drawer-container .header__icon--summary:hover .header-drawer-icon svg {
-  stroke: var(--primary-accent, #0E5C66);
-}
-
-/* ── Sticky & Scroll Behavior ── */
-.uly-header[sticky='always'] {
+/* ══════════════════════════════════════════════════════════════
+   2. STICKY & SCROLL BEHAVIOUR
+   ══════════════════════════════════════════════════════════════ */
+.header-section:has(> #header-component[sticky='always']),
+.header-section:has(> #header-component[sticky='scroll-up']) {
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
 .uly-header[sticky='scroll-up'] {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  transition: transform 0.3s ease;
+  transition: transform 0.35s ease;
 }
 
 .uly-header[data-scroll-direction='down'][sticky='scroll-up'] {
@@ -118,162 +58,193 @@
   transform: translateY(0);
 }
 
-.uly-header[data-sticky-state='active'] .uly-header__row {
-  box-shadow: 0 2px 16px rgba(14, 92, 102, 0.10);
-  background-color: var(--color-background);
+/* Row must be position:relative for mobile absolute-centered logo */
+.uly-header__row {
+  position: relative;
 }
 
-/* ── Sidebar drawer — force left-side on all screen sizes ── */
+/* ══════════════════════════════════════════════════════════════
+   3. TRANSPARENT HEADER (homepage only)
+   When .uly-header--transparent AND not yet sticky:
+     – hide the background underlay (show hero below)
+     – make icons/text white for readability
+   On sticky: glassmorphism — teal tint + blur
+   ══════════════════════════════════════════════════════════════ */
 
-/* Ensure the drawer slide behavior is always active */
-#header-component[data-menu-style='drawer'] .dropdown-localization,
-#header-component[data-menu-style='menu'] .dropdown-localization {
-  display: flex !important;
+/* Hide underlay → transparent background */
+.uly-header--transparent:not([data-sticky-state='active']) .uly-header__underlay--closed,
+.uly-header--transparent:not([data-sticky-state='active']) .uly-header__underlay--open {
+  background: transparent !important;
 }
 
-/* Hide default horizontal header-menu (we only use drawer) */
-#header-component header-menu {
+/* White icons/text when transparent */
+.uly-header--transparent:not([data-sticky-state='active']) {
+  --color-foreground: 255 255 255;
+  --color-foreground-rgb: 255 255 255;
+  --color-account-icon: #fff;
+}
+
+/* Glassmorphism when sticky activates */
+.uly-header--transparent[data-sticky-state='active'] .uly-header__underlay--closed,
+.uly-header[data-sticky-state='active'] .uly-header__underlay--closed {
+  background: rgba(14, 92, 102, 0.82) !important; /* --color-deep-teal at 82% */
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.12);
+  transition: background 0.35s ease, backdrop-filter 0.35s ease;
+}
+
+/* Non-transparent header — sticky shadow only */
+.uly-header:not(.uly-header--transparent)[data-sticky-state='active'] .uly-header__underlay--closed {
+  background: var(--color-background) !important;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4. ICON OVERRIDES
+   Search: custom mask icon (::after, pointer-events:none so button still clicks)
+   Account: native shopify-account SVG tinted via color
+   Cart: custom mask on svg-wrapper::after (button still clicks)
+   ══════════════════════════════════════════════════════════════ */
+
+/* Search */
+.uly-header .search-action button .svg-wrapper,
+.uly-header .search-action button svg {
   display: none !important;
 }
-
-/* ── Collection/subcategory drawer items — deep nested style ── */
-.menu-drawer__menu--childlist .menu-drawer__menu-item {
-  font-size: 0.9rem;
-  font-weight: 500;
-  padding-inline-start: 1.5rem;
-  color: var(--color-foreground);
-  opacity: 0.85;
+.uly-header .search-action button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
-.menu-drawer__menu--grandchildlist .menu-drawer__menu-item {
-  font-size: 0.8rem;
-  padding-inline-start: 2.5rem;
-  opacity: 0.7;
-}
-
-.menu-drawer__menu--childlist .menu-drawer__menu-item--active,
-.menu-drawer__menu--grandchildlist .menu-drawer__menu-item--active {
-  color: var(--primary-accent, #0E5C66);
-  opacity: 1;
-}
-
-/* ── Divider between top-level items ── */
-.menu-drawer__list-item--divider + .menu-drawer__list-item--divider {
-  border-top: 1px solid rgba(14, 92, 102, 0.12);
-}
-
-/* ── Back button in sub-drawer ── */
-.menu-drawer__back-button {
-  color: var(--primary-accent, #0E5C66);
-  font-family: var(--primary-font, sans-serif);
-  font-weight: 600;
-  font-size: 0.875rem;
-  letter-spacing: 0.02em;
-}
-
-/* ============================================================
-   NEW ADDITIONS: Transparent Header, Icons, Toggles
-============================================================ */
-
-/* ── Transparent Header on Homepage ── */
-.uly-header--transparent:not([data-sticky-state='active']),
-.uly-header--transparent:not([data-sticky-state='active']) .uly-header__row {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 100;
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* ── Toggles ── */
-.hide-account .account-button {
-  display: none !important;
-}
-
-.hide-cart .action__cart,
-.hide-cart cart-drawer-component {
-  display: none !important;
-}
-
-/* ── Custom Outline Icons (override native SVGs) ── */
-.uly-header .search-action button svg,
-.uly-header .account-button__icon,
-.uly-header .account-button shopify-account > svg,
-.uly-header .uly-account-link svg,
-.uly-header .uly-account-link .svg-wrapper,
-.uly-header .header-actions__cart-icon > .svg-wrapper,
-.uly-header .header-actions__cart-icon > svg {
-  display: none !important;
-}
-
-.uly-header .search-action button::before,
-.uly-header .account-button::before,
-.uly-header .uly-account-link::before,
-.uly-header .header-actions__cart-icon::before {
+.uly-header .search-action button::after {
   content: '';
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  background-color: currentColor;
+  display: block;
+  width: 22px;
+  height: 22px;
+  background-color: var(--color-foreground);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
   -webkit-mask-size: contain;
   mask-size: contain;
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   -webkit-mask-position: center;
   mask-position: center;
+  pointer-events: none;
   transition: background-color 0.2s ease;
 }
-
-.uly-header .search-action button:hover::before,
-.uly-header .account-button:hover::before,
-.uly-header .uly-account-link:hover::before,
-.uly-header .header-actions__cart-icon:hover::before {
-  background-color: var(--primary-accent, #0E5C66);
+.uly-header .search-action button:hover::after {
+  background-color: var(--color-mint, #5FBFB8);
 }
 
-.uly-header .search-action button::before {
-  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>');
-  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>');
+/* Account — let native shopify-account SVG show, just tint it */
+.uly-header .account-button shopify-account svg,
+.uly-header .account-button .account-button__icon {
+  color: var(--color-foreground);
+  transition: color 0.2s ease;
+}
+.uly-header .account-button:hover shopify-account svg,
+.uly-header .account-button:hover .account-button__icon {
+  color: var(--color-mint, #5FBFB8);
+}
+.uly-header .account-button {
+  background: transparent;
+  position: relative;
 }
 
-.uly-header .account-button::before,
-.uly-header .uly-account-link::before {
-  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>');
-  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>');
+/* Cart */
+.uly-header .header-actions__cart-icon .svg-wrapper svg {
+  display: none !important;
+}
+.uly-header .header-actions__cart-icon .svg-wrapper::after {
+  content: '';
+  display: block;
+  width: 22px;
+  height: 22px;
+  background-color: var(--color-foreground);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z'/%3E%3Cline x1='3' y1='6' x2='21' y2='6'/%3E%3Cpath d='M16 10a4 4 0 0 1-8 0'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z'/%3E%3Cline x1='3' y1='6' x2='21' y2='6'/%3E%3Cpath d='M16 10a4 4 0 0 1-8 0'/%3E%3C/svg%3E");
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  pointer-events: none;
+  transition: background-color 0.2s ease;
+}
+.uly-header .header-actions__action:hover .header-actions__cart-icon .svg-wrapper::after {
+  background-color: var(--color-mint, #5FBFB8);
 }
 
-.uly-header .header-actions__cart-icon::before {
-  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>');
-  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>');
+/* Cart bubble brand accent */
+.cart-bubble__background {
+  background-color: var(--color-vibrant-orange, #E8612C) !important;
+}
+.cart-bubble__text {
+  color: #fff !important;
 }
 
-/* Adjust spacing for new left/right groupings */
-.uly-header__col--left {
-  gap: var(--gap-md);
-  align-items: center;
+/* ══════════════════════════════════════════════════════════════
+   5. HAMBURGER ICON
+   ══════════════════════════════════════════════════════════════ */
+.header-drawer-icon svg {
+  stroke: var(--color-foreground);
+  transition: stroke 0.2s ease;
+}
+.menu-drawer-container .header__icon--summary:hover .header-drawer-icon svg {
+  stroke: var(--color-mint, #5FBFB8);
 }
 
-.uly-header__col--right {
-  gap: var(--gap-md);
-  align-items: center;
+/* ══════════════════════════════════════════════════════════════
+   6. LOGO
+   ══════════════════════════════════════════════════════════════ */
+.uly-logo {
+  transition: opacity 0.2s ease;
+}
+.uly-logo:hover {
+  opacity: 0.8;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   7. ACTION WRAPPERS
+   ══════════════════════════════════════════════════════════════ */
 .uly-header-actions-wrapper {
   display: flex;
   align-items: center;
-  gap: var(--gap-md);
+  gap: var(--gap-sm, 0.5rem);
+}
+.uly-header__col--left {
+  gap: var(--gap-sm, 0.5rem);
+  align-items: center;
+}
+.uly-header__col--right {
+  gap: var(--gap-sm, 0.5rem);
+  align-items: center;
 }
 
-/* ── Horizontal Desktop Menu ── */
-.uly-header__inline-menu {
-  display: flex;
+/* Toggles */
+.hide-account .account-button { display: none !important; }
+.hide-cart .action__cart,
+.hide-cart cart-drawer-component { display: none !important; }
+
+/* Force drawer mode */
+#header-component .header-menu,
+#header-component header-menu {
+  display: flex !important;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   8. DESKTOP HORIZONTAL MENU
+   ══════════════════════════════════════════════════════════════ */
+.uly-header__inline-menu { display: flex; }
 .uly-list-menu {
   display: flex;
-  gap: var(--gap-lg);
+  gap: var(--gap-lg, 1.5rem);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -281,143 +252,340 @@
 .uly-list-menu__item {
   color: var(--color-foreground);
   text-decoration: none;
-  font-family: var(--primary-font, sans-serif);
+  font-family: var(--primary-font, 'Geist', sans-serif);
   font-weight: 500;
-  font-size: 0.9rem;
-  letter-spacing: 0.02em;
+  font-size: 0.875rem;
+  letter-spacing: 0.03em;
   padding: 0.5rem;
   display: block;
+  transition: color 0.2s ease;
 }
 .uly-list-menu__item:hover,
 .uly-list-menu__item--active {
-  color: var(--primary-accent, #0E5C66);
+  color: var(--color-deep-teal, #0E5C66);
 }
 
-/* ── Custom Localization Dropdown (Matching Screenshot) ── */
-.uly-header .dropdown-localization__button {
-  background-color: #111;
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 4px;
-  padding: 6px 12px;
+/* ══════════════════════════════════════════════════════════════
+   9. LOCALIZATION DROPDOWN (desktop header)
+   ══════════════════════════════════════════════════════════════ */
+.uly-localization .dropdown-localization__button {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-family: var(--primary-font, sans-serif);
-  font-weight: 600;
   font-size: 0.8rem;
-  text-transform: uppercase;
-  transition: all 0.2s ease;
-}
-.uly-header .dropdown-localization__button:focus-visible,
-.uly-header .dropdown-localization__button:hover {
-  border-color: #2F80ED; /* Blue active border like screenshot */
-  box-shadow: 0 0 0 1px #2F80ED;
-}
-.uly-header .dropdown-localization__button .icon-caret {
-  width: 10px;
-  height: 10px;
-  opacity: 0.8;
-  color: #fff;
-}
-.uly-header .dropdown-localization__button .currency-code {
-  color: #fff;
-}
-.uly-header .localization-wrapper {
-  background-color: var(--color-background);
-  border-radius: 0 0 4px 4px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-  padding: 0;
-  min-width: 260px;
-  border: 1px solid rgba(0,0,0,0.05);
-}
-.uly-header .country-selector-form__wrapper::before {
-  content: 'SELECT CURRENCY';
-  display: block;
-  font-size: 0.7rem;
   font-weight: 600;
-  color: rgba(var(--color-foreground-rgb), 0.5);
-  padding: 16px 20px 8px;
-  border-bottom: 1px solid rgba(var(--color-foreground-rgb), 0.05);
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  padding: 5px 10px;
+  background: transparent !important;
+  border: 1px solid rgba(var(--color-foreground-rgb), 0.2) !important;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--color-foreground);
+  transition: border-color 0.2s ease, opacity 0.2s ease;
 }
-.uly-header .localization-form__list {
-  max-height: 400px;
-  overflow-y: auto;
-  padding: 8px 0;
+.uly-localization .dropdown-localization__button:hover {
+  border-color: var(--color-mint, #5FBFB8) !important;
 }
-.uly-header .localization-form__list-item {
-  padding: 12px 20px;
+.uly-localization .icon-flag {
+  width: 18px;
+  height: 18px;
+  clip-path: circle(50%);
+  background-position: center;
+  background-size: cover;
+  flex-shrink: 0;
+}
+.uly-localization .icon-caret {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.uly-localization .localization-wrapper {
+  border-radius: 8px;
+  border: 1px solid rgba(var(--color-foreground-rgb), 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  background-color: var(--color-background);
+  min-width: 240px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   10. AVERA DRAWER STYLES
+   ══════════════════════════════════════════════════════════════ */
+
+/* Drawer uses its own color scheme — body typography */
+.uly-drawer {
+  font-family: var(--primary-font, 'Geist', sans-serif);
+}
+
+/* ── Drawer header: logo + close button ── */
+.uly-drawer__header {
   display: flex;
   align-items: center;
-  gap: 16px;
-  cursor: pointer;
+  justify-content: space-between;
+  padding: 1.5rem 2rem 1rem;
+  border-bottom: 1px solid rgba(var(--color-foreground-rgb), 0.08);
+  flex-shrink: 0;
 }
-.uly-header .localization-form__list-item:hover {
-  background-color: rgba(var(--color-foreground-rgb), 0.03);
+
+.uly-drawer__logo-link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
-.uly-header .localization-form__list-item::before {
-  content: '';
+
+.uly-drawer__logo-img {
+  max-width: 140px;
+  height: auto;
   display: block;
-  width: 24px;
-  height: 16px;
-  background-image: var(--bg-flag);
+  filter: none;
+}
+
+.uly-drawer__logo-text {
+  font-family: var(--primary-font, sans-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-foreground);
+}
+
+.uly-drawer__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: var(--color-foreground);
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+  padding: 0;
+}
+.uly-drawer__close:hover { opacity: 1; }
+.uly-drawer__close svg { width: 20px; height: 20px; }
+
+/* ── Drawer menu items — uppercase Avera style ── */
+.uly-drawer .menu-drawer__menu-item {
+  font-family: var(--primary-font, sans-serif);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-foreground);
+}
+
+.uly-drawer .menu-drawer__menu-item--active {
+  color: var(--color-mint, #5FBFB8);
+}
+
+/* ── Caret & expand icons ── */
+.uly-drawer .icon-caret svg,
+.uly-drawer .icon-plus svg {
+  color: var(--color-foreground);
+  opacity: 0.5;
+}
+
+/* ── Divider between items ── */
+.uly-drawer .menu-drawer__list-item--divider {
+  border-bottom: 1px solid rgba(var(--color-foreground-rgb), 0.08);
+}
+
+/* ── Back button ── */
+.uly-drawer .menu-drawer__back-button {
+  font-family: var(--primary-font, sans-serif);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-foreground);
+}
+
+/* ── Hide the old standalone close button (replaced by uly-drawer__header close) ── */
+.uly-drawer > .menu-drawer__close-button,
+.uly-drawer > .close-button:first-child {
+  display: none !important;
+}
+
+/* ── Navigation has flex-grow so localization sticks to bottom ── */
+.uly-drawer .menu-drawer__navigation {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+/* The outer menu-drawer needs flex column so localization stays at bottom */
+.menu-drawer.uly-drawer {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Avera-style localization bottom bar ── */
+.uly-drawer__localization {
+  border-top: 1px solid rgba(var(--color-foreground-rgb), 0.1);
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+.uly-drawer__locale-row {
+  display: block;
+  border-bottom: 1px solid rgba(var(--color-foreground-rgb), 0.06);
+}
+.uly-drawer__locale-row:last-child {
+  border-bottom: none;
+}
+
+.uly-drawer__locale-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  cursor: pointer;
+  list-style: none;
+  text-decoration: none;
+  color: var(--color-foreground);
+  transition: background-color 0.15s ease;
+}
+.uly-drawer__locale-trigger::-webkit-details-marker { display: none; }
+.uly-drawer__locale-trigger:hover {
+  background-color: rgba(var(--color-foreground-rgb), 0.04);
+}
+
+.uly-drawer__locale-label {
+  font-family: var(--primary-font, sans-serif);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(var(--color-foreground-rgb), 0.5);
+}
+
+.uly-drawer__locale-value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--primary-font, sans-serif);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-foreground);
+}
+
+.uly-drawer__locale-value .icon-flag {
+  width: 20px;
+  height: 14px;
   background-size: cover;
   background-position: center;
   border-radius: 2px;
   flex-shrink: 0;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.1) inset;
-}
-.uly-header .localization-form__list-item .currency-details {
-  display: flex;
-  flex-direction: column;
-}
-.uly-header .localization-form__currency {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--color-foreground);
-  line-height: 1.2;
-}
-.uly-header .localization-form__list-item .country {
-  font-size: 0.7rem;
-  color: rgba(var(--color-foreground-rgb), 0.5);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-top: 2px;
-}
-/* Hide checkmark in this custom design */
-.uly-header .localization-form__list-item .icon-checkmark {
-  display: none !important;
 }
 
-/* ── Mobile Layout Ordering ── */
+.uly-drawer__locale-value .icon-caret {
+  width: 10px;
+  height: 10px;
+  opacity: 0.6;
+  rotate: 90deg; /* forward caret = pointing right → now pointing down */
+}
+
+/* Account link in utility */
+.menu-drawer__account {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm, 0.5rem);
+  padding: 1rem 2rem;
+  text-decoration: none;
+  color: var(--color-foreground);
+  font-family: var(--primary-font, sans-serif);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-top: 1px solid rgba(var(--color-foreground-rgb), 0.08);
+  transition: color 0.2s ease;
+}
+.menu-drawer__account:hover {
+  color: var(--color-mint, #5FBFB8);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   11. MOBILE HEADER  — ≡ 🔍 | Avera | 👤 🛒
+   ══════════════════════════════════════════════════════════════ */
 @media screen and (max-width: 749px) {
-  .uly-header__col {
-    display: contents;
-  }
+
+  /* Inner: flex row, space-between */
   .uly-header__inner {
-    display: flex;
-    flex-wrap: wrap;
+    display: flex !important;
+    flex-direction: row;
     align-items: center;
-    gap: 1rem;
-    padding: var(--header-padding);
+    justify-content: space-between;
+    padding: 0 1rem;
+    height: var(--header-height);
+    gap: 0;
+    position: relative;
+  }
+
+  /* Columns: flex (not contents) */
+  .uly-header__col {
+    display: flex;
+    align-items: center;
+  }
+
+  /* LEFT: hamburger + search */
+  .uly-header__col--left {
+    flex: 0 0 auto;
+    gap: 2px;
+    z-index: 1;
+  }
+
+  /* Hide desktop inline menu on mobile */
+  .uly-header__col--left .uly-header__inline-menu {
+    display: none !important;
+  }
+
+  /* CENTER: logo — absolutely centered */
+  .uly-header__col--center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: 0;
   }
   .uly-header__col--center .uly-logo {
-    order: 1;
-    margin-right: auto;
+    pointer-events: all;
   }
-  .search-action, .search-modal {
-    order: 2;
+  .uly-logo__img {
+    max-width: 110px;
   }
-  .uly-header-actions-wrapper {
-    order: 3;
+
+  /* RIGHT: account + cart */
+  .uly-header__col--right {
+    flex: 0 0 auto;
+    gap: 2px;
+    justify-content: flex-end;
+    margin-left: auto;
+    z-index: 1;
   }
-  header-drawer {
-    order: 4;
+
+  /* Hide localization in header on mobile — it's in the drawer */
+  .uly-header__col--right .uly-localization {
+    display: none !important;
   }
-  .uly-localization, 
-  .uly-header__inline-menu {
+
+  /* Show search icon on mobile (in left col alongside hamburger) */
+  .uly-header__col--left .search-action {
+    display: flex !important;
+  }
+
+  /* Desktop-menu block in drawer: show on mobile, hide on desktop */
+  .menu-drawer__menu--desktop-links {
+    display: block;
+  }
+}
+
+/* On desktop: hide the desktop-links block inside drawer (visible inline) */
+@media screen and (min-width: 750px) {
+  .menu-drawer__menu--desktop-links {
     display: none !important;
   }
 }
