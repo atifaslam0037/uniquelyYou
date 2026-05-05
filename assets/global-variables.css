@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
+
+
+:root {
+  /* Branding Colors extracted from palette */
+  --color-mint: #5FBFB8;
+  --color-deep-teal: #0E5C66;
+  --color-vibrant-orange: #E8612C;
+  --color-pale-peach: #FFE8DD;
+  
+  /* fonts */
+  --primary-font: "Geist", sans-serif;
+
+  /* Usage mapping */
+  --primary-accent: var(--color-deep-teal);
+  --secondary-accent: var(--color-vibrant-orange);
+  --background-soft: var(--color-pale-peach);
+  --white: #fff;
+  --black: #000;
+}
+
+*{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body{
+  font-family: var(--primary-font) !important;
+}

@@ -1,0 +1,423 @@
+/* ==============================================================
+   UNIQUELY YOU — Custom Header Stylesheet
+   All tokens from global-variables.css:
+     --primary-font, --color-mint, --color-deep-teal,
+     --color-vibrant-orange, --color-pale-peach,
+     --primary-accent, --secondary-accent, --background-soft
+   ============================================================== */
+
+/* ── Sidebar Drawer — always visible on all devices ── */
+.menu-drawer {
+  font-family: var(--primary-font, sans-serif);
+}
+
+/* Top-level drawer link typography */
+.menu-drawer__menu-item {
+  font-family: var(--primary-font, sans-serif);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* Active nav link accent */
+.menu-drawer__menu-item--active {
+  color: var(--primary-accent, #0E5C66);
+}
+
+/* Caret / expand icon color */
+.menu-drawer .icon-caret svg,
+.menu-drawer .icon-plus svg {
+  color: var(--primary-accent, #0E5C66);
+}
+
+/* Close button */
+.menu-drawer__close-button {
+  color: var(--color-foreground);
+}
+
+/* ── Localization (Avera-style) ── */
+
+/* Dropdown panel border */
+.uly-localization .localization-wrapper {
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  background-color: var(--color-background);
+}
+
+/* Selected / hovered country row */
+.uly-localization .localization-form__list-item[aria-current='true'] .language-selector {
+  color: var(--primary-accent, #0E5C66);
+  font-weight: 600;
+}
+
+.uly-localization .localization-form__select:hover {
+  background-color: rgba(95, 191, 184, 0.1); /* --color-mint at 10% */
+}
+
+/* ── Logo ── */
+.uly-logo {
+  transition: opacity 0.2s ease;
+}
+
+.uly-logo:hover {
+  opacity: 0.8;
+}
+
+/* ── Search icon — match brand ── */
+.uly-header__col--right .search-action button svg,
+.uly-header__col--right .header-actions__action svg {
+  stroke: var(--color-foreground);
+  transition: stroke 0.2s ease;
+}
+
+.uly-header__col--right .search-action button:hover svg,
+.uly-header__col--right .header-actions__action:hover svg {
+  stroke: var(--primary-accent, #0E5C66);
+}
+
+/* ── Cart bubble — brand orange ── */
+.cart-bubble__background {
+  background-color: var(--secondary-accent, #E8612C) !important;
+}
+
+.cart-bubble__text {
+  color: #fff !important;
+}
+
+/* ── Hamburger icon color ── */
+.header-drawer-icon svg {
+  stroke: var(--color-foreground);
+  transition: stroke 0.2s ease;
+}
+
+.menu-drawer-container .header__icon--summary:hover .header-drawer-icon svg {
+  stroke: var(--primary-accent, #0E5C66);
+}
+
+/* ── Sticky & Scroll Behavior ── */
+.uly-header[sticky='always'] {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.uly-header[sticky='scroll-up'] {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: transform 0.3s ease;
+}
+
+.uly-header[data-scroll-direction='down'][sticky='scroll-up'] {
+  transform: translateY(-100%);
+}
+
+.uly-header[data-scroll-direction='up'][sticky='scroll-up'],
+.uly-header[data-sticky-state='active'] {
+  transform: translateY(0);
+}
+
+.uly-header[data-sticky-state='active'] .uly-header__row {
+  box-shadow: 0 2px 16px rgba(14, 92, 102, 0.10);
+  background-color: var(--color-background);
+}
+
+/* ── Sidebar drawer — force left-side on all screen sizes ── */
+
+/* Ensure the drawer slide behavior is always active */
+#header-component[data-menu-style='drawer'] .dropdown-localization,
+#header-component[data-menu-style='menu'] .dropdown-localization {
+  display: flex !important;
+}
+
+/* Hide default horizontal header-menu (we only use drawer) */
+#header-component header-menu {
+  display: none !important;
+}
+
+/* ── Collection/subcategory drawer items — deep nested style ── */
+.menu-drawer__menu--childlist .menu-drawer__menu-item {
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding-inline-start: 1.5rem;
+  color: var(--color-foreground);
+  opacity: 0.85;
+}
+
+.menu-drawer__menu--grandchildlist .menu-drawer__menu-item {
+  font-size: 0.8rem;
+  padding-inline-start: 2.5rem;
+  opacity: 0.7;
+}
+
+.menu-drawer__menu--childlist .menu-drawer__menu-item--active,
+.menu-drawer__menu--grandchildlist .menu-drawer__menu-item--active {
+  color: var(--primary-accent, #0E5C66);
+  opacity: 1;
+}
+
+/* ── Divider between top-level items ── */
+.menu-drawer__list-item--divider + .menu-drawer__list-item--divider {
+  border-top: 1px solid rgba(14, 92, 102, 0.12);
+}
+
+/* ── Back button in sub-drawer ── */
+.menu-drawer__back-button {
+  color: var(--primary-accent, #0E5C66);
+  font-family: var(--primary-font, sans-serif);
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
+}
+
+/* ============================================================
+   NEW ADDITIONS: Transparent Header, Icons, Toggles
+============================================================ */
+
+/* ── Transparent Header on Homepage ── */
+.uly-header--transparent:not([data-sticky-state='active']),
+.uly-header--transparent:not([data-sticky-state='active']) .uly-header__row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* ── Toggles ── */
+.hide-account .account-button {
+  display: none !important;
+}
+
+.hide-cart .action__cart,
+.hide-cart cart-drawer-component {
+  display: none !important;
+}
+
+/* ── Custom Outline Icons (override native SVGs) ── */
+.uly-header .search-action button svg,
+.uly-header .account-button__icon,
+.uly-header .account-button shopify-account > svg,
+.uly-header .uly-account-link svg,
+.uly-header .uly-account-link .svg-wrapper,
+.uly-header .header-actions__cart-icon > .svg-wrapper,
+.uly-header .header-actions__cart-icon > svg {
+  display: none !important;
+}
+
+.uly-header .search-action button::before,
+.uly-header .account-button::before,
+.uly-header .uly-account-link::before,
+.uly-header .header-actions__cart-icon::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-color: currentColor;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  transition: background-color 0.2s ease;
+}
+
+.uly-header .search-action button:hover::before,
+.uly-header .account-button:hover::before,
+.uly-header .uly-account-link:hover::before,
+.uly-header .header-actions__cart-icon:hover::before {
+  background-color: var(--primary-accent, #0E5C66);
+}
+
+.uly-header .search-action button::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>');
+  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>');
+}
+
+.uly-header .account-button::before,
+.uly-header .uly-account-link::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>');
+  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>');
+}
+
+.uly-header .header-actions__cart-icon::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>');
+  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>');
+}
+
+/* Adjust spacing for new left/right groupings */
+.uly-header__col--left {
+  gap: var(--gap-md);
+  align-items: center;
+}
+
+.uly-header__col--right {
+  gap: var(--gap-md);
+  align-items: center;
+}
+
+.uly-header-actions-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-md);
+}
+
+/* ── Horizontal Desktop Menu ── */
+.uly-header__inline-menu {
+  display: flex;
+}
+.uly-list-menu {
+  display: flex;
+  gap: var(--gap-lg);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.uly-list-menu__item {
+  color: var(--color-foreground);
+  text-decoration: none;
+  font-family: var(--primary-font, sans-serif);
+  font-weight: 500;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  padding: 0.5rem;
+  display: block;
+}
+.uly-list-menu__item:hover,
+.uly-list-menu__item--active {
+  color: var(--primary-accent, #0E5C66);
+}
+
+/* ── Custom Localization Dropdown (Matching Screenshot) ── */
+.uly-header .dropdown-localization__button {
+  background-color: #111;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 4px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--primary-font, sans-serif);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+}
+.uly-header .dropdown-localization__button:focus-visible,
+.uly-header .dropdown-localization__button:hover {
+  border-color: #2F80ED; /* Blue active border like screenshot */
+  box-shadow: 0 0 0 1px #2F80ED;
+}
+.uly-header .dropdown-localization__button .icon-caret {
+  width: 10px;
+  height: 10px;
+  opacity: 0.8;
+  color: #fff;
+}
+.uly-header .dropdown-localization__button .currency-code {
+  color: #fff;
+}
+.uly-header .localization-wrapper {
+  background-color: var(--color-background);
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  padding: 0;
+  min-width: 260px;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+.uly-header .country-selector-form__wrapper::before {
+  content: 'SELECT CURRENCY';
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(var(--color-foreground-rgb), 0.5);
+  padding: 16px 20px 8px;
+  border-bottom: 1px solid rgba(var(--color-foreground-rgb), 0.05);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.uly-header .localization-form__list {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+.uly-header .localization-form__list-item {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+}
+.uly-header .localization-form__list-item:hover {
+  background-color: rgba(var(--color-foreground-rgb), 0.03);
+}
+.uly-header .localization-form__list-item::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 16px;
+  background-image: var(--bg-flag);
+  background-size: cover;
+  background-position: center;
+  border-radius: 2px;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.1) inset;
+}
+.uly-header .localization-form__list-item .currency-details {
+  display: flex;
+  flex-direction: column;
+}
+.uly-header .localization-form__currency {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-foreground);
+  line-height: 1.2;
+}
+.uly-header .localization-form__list-item .country {
+  font-size: 0.7rem;
+  color: rgba(var(--color-foreground-rgb), 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+/* Hide checkmark in this custom design */
+.uly-header .localization-form__list-item .icon-checkmark {
+  display: none !important;
+}
+
+/* ── Mobile Layout Ordering ── */
+@media screen and (max-width: 749px) {
+  .uly-header__col {
+    display: contents;
+  }
+  .uly-header__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    padding: var(--header-padding);
+  }
+  .uly-header__col--center .uly-logo {
+    order: 1;
+    margin-right: auto;
+  }
+  .search-action, .search-modal {
+    order: 2;
+  }
+  .uly-header-actions-wrapper {
+    order: 3;
+  }
+  header-drawer {
+    order: 4;
+  }
+  .uly-localization, 
+  .uly-header__inline-menu {
+    display: none !important;
+  }
+}
