@@ -7,7 +7,7 @@
   --color-deep-teal: #0E5C66;
   --color-vibrant-orange: #E8612C;
   --color-pale-peach: #FFE8DD;
-  
+
   /* fonts */
   --primary-font: "Geist", sans-serif;
 
@@ -19,12 +19,6 @@
   --black: #000;
 }
 
-*{
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body{
+body {
   font-family: var(--primary-font) !important;
 }

@@ -616,91 +616,52 @@
             assign color_shadow = '--color-shadow: rgb(var(--color-foreground-rgb) / var(--opacity-10-25));'
             assign form_style = localization_font | append: color_shadow
           %}
-          {%- comment -%} ── Avera-style bottom: separate REGION + CURRENCY rows ── {%- endcomment -%}
+          {%- comment -%} ── Single combined localization (mobile only — CSS hides on desktop) ── {%- endcomment -%}
+          {%- comment -%} Using ONE form prevents duplicate id="LocalizationForm" which breaks JS {%- endcomment -%}
           <div class="uly-drawer__localization">
 
-            {%- if show_language -%}
-              <drawer-localization-component class="uly-drawer__locale-row uly-drawer__locale-row--region">
-                <details
-                  id="drawer-localization-language"
-                  class="drawer-localization"
-                  on:toggle="/toggle"
+            <drawer-localization-component class="uly-drawer__locale-row">
+              <details
+                id="drawer-localization-combined"
+                class="drawer-localization"
+                on:toggle="/toggle"
+              >
+                <summary
+                  class="uly-drawer__locale-trigger link focus-inset"
+                  aria-expanded="false"
+                  on:click="header-drawer/open/submenu"
                 >
-                  <summary
-                    class="uly-drawer__locale-trigger link focus-inset"
-                    aria-expanded="false"
-                    on:click="header-drawer/open/submenu"
-                  >
-                    <span class="uly-drawer__locale-label">{{ 'content.language' | t | upcase }}</span>
-                    <span class="uly-drawer__locale-value">
-                      {{ localization.language.endonym_name | capitalize }}
-                      <span class="svg-wrapper icon-caret icon-caret--forward">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
-                    </span>
-                  </summary>
-                  <div class="menu-drawer__submenu has-submenu color-{{ settings.drawer_color_scheme }}">
-                    <div class="menu-drawer__nav-buttons" ref="navButtons">
-                      <button class="button menu-drawer__back-button link focus-inset" on:click="header-drawer/back">
-                        <span class="svg-wrapper icon-caret icon-caret--backward">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
-                        {{ 'content.language' | t }}
-                      </button>
-                      <button class="button button-unstyled uly-drawer__close" type="button" aria-label="{{ 'actions.close' | t }}" on:click="header-drawer/close">
-                        <span class="svg-wrapper header-drawer-icon header-drawer-icon--close">{{- 'icon-close.svg' | inline_asset_content -}}</span>
-                      </button>
-                    </div>
-                    {% render 'localization-form',
-                      show_country: false,
-                      show_language: true,
-                      localization_style: 'drawer',
-                      form_style: form_style,
-                      form_id: block.id
-                    %}
+                  <span class="uly-drawer__locale-label">{{ 'accessibility.localization_region_and_language' | t }}</span>
+                  <span class="uly-drawer__locale-value">
+                    {%- if show_country and section.settings.country_selector_style -%}
+                      <span class="icon-flag" style="background-image:url({{ localization.country | image_url: width: 32 }});--size-shadow:{{ flag_shadow_size }}px;"></span>
+                    {%- endif -%}
+                    {%- if show_country -%}<span>{{ localization.country.currency.iso_code }}</span>{%- endif -%}
+                    {%- if show_country and show_language -%}<span style="opacity:.4;margin:0 2px">/</span>{%- endif -%}
+                    {%- if show_language -%}<span>{{ localization.language.iso_code | upcase }}</span>{%- endif -%}
+                    <span class="svg-wrapper icon-caret icon-caret--forward">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+                  </span>
+                </summary>
+                <div class="menu-drawer__submenu has-submenu color-{{ settings.drawer_color_scheme }}">
+                  <div class="menu-drawer__nav-buttons" ref="navButtons">
+                    <button class="button menu-drawer__back-button link focus-inset" on:click="header-drawer/back">
+                      <span class="svg-wrapper icon-caret icon-caret--backward">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+                      {{ 'accessibility.localization_region_and_language' | t }}
+                    </button>
+                    <button class="button button-unstyled uly-drawer__close" type="button" aria-label="{{ 'actions.close' | t }}" on:click="header-drawer/close">
+                      <span class="svg-wrapper header-drawer-icon header-drawer-icon--close">{{- 'icon-close.svg' | inline_asset_content -}}</span>
+                    </button>
                   </div>
-                </details>
-              </drawer-localization-component>
-            {%- endif -%}
-
-            {%- if show_country -%}
-              <drawer-localization-component class="uly-drawer__locale-row uly-drawer__locale-row--currency">
-                <details
-                  id="drawer-localization-country"
-                  class="drawer-localization"
-                  on:toggle="/toggle"
-                >
-                  <summary
-                    class="uly-drawer__locale-trigger link focus-inset"
-                    aria-expanded="false"
-                    on:click="header-drawer/open/submenu"
-                  >
-                    <span class="uly-drawer__locale-label">CURRENCY</span>
-                    <span class="uly-drawer__locale-value">
-                      {%- if section.settings.country_selector_style -%}
-                        <span class="icon-flag" style="background-image:url({{ localization.country | image_url: width: 32 }});--size-shadow:{{ flag_shadow_size }}px;"></span>
-                      {%- endif -%}
-                      {{ localization.country.currency.iso_code }}
-                      <span class="svg-wrapper icon-caret icon-caret--forward">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
-                    </span>
-                  </summary>
-                  <div class="menu-drawer__submenu has-submenu color-{{ settings.drawer_color_scheme }}">
-                    <div class="menu-drawer__nav-buttons" ref="navButtons">
-                      <button class="button menu-drawer__back-button link focus-inset" on:click="header-drawer/back">
-                        <span class="svg-wrapper icon-caret icon-caret--backward">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
-                        CURRENCY
-                      </button>
-                      <button class="button button-unstyled uly-drawer__close" type="button" aria-label="{{ 'actions.close' | t }}" on:click="header-drawer/close">
-                        <span class="svg-wrapper header-drawer-icon header-drawer-icon--close">{{- 'icon-close.svg' | inline_asset_content -}}</span>
-                      </button>
-                    </div>
-                    {% render 'localization-form',
-                      show_country: true,
-                      show_language: false,
-                      localization_style: 'drawer',
-                      form_style: form_style,
-                      form_id: block.id
-                    %}
-                  </div>
-                </details>
-              </drawer-localization-component>
-            {%- endif -%}
+                  {% render 'localization-form',
+                    show_country: show_country,
+                    show_language: show_language,
+                    localization_style: 'drawer',
+                    form_style: form_style,
+                    form_id: block.id
+                  %}
+                </div>
+              </details>
+            </drawer-localization-component>
 
           </div>
         {%- comment -%} end localization {%- endcomment -%}

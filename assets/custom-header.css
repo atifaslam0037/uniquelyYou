@@ -14,10 +14,7 @@
    1. ACCOUNT POPUP POSITION
    ══════════════════════════════════════════════════════════════ */
 .uly-header {
-  --account-offset-top: calc(
-    var(--header-group-height, 64px)
-    + (var(--header-height, 64px) * var(--transparent-header-offset-boolean, 0))
-  );
+  --account-offset-top: calc(var(--header-group-height, 64px) + (var(--header-height, 64px) * var(--transparent-header-offset-boolean, 0)));
 }
 
 .uly-header[data-sticky-state='active'] {
@@ -117,6 +114,7 @@
   /* Constrain to header height so the logo never overflows */
   max-height: calc(var(--header-height, 64px) - 12px);
 }
+
 .uly-logo:hover {
   opacity: 0.8;
 }
@@ -157,6 +155,7 @@
   color: var(--color-foreground);
   transition: color 0.2s ease;
 }
+
 .uly-header .search-action button:hover svg,
 .uly-header .search-action button:hover .icon-search {
   color: var(--secondary-accent, #E8612C);
@@ -167,10 +166,12 @@
   color: var(--color-foreground);
   transition: color 0.2s ease;
 }
+
 .uly-header .account-button:hover shopify-account svg,
 .uly-header .account-button:hover svg {
   color: var(--secondary-accent, #E8612C);
 }
+
 .uly-header .account-button {
   background: transparent;
   position: relative;
@@ -181,6 +182,7 @@
   color: var(--color-foreground);
   transition: color 0.2s ease;
 }
+
 .uly-header .header-actions__action:hover .header-actions__cart-icon svg,
 .uly-header .header-actions__action:hover .header-actions__cart-icon .icon-cart {
   color: var(--secondary-accent, #E8612C);
@@ -195,6 +197,7 @@
   align-items: center;
   justify-content: center;
 }
+
 .cart-bubble__text {
   color: #fff !important;
   font-size: 10px;
@@ -208,6 +211,7 @@
   stroke: var(--color-foreground);
   transition: stroke 0.2s ease;
 }
+
 .menu-drawer-container .header__icon--summary:hover .header-drawer-icon svg {
   stroke: var(--secondary-accent, #E8612C);
 }
@@ -220,18 +224,35 @@
   align-items: center;
   gap: var(--gap-sm, 0.5rem);
 }
+
 .uly-header__col--left {
   gap: var(--gap-sm, 0.5rem);
   align-items: center;
 }
+
 .uly-header__col--right {
   gap: var(--gap-sm, 0.5rem);
   align-items: center;
 }
 
-.hide-account .account-button { display: none !important; }
+.uly-header__col .button-unstyled {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.uly-header__row .header-actions {
+  gap: 8px !important;
+}
+
+.hide-account .account-button {
+  display: none !important;
+}
+
 .hide-cart .action__cart,
-.hide-cart cart-drawer-component { display: none !important; }
+.hide-cart cart-drawer-component {
+  display: none !important;
+}
 
 #header-component .header-menu,
 #header-component header-menu {
@@ -241,7 +262,9 @@
 /* ══════════════════════════════════════════════════════════════
    8. DESKTOP HORIZONTAL MENU — 14px, secondary-accent hover
    ══════════════════════════════════════════════════════════════ */
-.uly-header__inline-menu { display: flex; }
+.uly-header__inline-menu {
+  display: flex;
+}
 
 .uly-list-menu {
   display: flex;
@@ -256,41 +279,23 @@
   text-decoration: none;
   font-family: var(--primary-font, 'Geist', sans-serif);
   font-weight: 500;
-  font-size: 14px !important;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  padding: 4px 0;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  padding: 4px 2px;
   display: block;
-  position: relative;
-  transition: color 0.3s ease;
-}
-
-.uly-list-menu__item::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: var(--secondary-accent, #E8612C);
-  transition: width 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 .uly-list-menu__item:hover,
 .uly-list-menu__item--active {
-  color: var(--secondary-accent, #E8612C) !important;
-}
-
-.uly-list-menu__item:hover::after,
-.uly-list-menu__item--active::after {
-  width: 100%;
+  color: var(--color-mint, #5FBFB8);
+  text-decoration: none;
 }
 
 /* ══════════════════════════════════════════════════════════════
-   9. LOCALIZATION DROPDOWN — FIX: inline dropdown, not overlay
+   9. LOCALIZATION DROPDOWN — simple, borderless
    ══════════════════════════════════════════════════════════════ */
 
-/* Wrap the dropdown-localization-component so its panel is anchored */
 dropdown-localization-component.uly-localization {
   position: relative;
   display: inline-flex;
@@ -300,29 +305,27 @@ dropdown-localization-component.uly-localization {
 .uly-localization .dropdown-localization__button {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   font-family: var(--primary-font, sans-serif);
-  font-size: 14px !important;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  padding: 5px 8px;
   background: transparent !important;
-  border: 1.5px solid var(--primary-accent, #0E5C66) !important;
+  border: none !important;
+  box-shadow: none !important;
   border-radius: 6px;
   cursor: pointer;
-  color: var(--primary-accent, #0E5C66);
-  transition: background-color 0.25s ease, color 0.25s ease;
+  color: var(--color-foreground);
+  transition: background-color 0.2s ease;
   white-space: nowrap;
 }
 
 .uly-localization .dropdown-localization__button:hover {
-  background: var(--primary-accent, #0E5C66) !important;
-  color: #fff !important;
-  border-color: var(--primary-accent, #0E5C66) !important;
+  background: rgba(var(--color-foreground-rgb), 0.06) !important;
 }
 
-/* The dropdown panel — position it BELOW the button, not full-screen */
+/* Panel — anchored below button */
 .uly-localization .localization-wrapper {
   position: absolute !important;
   top: calc(100% + 6px) !important;
@@ -332,21 +335,10 @@ dropdown-localization-component.uly-localization {
   max-height: 360px !important;
   overflow-y: auto !important;
   border-radius: 10px !important;
-  border: 1px solid rgba(var(--color-foreground-rgb), 0.10) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid rgba(var(--color-foreground-rgb), 0.08) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
   background-color: var(--color-background) !important;
   z-index: 9999 !important;
-  /* Prevent the panel from overlapping hero sections */
-  isolation: isolate;
-}
-
-/* Scrollbar styling for the dropdown */
-.uly-localization .localization-wrapper::-webkit-scrollbar {
-  width: 4px;
-}
-.uly-localization .localization-wrapper::-webkit-scrollbar-thumb {
-  background: rgba(var(--color-foreground-rgb), 0.2);
-  border-radius: 4px;
 }
 
 .uly-localization .icon-flag {
@@ -424,28 +416,35 @@ dropdown-localization-component.uly-localization {
   border: none;
   cursor: pointer;
 }
+
 .uly-drawer__close:hover {
   opacity: 1;
   color: var(--secondary-accent, #E8612C);
 }
-.uly-drawer__close svg { width: 20px; height: 20px; }
 
-/* Sidebar menu items — 14px + secondary-accent */
+.uly-drawer__close svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Sidebar menu items — refined, smaller, no underline */
 .uly-drawer .menu-drawer__menu-item {
   font-family: var(--primary-font, sans-serif) !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.5px !important;
-  text-transform: uppercase !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.02em !important;
+  text-transform: none !important;
   color: var(--color-foreground) !important;
-  transition: background-color 0.25s ease, color 0.25s ease !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease !important;
 }
 
 .uly-drawer .menu-drawer__menu-item:hover,
 .uly-drawer .menu-drawer__menu-item--active,
 .uly-drawer .menu-drawer__menu-item[aria-current='page'] {
-  color: var(--secondary-accent, #E8612C) !important;
-  background: rgba(var(--color-foreground-rgb), 0.04) !important;
+  color: var(--color-mint, #5FBFB8) !important;
+  background: transparent !important;
+  text-decoration: none !important;
 }
 
 /* Caret icons */
@@ -455,6 +454,7 @@ dropdown-localization-component.uly-localization {
   opacity: 0.5;
   transition: opacity 0.2s ease;
 }
+
 .uly-drawer .menu-drawer__menu-item:hover .icon-caret svg,
 .uly-drawer .menu-drawer__menu-item:hover .icon-plus svg {
   opacity: 1;
@@ -470,13 +470,14 @@ dropdown-localization-component.uly-localization {
   color: var(--color-foreground) !important;
   transition: color 0.2s ease !important;
 }
+
 .uly-drawer .menu-drawer__back-button:hover {
   color: var(--secondary-accent, #E8612C) !important;
 }
 
 /* Hide old standalone close button */
-.uly-drawer > .menu-drawer__close-button,
-.uly-drawer > .close-button:first-child {
+.uly-drawer>.menu-drawer__close-button,
+.uly-drawer>.close-button:first-child {
   display: none !important;
 }
 
@@ -519,6 +520,7 @@ dropdown-localization-component.uly-localization {
   display: block;
   border-bottom: 1px solid rgba(var(--color-foreground-rgb), 0.06);
 }
+
 .uly-drawer__locale-row:last-child {
   border-bottom: none;
 }
@@ -527,45 +529,49 @@ dropdown-localization-component.uly-localization {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 24px;
+  padding: 14px 24px;
   cursor: pointer;
   list-style: none;
   text-decoration: none;
   color: var(--color-foreground);
-  transition: background-color 0.15s ease;
+  transition: color 0.2s ease;
 }
-.uly-drawer__locale-trigger::-webkit-details-marker { display: none; }
+
+.uly-drawer__locale-trigger::-webkit-details-marker {
+  display: none;
+}
+
 .uly-drawer__locale-trigger:hover {
-  background-color: rgba(var(--color-foreground-rgb), 0.04);
+  color: var(--color-mint, #5FBFB8);
 }
 
 .uly-drawer__locale-label {
   font-family: var(--primary-font, sans-serif);
   font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 1px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(var(--color-foreground-rgb), 0.5);
+  color: rgba(var(--color-foreground-rgb), 0.45);
 }
 
 .uly-drawer__locale-value {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-family: var(--primary-font, sans-serif);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--color-foreground);
-  transition: color 0.25s ease;
+  transition: color 0.2s ease;
 }
 
 .uly-drawer__locale-trigger:hover .uly-drawer__locale-value {
-  color: var(--secondary-accent, #E8612C);
+  color: var(--color-mint, #5FBFB8);
 }
 
 .uly-drawer__locale-value .icon-flag {
-  width: 20px;
-  height: 14px;
+  width: 18px;
+  height: 13px;
   background-size: cover;
   background-position: center;
   border-radius: 2px;
@@ -573,9 +579,9 @@ dropdown-localization-component.uly-localization {
 }
 
 .uly-drawer__locale-value .icon-caret {
-  width: 10px;
-  height: 10px;
-  opacity: 0.6;
+  width: 9px;
+  height: 9px;
+  opacity: 0.5;
   rotate: 90deg;
 }
 
@@ -595,6 +601,7 @@ dropdown-localization-component.uly-localization {
   border-top: 1px solid rgba(var(--color-foreground-rgb), 0.08);
   transition: color 0.2s ease;
 }
+
 .menu-drawer__account:hover {
   color: var(--secondary-accent, #E8612C) !important;
 }
@@ -603,6 +610,7 @@ dropdown-localization-component.uly-localization {
 .menu-drawer__menu--desktop-links {
   display: block;
 }
+
 @media screen and (min-width: 750px) {
   .menu-drawer__menu--desktop-links {
     display: none !important;
@@ -649,6 +657,7 @@ dropdown-localization-component.uly-localization {
     pointer-events: none;
     z-index: 0;
   }
+
   .uly-header__col--center .uly-logo {
     pointer-events: all;
   }

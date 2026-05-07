@@ -5,7 +5,10 @@
 
 <style>
   /* Collection Grid Section Styles */
-
+  #collection-grid-{{ section.id }}{
+    background-color: {{ section.settings.section_background_color }};
+    overflow: hidden;
+  }
   .collection-grid-wrapper {
     background-color: var(--white);
     overflow: hidden;
@@ -38,6 +41,7 @@
     font-weight: 700;
     line-height: 1.2;
     color: var(--black);
+    margin-top: 12px;
     margin-bottom: 12px;
     font-family: var(--primary-font);
   }
@@ -614,6 +618,204 @@
   </div>
 </div>
 
+{% comment %}
+  {% schema %}
+  {
+    "name": "Collection Grid",
+    "tag": "section",
+    "class": "section-collection-grid",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Section Header"
+      },
+      {
+        "type": "text",
+        "id": "eyebrow_text",
+        "label": "Eyebrow Text",
+        "default": "SHOP BY"
+      },
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Heading",
+        "default": "One-liner collections"
+      },
+      {
+        "type": "textarea",
+        "id": "subheading",
+        "label": "Subheading",
+        "default": "Each collection tells a story. Pick the one that sounds the most like you."
+      },
+      {
+        "type": "header",
+        "content": "Layout Settings"
+      },
+      {
+        "type": "select",
+        "id": "grid_layout",
+        "label": "Grid Layout Style",
+        "options": [
+          {
+            "value": "featured",
+            "label": "Featured (First item larger)"
+          },
+          {
+            "value": "regular",
+            "label": "Regular Grid"
+          }
+        ],
+        "default": "featured",
+        "info": "Featured layout makes the first collection larger, like the reference design"
+      },
+      {
+        "type": "range",
+        "id": "grid_gap",
+        "min": 8,
+        "max": 40,
+        "step": 4,
+        "unit": "px",
+        "label": "Gap Between Items",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "border_radius",
+        "min": 0,
+        "max": 32,
+        "step": 2,
+        "unit": "px",
+        "label": "Corner Radius",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "columns_desktop",
+        "min": 2,
+        "max": 4,
+        "step": 1,
+        "label": "Columns on Desktop",
+        "default": 3
+      },
+      {
+        "type": "range",
+        "id": "columns_tablet",
+        "min": 1,
+        "max": 3,
+        "step": 1,
+        "label": "Columns on Tablet",
+        "default": 2
+      },
+      {
+        "type": "select",
+        "id": "columns_mobile",
+        "label": "Columns on Mobile",
+        "options": [
+          {
+            "value": "1",
+            "label": "1 Column"
+          },
+          {
+            "value": "2",
+            "label": "2 Columns"
+          }
+        ],
+        "default": "1"
+      },
+      {
+        "type": "header",
+        "content": "Call to Action"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_cta",
+        "label": "Show CTA Button",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "cta_text",
+        "label": "CTA Text",
+        "default": "Shop collection"
+      },
+      {
+        "type": "header",
+        "content": "Section Spacing"
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 4,
+        "unit": "px",
+        "label": "Padding Top",
+        "default": 60
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 4,
+        "unit": "px",
+        "label": "Padding Bottom",
+        "default": 60
+      }
+    ],
+    "blocks": [
+      {
+        "type": "collection",
+        "name": "Collection Item",
+        "settings": [
+          {
+            "type": "collection",
+            "id": "collection",
+            "label": "Collection"
+          },
+          {
+            "type": "image_picker",
+            "id": "custom_image",
+            "label": "Custom Image (Optional)",
+            "info": "Overrides collection featured image"
+          },
+          {
+            "type": "text",
+            "id": "custom_title",
+            "label": "Custom Title (Optional)",
+            "info": "Overrides collection title"
+          },
+          {
+            "type": "checkbox",
+            "id": "show_product_count",
+            "label": "Show Product Count",
+            "default": true
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Collection Grid",
+        "blocks": [
+          {
+            "type": "collection"
+          },
+          {
+            "type": "collection"
+          },
+          {
+            "type": "collection"
+          },
+          {
+            "type": "collection"
+          }
+        ]
+      }
+    ]
+  }
+  {% endschema %}
+{% endcomment %}
 {% schema %}
 {
   "name": "Collection Grid",
@@ -651,14 +853,8 @@
       "id": "grid_layout",
       "label": "Grid Layout Style",
       "options": [
-        {
-          "value": "featured",
-          "label": "Featured (First item larger)"
-        },
-        {
-          "value": "regular",
-          "label": "Regular Grid"
-        }
+        { "value": "featured", "label": "Featured (First item larger)" },
+        { "value": "regular", "label": "Regular Grid" }
       ],
       "default": "featured",
       "info": "Featured layout makes the first collection larger, like the reference design"
@@ -706,14 +902,8 @@
       "id": "columns_mobile",
       "label": "Columns on Mobile",
       "options": [
-        {
-          "value": "1",
-          "label": "1 Column"
-        },
-        {
-          "value": "2",
-          "label": "2 Columns"
-        }
+        { "value": "1", "label": "1 Column" },
+        { "value": "2", "label": "2 Columns" }
       ],
       "default": "1"
     },
@@ -732,6 +922,17 @@
       "id": "cta_text",
       "label": "CTA Text",
       "default": "Shop collection"
+    },
+    {
+      "type": "header",
+      "content": "Section Styling"
+    },
+    {
+      "type": "color",
+      "id": "section_background_color",
+      "label": "Background Color",
+      "default": "#FFE8DD",
+      "info": "Choose the background color for this section"
     },
     {
       "type": "header",
@@ -763,11 +964,7 @@
       "type": "collection",
       "name": "Collection Item",
       "settings": [
-        {
-          "type": "collection",
-          "id": "collection",
-          "label": "Collection"
-        },
+        { "type": "collection", "id": "collection", "label": "Collection" },
         {
           "type": "image_picker",
           "id": "custom_image",
@@ -780,32 +977,14 @@
           "label": "Custom Title (Optional)",
           "info": "Overrides collection title"
         },
-        {
-          "type": "checkbox",
-          "id": "show_product_count",
-          "label": "Show Product Count",
-          "default": true
-        }
+        { "type": "checkbox", "id": "show_product_count", "label": "Show Product Count", "default": true }
       ]
     }
   ],
   "presets": [
     {
       "name": "Collection Grid",
-      "blocks": [
-        {
-          "type": "collection"
-        },
-        {
-          "type": "collection"
-        },
-        {
-          "type": "collection"
-        },
-        {
-          "type": "collection"
-        }
-      ]
+      "blocks": [{ "type": "collection" }, { "type": "collection" }, { "type": "collection" }, { "type": "collection" }]
     }
   ]
 }
