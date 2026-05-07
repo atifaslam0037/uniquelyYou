@@ -1,5 +1,5 @@
 /* ==============================================================
-   UNIQUELY YOU — Custom Header Stylesheet v4 (COMPLETE FIX)
+   UNIQUELY YOU — Custom Header Stylesheet v5
    Brand tokens (from global-variables.css):
      --color-mint:           #5FBFB8
      --color-deep-teal:      #0E5C66
@@ -8,8 +8,6 @@
      --primary-accent:       var(--color-deep-teal)
      --secondary-accent:     var(--color-vibrant-orange)
      --primary-font:         "Geist", sans-serif
-   
-   FONT SIZE: 14px for all menu items and localization
    ============================================================== */
 
 /* ══════════════════════════════════════════════════════════════
@@ -48,11 +46,7 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   3. TRANSPARENT HEADER (homepage only) - FIXED
-   When .uly-header--transparent AND not scrolled:
-     – hide the background underlay (show hero below)
-     – make icons/text white for readability
-   On scroll past threshold: glassmorphism — teal tint + blur
+   3. TRANSPARENT HEADER (homepage only)
    ══════════════════════════════════════════════════════════════ */
 
 .uly-header--transparent {
@@ -63,7 +57,6 @@
   z-index: 200;
 }
 
-/* Hide underlay → transparent background when NOT scrolled */
 .uly-header--transparent:not([data-scrolled='true']) .uly-header__underlay--closed,
 .uly-header--transparent:not([data-scrolled='true']) .uly-header__underlay--open {
   background: transparent !important;
@@ -72,7 +65,6 @@
   box-shadow: none !important;
 }
 
-/* White icons/text when transparent and not scrolled */
 .uly-header--transparent:not([data-scrolled='true']) {
   --color-foreground: rgb(255, 255, 255);
   --color-foreground-rgb: 255, 255, 255;
@@ -84,29 +76,22 @@
 .uly-header--transparent:not([data-scrolled='true']) .header-drawer-icon svg,
 .uly-header--transparent:not([data-scrolled='true']) .uly-localization .dropdown-localization__button,
 .uly-header--transparent:not([data-scrolled='true']) .search-action button svg,
-.uly-header--transparent:not([data-scrolled='true']) .search-action button .icon-search,
 .uly-header--transparent:not([data-scrolled='true']) .header-actions__cart-icon svg,
-.uly-header--transparent:not([data-scrolled='true']) .header-actions__cart-icon .icon-cart,
 .uly-header--transparent:not([data-scrolled='true']) .account-button svg {
   color: rgb(255, 255, 255) !important;
   stroke: rgb(255, 255, 255) !important;
 }
 
-.uly-header--transparent:not([data-scrolled='true']) .uly-localization .dropdown-localization__button {
-  border-color: rgb(255, 255, 255) !important;
-}
-
-/* Glassmorphism when scrolled past threshold (data-scrolled="true") */
+/* Glassmorphism on scroll */
 .uly-header--transparent[data-scrolled='true'] .uly-header__underlay--closed,
 .uly-header[data-sticky-state='active']:not([data-sticky-style='solid']) .uly-header__underlay--closed {
-  background: rgba(14, 92, 102, 0.82) !important; /* --color-deep-teal at 82% */
+  background: rgba(14, 92, 102, 0.82) !important;
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.12);
-  transition: background 0.35s ease, backdrop-filter 0.35s ease, box-shadow 0.35s ease;
+  transition: background 0.35s ease, backdrop-filter 0.35s ease;
 }
 
-/* Solid sticky variant (when merchant selects "solid" in schema) */
 #header-component[data-sticky-style='solid'][data-sticky-state='active'] .uly-header__underlay--closed,
 #header-component[data-sticky-style='solid'][data-scrolled='true'] .uly-header__underlay--closed {
   background: var(--color-background) !important;
@@ -115,19 +100,58 @@
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* Non-transparent header — solid background with shadow when sticky */
 .uly-header:not(.uly-header--transparent)[data-sticky-state='active'] .uly-header__underlay--closed {
   background: var(--color-background) !important;
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
 }
 
 /* ══════════════════════════════════════════════════════════════
-   4. ICON OVERRIDES WITH SECONDARY-ACCENT HOVER
+   4. LOGO — FIX: contained within header height
+   ══════════════════════════════════════════════════════════════ */
+.uly-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--color-foreground);
+  transition: opacity 0.2s ease;
+  /* Constrain to header height so the logo never overflows */
+  max-height: calc(var(--header-height, 64px) - 12px);
+}
+.uly-logo:hover {
+  opacity: 0.8;
+}
+
+.uly-logo__img {
+  display: block;
+  width: auto;
+  height: 100%;
+  /* Hard cap: never wider than the schema setting, never taller than the header */
+  max-width: var(--logo-max-width, 120px);
+  max-height: calc(var(--header-height, 64px) - 12px);
+  object-fit: contain;
+}
+
+.uly-logo__text {
+  font-family: var(--primary-font, sans-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-foreground);
+  white-space: nowrap;
+}
+
+/* Mobile logo size */
+@media screen and (max-width: 749px) {
+  .uly-logo__img {
+    max-width: 110px;
+    max-height: calc(var(--header-height, 56px) - 10px);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5. ICON OVERRIDES WITH SECONDARY-ACCENT HOVER
    ══════════════════════════════════════════════════════════════ */
 
-/* Search */
 .uly-header .search-action button svg,
 .uly-header .search-action button .icon-search {
   color: var(--color-foreground);
@@ -138,15 +162,12 @@
   color: var(--secondary-accent, #E8612C);
 }
 
-/* Account */
 .uly-header .account-button shopify-account svg,
-.uly-header .account-button .account-button__icon,
 .uly-header .account-button svg {
   color: var(--color-foreground);
   transition: color 0.2s ease;
 }
 .uly-header .account-button:hover shopify-account svg,
-.uly-header .account-button:hover .account-button__icon,
 .uly-header .account-button:hover svg {
   color: var(--secondary-accent, #E8612C);
 }
@@ -155,7 +176,6 @@
   position: relative;
 }
 
-/* Cart */
 .uly-header .header-actions__cart-icon svg,
 .uly-header .header-actions__cart-icon .icon-cart {
   color: var(--color-foreground);
@@ -166,7 +186,6 @@
   color: var(--secondary-accent, #E8612C);
 }
 
-/* Cart bubble brand accent */
 .cart-bubble__background {
   background-color: var(--secondary-accent, #E8612C) !important;
   width: 16px;
@@ -183,7 +202,7 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   5. HAMBURGER ICON
+   6. HAMBURGER ICON
    ══════════════════════════════════════════════════════════════ */
 .header-drawer-icon svg {
   stroke: var(--color-foreground);
@@ -191,16 +210,6 @@
 }
 .menu-drawer-container .header__icon--summary:hover .header-drawer-icon svg {
   stroke: var(--secondary-accent, #E8612C);
-}
-
-/* ══════════════════════════════════════════════════════════════
-   6. LOGO
-   ══════════════════════════════════════════════════════════════ */
-.uly-logo {
-  transition: opacity 0.2s ease;
-}
-.uly-logo:hover {
-  opacity: 0.8;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -220,21 +229,20 @@
   align-items: center;
 }
 
-/* Toggles */
 .hide-account .account-button { display: none !important; }
 .hide-cart .action__cart,
 .hide-cart cart-drawer-component { display: none !important; }
 
-/* Force drawer mode */
 #header-component .header-menu,
 #header-component header-menu {
   display: flex !important;
 }
 
 /* ══════════════════════════════════════════════════════════════
-   8. DESKTOP HORIZONTAL MENU - 14PX FONT SIZE
+   8. DESKTOP HORIZONTAL MENU — 14px, secondary-accent hover
    ══════════════════════════════════════════════════════════════ */
 .uly-header__inline-menu { display: flex; }
+
 .uly-list-menu {
   display: flex;
   gap: var(--gap-lg, 1.5rem);
@@ -242,19 +250,21 @@
   margin: 0;
   padding: 0;
 }
+
 .uly-list-menu__item {
   color: var(--color-foreground);
   text-decoration: none;
   font-family: var(--primary-font, 'Geist', sans-serif);
   font-weight: 500;
-  font-size: 14px;
+  font-size: 14px !important;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   padding: 4px 0;
   display: block;
   position: relative;
-  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: color 0.3s ease;
 }
+
 .uly-list-menu__item::after {
   content: '';
   position: absolute;
@@ -263,42 +273,82 @@
   width: 0;
   height: 2px;
   background: var(--secondary-accent, #E8612C);
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.3s ease;
 }
+
 .uly-list-menu__item:hover,
 .uly-list-menu__item--active {
-  color: var(--secondary-accent, #E8612C);
+  color: var(--secondary-accent, #E8612C) !important;
 }
+
 .uly-list-menu__item:hover::after,
 .uly-list-menu__item--active::after {
   width: 100%;
 }
 
 /* ══════════════════════════════════════════════════════════════
-   9. LOCALIZATION DROPDOWN (desktop header) - 14PX FONT SIZE
+   9. LOCALIZATION DROPDOWN — FIX: inline dropdown, not overlay
    ══════════════════════════════════════════════════════════════ */
+
+/* Wrap the dropdown-localization-component so its panel is anchored */
+dropdown-localization-component.uly-localization {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
 .uly-localization .dropdown-localization__button {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-family: var(--primary-font, sans-serif);
-  font-size: 13px;
+  font-size: 14px !important;
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 8px 16px;
+  padding: 6px 12px;
   background: transparent !important;
   border: 1.5px solid var(--primary-accent, #0E5C66) !important;
   border-radius: 6px;
   cursor: pointer;
   color: var(--primary-accent, #0E5C66);
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  white-space: nowrap;
 }
+
 .uly-localization .dropdown-localization__button:hover {
   background: var(--primary-accent, #0E5C66) !important;
   color: #fff !important;
   border-color: var(--primary-accent, #0E5C66) !important;
 }
+
+/* The dropdown panel — position it BELOW the button, not full-screen */
+.uly-localization .localization-wrapper {
+  position: absolute !important;
+  top: calc(100% + 6px) !important;
+  right: 0 !important;
+  left: auto !important;
+  width: 260px !important;
+  max-height: 360px !important;
+  overflow-y: auto !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(var(--color-foreground-rgb), 0.10) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+  background-color: var(--color-background) !important;
+  z-index: 9999 !important;
+  /* Prevent the panel from overlapping hero sections */
+  isolation: isolate;
+}
+
+/* Scrollbar styling for the dropdown */
+.uly-localization .localization-wrapper::-webkit-scrollbar {
+  width: 4px;
+}
+.uly-localization .localization-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-foreground-rgb), 0.2);
+  border-radius: 4px;
+}
+
 .uly-localization .icon-flag {
   width: 18px;
   height: 18px;
@@ -307,36 +357,32 @@
   background-size: cover;
   flex-shrink: 0;
 }
+
 .uly-localization .icon-caret {
   width: 10px;
   height: 10px;
   flex-shrink: 0;
   transition: transform 0.2s ease;
 }
-.uly-localization .localization-wrapper {
-  border-radius: 8px;
-  border: 1px solid rgba(var(--color-foreground-rgb), 0.08);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-  background-color: var(--color-background);
-  min-width: 240px;
-  z-index: 999;
+
+.uly-localization .dropdown-localization__button[aria-expanded='true'] .icon-caret svg {
+  transform: rotate(180deg);
 }
 
 /* ══════════════════════════════════════════════════════════════
-   10. AVERA DRAWER STYLES - 14PX FONT SIZE
+   10. SIDEBAR DRAWER — 14px, global colors, secondary-accent
    ══════════════════════════════════════════════════════════════ */
 
 .uly-drawer {
   font-family: var(--primary-font, 'Geist', sans-serif);
 }
 
-/* ── Drawer header: logo + close button ── */
+/* Drawer header */
 .uly-drawer__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 32px;
+  padding: 20px 24px;
   border-bottom: 1px solid rgba(var(--color-foreground-rgb), 0.08);
   flex-shrink: 0;
 }
@@ -345,20 +391,22 @@
   text-decoration: none;
   display: flex;
   align-items: center;
-  flex-shrink: 0;
 }
 
 .uly-drawer__logo-img {
-  max-width: 140px;
+  max-width: 120px;
+  max-height: 44px;
+  width: auto;
   height: auto;
+  object-fit: contain;
   display: block;
 }
 
 .uly-drawer__logo-text {
   font-family: var(--primary-font, sans-serif);
-  font-size: 28px;
-  font-weight: 400;
-  letter-spacing: 2px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 1px;
   color: var(--primary-accent, #0E5C66);
 }
 
@@ -372,95 +420,98 @@
   opacity: 0.6;
   transition: opacity 0.2s ease, color 0.2s ease;
   padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
 }
-.uly-drawer__close:hover { 
-  opacity: 1; 
+.uly-drawer__close:hover {
+  opacity: 1;
   color: var(--secondary-accent, #E8612C);
 }
 .uly-drawer__close svg { width: 20px; height: 20px; }
 
-/* ── Drawer menu items — 14px font size with hover ── */
+/* Sidebar menu items — 14px + secondary-accent */
 .uly-drawer .menu-drawer__menu-item {
-  font-family: var(--primary-font, sans-serif);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: var(--color-foreground);
-  transition: background-color 0.3s ease, color 0.3s ease;
-  padding: 20px 32px;
+  font-family: var(--primary-font, sans-serif) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+  color: var(--color-foreground) !important;
+  transition: background-color 0.25s ease, color 0.25s ease !important;
 }
 
 .uly-drawer .menu-drawer__menu-item:hover,
-.uly-drawer .menu-drawer__menu-item--active {
-  color: var(--secondary-accent, #E8612C);
-  background: rgba(var(--color-foreground-rgb), 0.04);
+.uly-drawer .menu-drawer__menu-item--active,
+.uly-drawer .menu-drawer__menu-item[aria-current='page'] {
+  color: var(--secondary-accent, #E8612C) !important;
+  background: rgba(var(--color-foreground-rgb), 0.04) !important;
 }
 
-/* ── Caret & expand icons ── */
+/* Caret icons */
 .uly-drawer .icon-caret svg,
 .uly-drawer .icon-plus svg {
   color: var(--color-foreground);
   opacity: 0.5;
   transition: opacity 0.2s ease;
 }
-
-.uly-drawer .icon-caret:hover svg,
-.uly-drawer .icon-plus:hover svg {
+.uly-drawer .menu-drawer__menu-item:hover .icon-caret svg,
+.uly-drawer .menu-drawer__menu-item:hover .icon-plus svg {
   opacity: 1;
 }
 
-/* ── Divider between items ── */
-.uly-drawer .menu-drawer__menu li {
-  border-bottom: 1px solid rgba(var(--color-foreground-rgb), 0.08);
-}
-
-/* ── Back button ── */
+/* Back button */
 .uly-drawer .menu-drawer__back-button {
-  font-family: var(--primary-font, sans-serif);
-  font-size: 14px; /* FIXED: 14px as requested */
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-foreground);
-  transition: color 0.2s ease;
+  font-family: var(--primary-font, sans-serif) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: var(--color-foreground) !important;
+  transition: color 0.2s ease !important;
 }
-
 .uly-drawer .menu-drawer__back-button:hover {
-  color: var(--secondary-accent, #E8612C);
+  color: var(--secondary-accent, #E8612C) !important;
 }
 
-/* ── Hide the old standalone close button ── */
+/* Hide old standalone close button */
 .uly-drawer > .menu-drawer__close-button,
 .uly-drawer > .close-button:first-child {
   display: none !important;
 }
 
-/* ── Navigation has flex-grow so localization sticks to bottom ── */
+/* Navigation flex-grow so localization sticks to bottom */
 .uly-drawer .menu-drawer__navigation {
   flex-grow: 1;
   overflow-y: auto;
 }
 
-/* The outer menu-drawer needs flex column so localization stays at bottom */
 .menu-drawer.uly-drawer {
   display: flex;
   flex-direction: column;
 }
 
-/* ── Avera-style localization bottom bar - 14PX FONT - MOBILE ONLY ── */
+/* ══════════════════════════════════════════════════════════════
+   11. MOBILE DRAWER LOCALIZATION BOTTOM BAR
+   ══════════════════════════════════════════════════════════════ */
 .uly-drawer__localization {
   border-top: 1px solid rgba(var(--color-foreground-rgb), 0.1);
   margin-top: auto;
   flex-shrink: 0;
   background: rgba(var(--color-foreground-rgb), 0.02);
-  display: none !important; /* Hidden by default */
+  /* Hidden by default — shown only on mobile (below) */
+  display: none !important;
 }
 
-/* Show in drawer on MOBILE ONLY */
 @media screen and (max-width: 749px) {
   .uly-drawer__localization {
     display: block !important;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .uly-drawer__localization {
+    display: none !important;
   }
 }
 
@@ -476,7 +527,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 32px;
+  padding: 18px 24px;
   cursor: pointer;
   list-style: none;
   text-decoration: none;
@@ -490,7 +541,7 @@
 
 .uly-drawer__locale-label {
   font-family: var(--primary-font, sans-serif);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -505,7 +556,7 @@
   font-size: 14px;
   font-weight: 600;
   color: var(--color-foreground);
-  transition: color 0.3s ease;
+  transition: color 0.25s ease;
 }
 
 .uly-drawer__locale-trigger:hover .uly-drawer__locale-value {
@@ -528,33 +579,41 @@
   rotate: 90deg;
 }
 
-/* Account link in utility - 14px font size with hover */
+/* Account link in drawer */
 .menu-drawer__account {
   display: flex;
   align-items: center;
   gap: var(--gap-sm, 0.5rem);
-  padding: 1rem 2rem;
+  padding: 1rem 1.5rem;
   text-decoration: none;
   color: var(--color-foreground);
   font-family: var(--primary-font, sans-serif);
-  font-size: 14px; /* FIXED: 14px as requested */
+  font-size: 14px !important;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   border-top: 1px solid rgba(var(--color-foreground-rgb), 0.08);
   transition: color 0.2s ease;
 }
 .menu-drawer__account:hover {
-  color: var(--secondary-accent, #E8612C);
+  color: var(--secondary-accent, #E8612C) !important;
+}
+
+/* Desktop-links inside drawer: shown on mobile, hidden on desktop */
+.menu-drawer__menu--desktop-links {
+  display: block;
+}
+@media screen and (min-width: 750px) {
+  .menu-drawer__menu--desktop-links {
+    display: none !important;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════
-   11. MOBILE HEADER LAYOUT - FIXED
-   Layout: [☰ 🔍] [LOGO] [🌐 👤 🛒]
+   12. MOBILE HEADER LAYOUT
    ══════════════════════════════════════════════════════════════ */
 @media screen and (max-width: 749px) {
 
-  /* Inner: flex row, space-between */
   .uly-header__inner {
     display: flex !important;
     flex-direction: row;
@@ -566,13 +625,11 @@
     position: relative;
   }
 
-  /* Columns: flex (not contents) */
   .uly-header__col {
     display: flex;
     align-items: center;
   }
 
-  /* LEFT: hamburger + search */
   .uly-header__col--left {
     flex: 0 0 auto;
     gap: 2px;
@@ -595,11 +652,7 @@
   .uly-header__col--center .uly-logo {
     pointer-events: all;
   }
-  .uly-logo__img {
-    max-width: 110px;
-  }
 
-  /* RIGHT: localization + account + cart */
   .uly-header__col--right {
     flex: 0 0 auto;
     gap: 2px;
@@ -608,34 +661,16 @@
     z-index: 1;
   }
 
-  /* HIDE localization in header on mobile - moved to drawer bottom */
+  /* Hide localization in header on mobile — moved to drawer bottom */
   .uly-header__col--right .uly-localization {
     display: none !important;
   }
-
-  /* Show search icon on mobile (in left col alongside hamburger) */
-  .uly-header__col--left .search-action {
-    display: flex !important;
-  }
-
-  /* Desktop-menu block in drawer: show on mobile, hide on desktop */
-  .menu-drawer__menu--desktop-links {
-    display: block;
-  }
 }
 
-/* On desktop: hide the desktop-links block inside drawer (visible inline) */
+/* ══════════════════════════════════════════════════════════════
+   13. DESKTOP: localization visible in header, not in drawer
+   ══════════════════════════════════════════════════════════════ */
 @media screen and (min-width: 750px) {
-  .menu-drawer__menu--desktop-links {
-    display: none !important;
-  }
-  
-  /* Hide localization in sidebar on desktop - it's in the header */
-  .uly-drawer__localization {
-    display: none !important;
-  }
-  
-  /* SHOW localization in header on desktop only */
   .uly-header__col--right .uly-localization {
     display: flex !important;
   }

@@ -298,8 +298,7 @@
 
 {% stylesheet %}
   /* ============================================================
-     ULY CUSTOM HEADER — Base structural styles
-     All design tokens sourced from global-variables.css
+     ULY CUSTOM HEADER — Admin Editor styles (mirrors custom-header.css)
   ============================================================ */
 
   body {
@@ -310,14 +309,11 @@
 
   .uly-header {
     --header-padding: 0 var(--padding-lg);
-    --header-content-transition-timing: 0s;
-
     display: block;
     background: transparent;
     font-family: var(--primary-font, sans-serif);
   }
 
-  /* ── Sticky ── */
   .header-section:has(> #header-component[sticky='always']),
   .header-section:has(> #header-component[sticky='scroll-up'][data-sticky-state='active']) {
     position: sticky;
@@ -325,43 +321,23 @@
     z-index: var(--layer-sticky);
   }
 
-  .uly-header[data-sticky-state] {
-    transition: opacity var(--animation-speed) var(--animation-easing);
-    opacity: 1;
-  }
-
-  .uly-header[data-sticky-state='idle'] {
-    opacity: 0;
-  }
-
-  /* ── Underlays (background) ── */
   .uly-header__underlay {
     position: absolute;
     inset: 0;
     pointer-events: none;
   }
-
   .uly-header__underlay--closed {
     height: 100%;
     z-index: var(--layer-lowest);
-    /* Use the color scheme's background directly — updates when scheme changes */
     background: var(--color-background);
-    transition: height var(--animation-speed-slow) var(--ease-out-cubic);
   }
-
   .uly-header__underlay--open {
     height: var(--full-open-header-height, 0px);
     background: var(--color-background);
-    transition: height var(--submenu-animation-speed, 0.3s) var(--ease-out-cubic);
   }
 
-  /* ── Row ── */
-  .uly-header__row {
-    position: relative;
-    background-color: transparent; /* Background comes from the underlay + color scheme class */
-  }
+  .uly-header__row { position: relative; background-color: transparent; }
 
-  /* ── Inner grid — 1fr auto 1fr gives true centered logo on desktop ── */
   .uly-header__inner {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -372,83 +348,29 @@
     gap: var(--gap-md, 1rem);
   }
 
-  /* ── Columns ── */
-  .uly-header__col {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-sm, 0.5rem);
-  }
+  .uly-header__col { display: flex; align-items: center; gap: var(--gap-sm, 0.5rem); }
+  .uly-header__col--left  { grid-area: left; }
+  .uly-header__col--center { grid-area: center; justify-content: center; }
+  .uly-header__col--right  { grid-area: right; justify-content: flex-end; }
 
-  .uly-header__col--left {
-    grid-area: left;
-  }
-  .uly-header__col--center {
-    grid-area: center;
-    justify-content: center;
-  }
-  .uly-header__col--right {
-    grid-area: right;
-    justify-content: flex-end;
-  }
-
-  /* ── Localization button (Avera style) ── */
-  .uly-localization .dropdown-localization__button {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-family: var(--primary-font, sans-serif);
-    font-size: 0.875rem;
-    font-weight: 500;
-    padding-inline: var(--padding-2xs);
-    background: transparent !important;
-    border-color: transparent !important;
-    box-shadow: none !important;
-    cursor: pointer;
-    color: var(--color-foreground);
-    letter-spacing: 0.02em;
-    transition: opacity 0.2s ease;
-  }
-
-  .uly-localization .dropdown-localization__button:hover {
-    opacity: 0.75;
-  }
-
-  .uly-localization .icon-flag {
-    width: 18px;
-    height: 18px;
-    clip-path: circle(50%);
-    background-position: center;
-    background-size: cover;
-    margin-inline-end: 2px;
-    position: relative;
-    flex-shrink: 0;
-  }
-
-  .uly-localization .icon-caret {
-    width: 10px;
-    height: 10px;
-    flex-shrink: 0;
-    transition: transform 0.2s ease;
-  }
-
-  .uly-localization .dropdown-localization__button[aria-expanded='true'] .icon-caret svg {
-    transform: rotate(180deg);
-  }
-
-  /* ── Logo ── */
+  /* LOGO — contained within header height */
   .uly-logo {
     display: flex;
     align-items: center;
     text-decoration: none;
     color: var(--color-foreground);
+    max-height: calc(var(--header-height, 64px) - 12px);
+    transition: opacity 0.2s ease;
   }
-
+  .uly-logo:hover { opacity: 0.8; }
   .uly-logo__img {
-    height: auto;
-    max-width: var(--logo-max-width, 160px);
     display: block;
+    width: auto;
+    height: 100%;
+    max-width: var(--logo-max-width, 120px);
+    max-height: calc(var(--header-height, 64px) - 12px);
+    object-fit: contain;
   }
-
   .uly-logo__text {
     font-family: var(--primary-font, sans-serif);
     font-size: 1.35rem;
@@ -458,41 +380,118 @@
     white-space: nowrap;
   }
 
-  /* ── Action icons (search/cart) ── */
+  /* Desktop menu — 14px + secondary-accent hover */
+  .uly-header__inline-menu { display: flex; }
+  .uly-list-menu { display: flex; gap: var(--gap-lg, 1.5rem); list-style: none; margin: 0; padding: 0; }
+  .uly-list-menu__item {
+    color: var(--color-foreground);
+    text-decoration: none;
+    font-family: var(--primary-font, sans-serif);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 4px 0;
+    display: block;
+    position: relative;
+    transition: color 0.3s ease;
+  }
+  .uly-list-menu__item::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 0; height: 2px;
+    background: var(--secondary-accent, #E8612C);
+    transition: width 0.3s ease;
+  }
+  .uly-list-menu__item:hover,
+  .uly-list-menu__item--active { color: var(--secondary-accent, #E8612C); }
+  .uly-list-menu__item:hover::after,
+  .uly-list-menu__item--active::after { width: 100%; }
+
+  /* Localization — anchored dropdown panel */
+  dropdown-localization-component.uly-localization {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  .uly-localization .dropdown-localization__button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--primary-font, sans-serif);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    background: transparent !important;
+    border: 1.5px solid var(--primary-accent, #0E5C66) !important;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--primary-accent, #0E5C66);
+    white-space: nowrap;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+  .uly-localization .dropdown-localization__button:hover {
+    background: var(--primary-accent, #0E5C66) !important;
+    color: #fff !important;
+  }
+  .uly-localization .localization-wrapper {
+    position: absolute !important;
+    top: calc(100% + 6px) !important;
+    right: 0 !important;
+    left: auto !important;
+    width: 260px !important;
+    max-height: 360px !important;
+    overflow-y: auto !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(var(--color-foreground-rgb), 0.10) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+    background-color: var(--color-background) !important;
+    z-index: 9999 !important;
+  }
+  .uly-localization .icon-flag { width: 18px; height: 18px; clip-path: circle(50%); background-size: cover; flex-shrink: 0; }
+  .uly-localization .icon-caret { width: 10px; height: 10px; flex-shrink: 0; transition: transform 0.2s ease; }
+  .uly-localization .dropdown-localization__button[aria-expanded='true'] .icon-caret svg { transform: rotate(180deg); }
+
+  /* Action icons */
   .uly-header__col--right .header-actions__action {
     color: var(--color-foreground);
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.2s ease;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 0.2s ease;
   }
+  .uly-header__col--right .header-actions__action:hover { color: var(--secondary-accent, #E8612C); }
 
-  .uly-header__col--right .header-actions__action:hover {
-    opacity: 0.7;
-  }
-
-  /* ── Hamburger button ── */
   .uly-header__col--left .menu-drawer-container .header__icon--summary {
     color: var(--color-foreground);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: flex; justify-content: center; align-items: center;
     padding: var(--padding-sm, 0.5rem);
     cursor: pointer;
   }
 
-  /* ── Force drawer style on all screen sizes (header.js sets data-menu-style) ── */
   #header-component .header-menu,
-  #header-component header-menu {
-    display: flex !important;
-  }
+  #header-component header-menu { display: flex !important; }
 
-  /* ── Mobile height (layout handled by custom-header.css) ── */
   @media screen and (max-width: 749px) {
-    body {
-      --header-height: 56px;
+    body { --header-height: 56px; }
+    .uly-header__inner {
+      display: flex !important;
+      flex-direction: row; align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem; position: relative;
     }
+    .uly-header__col--center {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      pointer-events: none; z-index: 0;
+    }
+    .uly-header__col--center .uly-logo { pointer-events: all; }
+    .uly-header__col--right .uly-localization { display: none !important; }
+    .uly-header__col--left .uly-header__inline-menu { display: none !important; }
+  }
+  @media screen and (min-width: 750px) {
+    .uly-header__col--right .uly-localization { display: flex !important; }
   }
 {% endstylesheet %}
 
