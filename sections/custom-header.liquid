@@ -29,6 +29,16 @@
   endif
 %}
 
+{% if sticky %}
+  <style>
+    #shopify-section-{{ section.id }} {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+  </style>
+{% endif %}
+
 {%- comment -%} ── Logo ── {%- endcomment -%}
 {% capture logo %}
   <a href="{{ routes.root_url }}" class="uly-logo" aria-label="{{ shop.name }}">
@@ -62,7 +72,7 @@
   <div class="uly-header-actions-wrapper{% if section.settings.show_account == false %} hide-account{% endif %}{% if section.settings.show_cart == false %} hide-cart{% endif %}">
     {% render 'header-actions',
       section: section,
-      customer_account_menu: section.settings.customer_account_menu,
+      customer_account_menu: section.settings.customer_account_menu.handle,
       display_style: section.settings.actions_display_style
     %}
   </div>
@@ -236,13 +246,50 @@
   </div>
 </header-component>
 
-{%- comment -%} ── Force sidebar mode on ALL devices (override theme.liquid inline script) ── {%- endcomment -%}
+{%- comment -%} ── Header controller: drawer mode + scroll-based transparency ── {%- endcomment -%}
 <script>
-  (function overrideMenuStyle() {
-    const header = document.querySelector('#header-component');
-    if (header) {
-      header.dataset.menuStyle = 'drawer';
+  (function () {
+    'use strict';
+
+    var header = document.getElementById('header-component');
+    if (!header) return;
+
+    // 1. Always force drawer / sidebar mode regardless of Shopify's detection
+    header.dataset.menuStyle = 'drawer';
+
+    // 2. Scroll-based transparent header logic
+    //    We use data-scrolled (our attribute) because Shopify's header.js sets
+    //    data-sticky-state="active" immediately on load for sticky="always",
+    //    which would always suppress the transparent state before the user scrolls.
+    var isTransparent = header.classList.contains('uly-header--transparent');
+    var THRESHOLD = 20; // px from top before switching to solid/glassmorphism
+
+    function onScroll() {
+      if (window.scrollY > THRESHOLD) {
+        header.setAttribute('data-scrolled', 'true');
+      } else {
+        header.removeAttribute('data-scrolled');
+      }
     }
+
+    if (isTransparent) {
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll(); // Set correct initial state without waiting for a scroll event
+    }
+
+    // 3. Shopify Theme Editor live-reload: re-run when section is updated
+    document.addEventListener('shopify:section:load', function (e) {
+      if (e.detail && e.detail.sectionId === '{{ section.id }}') {
+        var h = document.getElementById('header-component');
+        if (h) {
+          h.dataset.menuStyle = 'drawer';
+          if (h.classList.contains('uly-header--transparent')) {
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+          }
+        }
+      }
+    });
   })();
 </script>
 
@@ -266,7 +313,6 @@
     --header-content-transition-timing: 0s;
 
     display: block;
-    contain: layout style;
     background: transparent;
     font-family: var(--primary-font, sans-serif);
   }
@@ -502,16 +548,7 @@
       "label": "Desktop Horizontal Menu",
       "info": "This menu appears horizontally on desktop devices."
     },
-    {
-      "type": "header",
-      "content": "Customer Account"
-    },
-    {
-      "type": "link_list",
-      "id": "customer_account_menu",
-      "label": "Account menu",
-      "default": "customer-account-main-menu"
-    },
+
     {
       "type": "header",
       "content": "Icons"

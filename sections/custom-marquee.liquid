@@ -1,0 +1,270 @@
+{% comment %}
+  Marquee Section
+  Scrolling text banner for announcements and promotions
+{% endcomment %}
+
+<style>
+  /* Marquee Section Styles */
+
+  .marquee-wrapper {
+    overflow: hidden;
+    position: relative;
+  }
+
+  .marquee-container {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    animation: marquee-scroll 30s linear infinite;
+    will-change: transform;
+  }
+
+  .marquee-container:hover {
+    animation-play-state: paused;
+  }
+
+  .marquee-item {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .marquee-text {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    font-family: var(--primary-font);
+    color: inherit;
+    padding: 0 24px;
+  }
+
+  .marquee-separator {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    opacity: 0.5;
+    flex-shrink: 0;
+  }
+
+  /* Animation */
+  @keyframes marquee-scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* Pause on hover */
+  .marquee-wrapper:hover .marquee-container {
+    animation-play-state: paused;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 767px) {
+    .marquee-text {
+      font-size: 14px;
+      padding: 0 16px;
+    }
+
+    .marquee-separator {
+      width: 5px;
+      height: 5px;
+    }
+  }
+
+  /* Accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-container {
+      animation: none;
+    }
+  }
+
+  /* Section Styling */
+  #marquee-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    background-color: {{ section.settings.background_color | default: '#0E5C66' }};
+    color: {{ section.settings.text_color | default: '#FFFFFF' }};
+  }
+
+  #marquee-{{ section.id }} .marquee-separator {
+    background-color: {{ section.settings.separator_color | default: '#FFFFFF' }};
+  }
+
+  #marquee-{{ section.id }} .marquee-container {
+    animation-duration: {{ section.settings.scroll_speed }}s;
+  }
+
+  @media (max-width: 767px) {
+    #marquee-{{ section.id }} .marquee-container {
+      animation-duration: {{ section.settings.mobile_scroll_speed }}s;
+    }
+  }
+</style>
+
+<div class="marquee-wrapper" id="marquee-{{ section.id }}">
+  <div class="marquee-container" aria-label="Scrolling announcements">
+    {% comment %} First set of items {% endcomment %}
+    {% for block in section.blocks %}
+      <div class="marquee-item" {{ block.shopify_attributes }}>
+        <span class="marquee-text">{{ block.settings.text }}</span>
+      </div>
+      {% unless forloop.last %}
+        <div class="marquee-item">
+          <span class="marquee-separator" aria-hidden="true"></span>
+        </div>
+      {% endunless %}
+    {% endfor %}
+
+    {% comment %} Duplicate for seamless loop {% endcomment %}
+    {% for block in section.blocks %}
+      <div class="marquee-item">
+        <span class="marquee-separator" aria-hidden="true"></span>
+      </div>
+      <div class="marquee-item">
+        <span class="marquee-text">{{ block.settings.text }}</span>
+      </div>
+    {% endfor %}
+
+    {% comment %} Final separator for seamless connection {% endcomment %}
+    <div class="marquee-item">
+      <span class="marquee-separator" aria-hidden="true"></span>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Marquee",
+  "tag": "section",
+  "class": "section-marquee",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#0E5C66"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "separator_color",
+      "label": "Separator Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Animation"
+    },
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "s",
+      "label": "Scroll Speed (Desktop)",
+      "default": 30,
+      "info": "Lower is faster"
+    },
+    {
+      "type": "range",
+      "id": "mobile_scroll_speed",
+      "min": 5,
+      "max": 40,
+      "step": 5,
+      "unit": "s",
+      "label": "Scroll Speed (Mobile)",
+      "default": 15,
+      "info": "Lower is faster. Recommended: 15s for mobile"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 16
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Marquee Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Free shipping on orders over $75"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marquee",
+      "blocks": [
+        {
+          "type": "text",
+          "settings": {
+            "text": "Free shipping on orders over $75"
+          }
+        },
+        {
+          "type": "text",
+          "settings": {
+            "text": "Print-on-demand, made to order"
+          }
+        },
+        {
+          "type": "text",
+          "settings": {
+            "text": "Original artwork you won't find anywhere else"
+          }
+        },
+        {
+          "type": "text",
+          "settings": {
+            "text": "30-day hassle-free returns"
+          }
+        },
+        {
+          "type": "text",
+          "settings": {
+            "text": "Sustainable cotton prints"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

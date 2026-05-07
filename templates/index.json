@@ -89,23 +89,209 @@
         "padding-block-end": 72
       }
     },
-    "marquee": {
-      "type": "marquee",
-      "settings": {}
+    "custom-marquee": {
+      "type": "custom-marquee",
+      "blocks": {
+        "text_W3nVHa": {
+          "type": "text",
+          "settings": {
+            "text": "Free shipping on orders over $75"
+          }
+        },
+        "text_d3mU78": {
+          "type": "text",
+          "settings": {
+            "text": "Free shipping on orders over $75"
+          }
+        },
+        "text_rFTATW": {
+          "type": "text",
+          "settings": {
+            "text": "Free shipping on orders over $75"
+          }
+        },
+        "text_4H6Hkh": {
+          "type": "text",
+          "settings": {
+            "text": "Free shipping on orders over $75"
+          }
+        }
+      },
+      "block_order": [
+        "text_W3nVHa",
+        "text_d3mU78",
+        "text_rFTATW",
+        "text_4H6Hkh"
+      ],
+      "settings": {
+        "background_color": "#0e5c66",
+        "text_color": "#ffffff",
+        "separator_color": "#ffffff",
+        "scroll_speed": 10,
+        "mobile_scroll_speed": 5,
+        "padding_top": 16,
+        "padding_bottom": 16
+      }
     },
     "collection-grid": {
       "type": "feature-collection",
-      "settings": {}
+      "blocks": {
+        "collection_RGUtKw": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "custom_title": "",
+            "show_product_count": true
+          }
+        },
+        "collection_w6mVRc": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "custom_title": "",
+            "show_product_count": true
+          }
+        },
+        "collection_FRBwUK": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "custom_title": "",
+            "show_product_count": true
+          }
+        },
+        "collection_RjrMpD": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "custom_title": "",
+            "show_product_count": true
+          }
+        }
+      },
+      "block_order": [
+        "collection_RGUtKw",
+        "collection_w6mVRc",
+        "collection_FRBwUK",
+        "collection_RjrMpD"
+      ],
+      "settings": {
+        "eyebrow_text": "SHOP BY",
+        "heading": "One-liner collections",
+        "subheading": "Each collection tells a story. Pick the one that sounds the most like you.",
+        "grid_layout": "featured",
+        "grid_gap": 8,
+        "border_radius": 0,
+        "columns_desktop": 3,
+        "columns_tablet": 2,
+        "columns_mobile": "2",
+        "show_cta": true,
+        "cta_text": "Shop collection",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
     },
     "feature-products": {
       "type": "feature-products",
       "settings": {}
+    },
+    "banner-sec": {
+      "type": "banner-sec",
+      "settings": {
+        "image": "shopify://shop_images/banner.jpg",
+        "overlay_opacity": 85,
+        "badge_text": "LIMITED DROP",
+        "heading": "Made for the moments that make you, you.",
+        "description": "Custom prints, sustainable cotton, and designs that don't take themselves too seriously.",
+        "button_text": "Shop the drop",
+        "button_link": "",
+        "badge_color": "#e8612c",
+        "button_background": "#ffffff",
+        "button_text_color": "#000000",
+        "banner_height": 500,
+        "mobile_height": 400,
+        "border_radius": 0,
+        "padding_top": 60,
+        "padding_bottom": 60
+      }
+    },
+    "feature-badges": {
+      "type": "feature-badges",
+      "blocks": {
+        "badge_EB8pPx": {
+          "type": "badge",
+          "settings": {
+            "icon": "shipping",
+            "title": "Free US shipping",
+            "description": "On all orders over $75"
+          }
+        },
+        "badge_ARUi6f": {
+          "type": "badge",
+          "settings": {
+            "icon": "print",
+            "title": "Print-on-demand",
+            "description": "Made to order, less waste"
+          }
+        },
+        "badge_PJTEAn": {
+          "type": "badge",
+          "settings": {
+            "icon": "star",
+            "title": "Original artwork",
+            "description": "Designs you won't see anywhere else"
+          }
+        },
+        "badge_BUKqdH": {
+          "type": "badge",
+          "settings": {
+            "icon": "shield",
+            "title": "Easy returns",
+            "description": "30-day hassle-free returns"
+          }
+        }
+      },
+      "block_order": [
+        "badge_EB8pPx",
+        "badge_ARUi6f",
+        "badge_PJTEAn",
+        "badge_BUKqdH"
+      ],
+      "settings": {
+        "columns_desktop": 4,
+        "columns_tablet": 2,
+        "grid_gap": 32,
+        "show_borders": true,
+        "background_color": "",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "badge_text": "JOIN THE CLUB",
+        "heading": "Get 10% off your first order.",
+        "description": "Drop your email for early access to new collections and exclusive print drops.",
+        "placeholder": "you@example.com",
+        "button_text": "Subscribe",
+        "success_message": "Thanks for subscribing! Check your email for your discount code.",
+        "background_color": "#0e5c66",
+        "badge_color": "#e8612c",
+        "button_color": "#e8612c",
+        "border_radius": 0,
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
     }
   },
   "order": [
     "hero-banner",
-    "marquee",
+    "custom-marquee",
     "collection-grid",
-    "feature-products"
+    "feature-products",
+    "banner-sec",
+    "feature-badges",
+    "newsletter"
   ]
 }

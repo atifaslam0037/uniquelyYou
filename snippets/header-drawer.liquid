@@ -72,14 +72,7 @@
     >
       {%- comment -%} ── Avera-style drawer header: logo + close ── {%- endcomment -%}
       <div class="uly-drawer__header">
-        {%- assign _drawer_logo = section.settings.logo_image | default: settings.logo -%}
-        <a href="{{ routes.root_url }}" class="uly-drawer__logo-link" aria-label="{{ shop.name }}" on:click="/close">
-          {%- if _drawer_logo -%}
-            {{- _drawer_logo | image_url: width: 200 | image_tag: class: 'uly-drawer__logo-img', alt: shop.name, loading: 'lazy' -}}
-          {%- else -%}
-            <span class="uly-drawer__logo-text">{{ shop.name }}</span>
-          {%- endif -%}
-        </a>
+        <div class="uly-drawer__logo-text">Menu</div>
         <button
           class="button button-unstyled uly-drawer__close"
           type="button"
@@ -609,7 +602,7 @@
             assign show_country = false
           endif
         %}
-        {% if data_header_drawer_type == 'mobile-drawer' and show_country or show_language %}
+        {% if data_header_drawer_type == 'mobile-drawer' and (show_country or show_language) %}
           {% liquid
             assign background_brightness = block.settings.color_scheme.settings.background | color_brightness
             if background_brightness < 64
