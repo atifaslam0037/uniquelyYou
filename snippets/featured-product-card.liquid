@@ -1,0 +1,367 @@
+{% comment %}
+  Featured Product Card - Native Theme Component
+  Uses theme's add-to-cart-button component for consistency
+  Optimized hover effects with second image
+{% endcomment %}
+
+{% liquid
+  assign onboarding = false
+  if product == blank or product.id == empty
+    assign onboarding = true
+    assign product_title = 'Product Title'
+    assign product_url = '#'
+    assign product_vendor = 'Vendor'
+    assign product_price = 1999
+    assign product_compare_price = blank
+    assign product_available = true
+  else
+    assign variant = product.selected_or_first_available_variant
+    assign product_title = product.title
+    assign product_url = product.url
+    assign product_vendor = product.vendor
+    assign product_price = variant.price
+    assign product_compare_price = variant.compare_at_price
+    assign product_available = product.available
+  endif
+
+  assign has_compare_price = false
+  if product_compare_price > product_price
+    assign has_compare_price = true
+  endif
+
+  assign featured_media = product.featured_media
+  assign second_media = product.media[1]
+
+  # Determine aspect ratio class
+  case image_ratio
+    when 'square'
+      assign aspect_ratio_class = 'aspect-ratio--square'
+    when 'portrait'
+      assign aspect_ratio_class = 'aspect-ratio--portrait'
+    when 'landscape'
+      assign aspect_ratio_class = 'aspect-ratio--landscape'
+    else
+      assign aspect_ratio_class = 'aspect-ratio--adapt'
+  endcase
+%}
+
+<div class="featured-product-card" data-product-id="{{ product.id }}">
+  {% comment %} Product Link Overlay {% endcomment %}
+  <a href="{{ product_url }}" class="featured-product-card__link" aria-label="{{ product_title }}"></a>
+
+  {% comment %} Product Media {% endcomment %}
+  <div class="featured-product-card__media {{ aspect_ratio_class }}">
+    {% if has_compare_price %}
+      <span class="featured-product-card__badge">Sale</span>
+    {% endif %}
+
+    <div class="featured-product-card__images">
+      {% if onboarding %}
+        <div class="featured-product-card__placeholder">
+          {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        </div>
+      {% else %}
+        {% if featured_media %}
+          {{
+            featured_media
+            | image_url: width: 900
+            | image_tag:
+              loading: 'lazy',
+              sizes: '(min-width: 1200px) 300px, (min-width: 768px) 45vw, 90vw',
+              widths: '300, 600, 900',
+              class: 'featured-product-card__img featured-product-card__img--primary'
+          }}
+        {% endif %}
+
+        {% if second_media %}
+          {{
+            second_media
+            | image_url: width: 900
+            | image_tag:
+              loading: 'lazy',
+              sizes: '(min-width: 1200px) 300px, (min-width: 768px) 45vw, 90vw',
+              widths: '300, 600, 900',
+              class: 'featured-product-card__img featured-product-card__img--secondary'
+          }}
+        {% endif %}
+      {% endif %}
+    </div>
+
+    {% comment %} Quick Add Button - Using Native Component {% endcomment %}
+    {% if show_quick_add and product_available and onboarding == false %}
+      <div class="featured-product-card__quick-add-wrapper">
+        <product-form class="product-form" data-hide-errors>
+          <form
+            method="post"
+            action="/cart/add"
+            accept-charset="UTF-8"
+            enctype="multipart/form-data"
+            data-productid="{{ product.id }}"
+          >
+            <input type="hidden" name="id" value="{{ variant.id }}">
+            
+            {% render 'add-to-cart-button',
+              can_add_to_cart: product_available,
+              add_to_cart_text: 'Quick Add',
+              product: product,
+              class: 'button--solid featured-product-card__quick-add-btn',
+              icon_only_on_mobile: false
+            %}
+          </form>
+        </product-form>
+      </div>
+    {% endif %}
+  </div>
+
+  {% comment %} Product Info {% endcomment %}
+  <div class="featured-product-card__info">
+    {% if show_vendor and product_vendor != blank %}
+      <span class="featured-product-card__vendor">{{ product_vendor }}</span>
+    {% endif %}
+
+    <h3 class="featured-product-card__title">
+      <a href="{{ product_url }}">{{ product_title }}</a>
+    </h3>
+
+    <div class="featured-product-card__price">
+      {% if has_compare_price %}
+        <span class="featured-product-card__price--compare">{{ product_compare_price | money }}</span>
+      {% endif %}
+      <span class="featured-product-card__price--current">{{ product_price | money }}</span>
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .featured-product-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-background);
+    font-family: var(--primary-font, 'Geist', sans-serif);
+    height: 100%;
+  }
+
+  .featured-product-card__link {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+  }
+
+  .featured-product-card__media {
+    position: relative;
+    overflow: hidden;
+    background: var(--background-soft, #FFE8DD);
+    margin-bottom: 12px;
+    border-radius: 8px;
+  }
+
+  /* Aspect Ratios */
+  .aspect-ratio--adapt {
+    aspect-ratio: auto;
+  }
+  .aspect-ratio--square {
+    aspect-ratio: 1 / 1;
+  }
+  .aspect-ratio--portrait {
+    aspect-ratio: 3 / 4;
+  }
+  .aspect-ratio--landscape {
+    aspect-ratio: 4 / 3;
+  }
+
+  .featured-product-card__badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--primary-accent, #0E5C66);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 4px;
+    z-index: 3;
+  }
+
+  .featured-product-card__images {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .featured-product-card__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+  }
+
+  .featured-product-card__placeholder svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.2;
+  }
+
+  .featured-product-card__img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .featured-product-card__img--secondary {
+    opacity: 0;
+  }
+
+  .featured-product-card:hover .featured-product-card__img--secondary {
+    opacity: 1;
+  }
+
+  .featured-product-card:hover .featured-product-card__img--primary {
+    transform: scale(1.03);
+  }
+
+  /* Quick Add Wrapper */
+  .featured-product-card__quick-add-wrapper {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    z-index: 2;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .featured-product-card:hover .featured-product-card__quick-add-wrapper {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .featured-product-card__quick-add-wrapper .product-form {
+    width: 100%;
+  }
+
+  .featured-product-card__quick-add-wrapper form {
+    width: 100%;
+  }
+
+  .featured-product-card__quick-add-btn {
+    width: 100%;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+  }
+
+  .featured-product-card__quick-add-btn:hover {
+    background: var(--primary-accent, #0E5C66);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Product Info */
+  .featured-product-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0;
+  }
+
+  .featured-product-card__vendor {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--primary-accent, #0E5C66);
+    margin-bottom: 2px;
+  }
+
+  .featured-product-card__title {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-foreground);
+    margin: 0;
+  }
+
+  .featured-product-card__title a {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.2s ease;
+  }
+
+  .featured-product-card__title a:hover {
+    color: var(--secondary-accent, #E8612C);
+  }
+
+  .featured-product-card__price {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-foreground);
+    margin-top: 4px;
+  }
+
+  .featured-product-card__price--compare {
+    text-decoration: line-through;
+    color: rgba(var(--color-foreground-rgb), 0.6);
+    margin-right: 8px;
+    font-size: 14px;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 749px) {
+    .featured-product-card__media {
+      margin-bottom: 10px;
+    }
+
+    .featured-product-card__quick-add-wrapper {
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+    }
+
+    .featured-product-card__quick-add-btn {
+      padding: 10px 20px;
+      font-size: 13px;
+    }
+
+    .featured-product-card__title {
+      font-size: 14px;
+    }
+
+    .featured-product-card__price {
+      font-size: 14px;
+    }
+
+    /* Always show quick add on mobile (no hover) */
+    .featured-product-card__quick-add-wrapper {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+  }
+
+  /* Reduced Motion */
+  @media (prefers-reduced-motion: reduce) {
+    .featured-product-card__img,
+    .featured-product-card__quick-add-wrapper,
+    .featured-product-card__quick-add-btn {
+      transition: none;
+    }
+  }
+{% endstylesheet %}

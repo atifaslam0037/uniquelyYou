@@ -1,0 +1,399 @@
+{% comment %}
+  Featured Products Section - Optimized with Native Theme Components
+  Uses product-list structure with add-to-cart-button component
+  Supports Grid and Carousel layouts
+{% endcomment %}
+
+{% liquid
+  assign max_items = section.settings.max_products
+  assign collection = collections[section.settings.collection]
+%}
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<div
+  data-testid="featured-products"
+  class="
+    section
+    section--{{ section.settings.section_width }}
+    color-{{ section.settings.color_scheme }}
+    section-resource-list
+    spacing-style
+    gap-style
+  "
+  style="
+    {% render 'spacing-style', settings: section.settings %}
+    {% render 'gap-style', value: section.settings.gap %}
+  "
+>
+  {% comment %} Header {% endcomment %}
+  <div class="section-resource-list__header">
+    <div class="layout-panel-flex" style="justify-content: space-between; align-items: flex-end; width: 100%;">
+      {% if section.settings.heading != blank %}
+        <h2 class="featured-products__heading">{{ section.settings.heading }}</h2>
+      {% endif %}
+      
+      {% if section.settings.show_view_all and collection != blank %}
+        <a href="{{ collection.url }}" class="button button--link">
+          {{ 'sections.featured_collection.view_all' | t }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% comment %} Product List {% endcomment %}
+  {% capture list_items %}
+    {% if collection != blank and collection.products_count > 0 %}
+      {% for product in collection.products limit: max_items %}
+        <div class="resource-list__item">
+          {% render 'featured-product-card-native',
+            product: product,
+            layout_type: section.settings.layout_type,
+            show_vendor: section.settings.show_vendor,
+            show_quick_add: section.settings.show_quick_add,
+            image_ratio: section.settings.image_ratio
+          %}
+        </div>
+
+        {% unless forloop.last %}
+          <!--@list/split-->
+        {% endunless %}
+      {% endfor %}
+    {% else %}
+      {% comment %} Placeholder products {% endcomment %}
+      {% for i in (1..max_items) %}
+        <div class="resource-list__item">
+          {% render 'featured-product-card-native',
+            product: blank,
+            layout_type: section.settings.layout_type,
+            show_vendor: section.settings.show_vendor,
+            show_quick_add: section.settings.show_quick_add,
+            image_ratio: section.settings.image_ratio
+          %}
+        </div>
+
+        {% unless forloop.last %}
+          <!--@list/split-->
+        {% endunless %}
+      {% endfor %}
+    {% endif %}
+  {% endcapture %}
+
+  {% liquid
+    assign list_items_array = list_items | strip | split: '<!--@list/split-->'
+  %}
+
+  {% render 'resource-list',
+    list_items: list_items,
+    list_items_array: list_items_array,
+    settings: section.settings,
+    slide_count: max_items,
+    content_type: 'products',
+    test_id: 'featured-products-list'
+  %}
+</div>
+
+{% schema %}
+{
+  "name": "Featured Products",
+  "tag": "section",
+  "class": "section-featured-products",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Featured Products"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "max_products",
+      "label": "Maximum products to show",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View all' button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Enable quick add button",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "layout_type",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grid"
+        },
+        {
+          "value": "carousel",
+          "label": "Carousel"
+        }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns (desktop)",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4,
+      "info": "For grid and carousel layouts"
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "Columns (mobile)",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "checkbox",
+      "id": "carousel_on_mobile",
+      "label": "Enable carousel on mobile",
+      "default": false,
+      "info": "Only applies when layout is Grid"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Image ratio",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "Adapt to image"
+        },
+        {
+          "value": "square",
+          "label": "1:1"
+        },
+        {
+          "value": "portrait",
+          "label": "2:3"
+        },
+        {
+          "value": "landscape",
+          "label": "3:2"
+        }
+      ],
+      "default": "portrait"
+    },
+    {
+      "type": "range",
+      "id": "columns_gap",
+      "label": "Gap between products",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "rows_gap",
+      "label": "Gap between rows",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Carousel Settings",
+      "info": "Only applies when layout is Carousel"
+    },
+    {
+      "type": "select",
+      "id": "icons_style",
+      "label": "Navigation arrows",
+      "options": [
+        {
+          "value": "arrow",
+          "label": "Arrows"
+        },
+        {
+          "value": "chevron",
+          "label": "Chevrons"
+        },
+        {
+          "value": "arrows_large",
+          "label": "Large arrows"
+        },
+        {
+          "value": "chevron_large",
+          "label": "Large chevrons"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ],
+      "default": "arrow"
+    },
+    {
+      "type": "select",
+      "id": "icons_shape",
+      "label": "Arrow background",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "circle",
+          "label": "Circle"
+        },
+        {
+          "value": "square",
+          "label": "Square"
+        }
+      ],
+      "default": "circle"
+    },
+    {
+      "type": "select",
+      "id": "mobile_card_size",
+      "label": "Mobile card size",
+      "options": [
+        {
+          "value": "60cqw",
+          "label": "Large"
+        },
+        {
+          "value": "44cqw",
+          "label": "Medium"
+        }
+      ],
+      "default": "60cqw"
+    },
+    {
+      "type": "header",
+      "content": "Section Design"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "Page width"
+        },
+        {
+          "value": "full-width",
+          "label": "Full width"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Content gap",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Section Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Padding top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Products",
+      "settings": {
+        "heading": "Featured Products",
+        "max_products": 8,
+        "layout_type": "grid",
+        "columns": 4,
+        "mobile_columns": "2",
+        "show_vendor": false,
+        "show_view_all": true,
+        "show_quick_add": true,
+        "image_ratio": "portrait",
+        "columns_gap": 16,
+        "rows_gap": 24,
+        "carousel_on_mobile": false,
+        "icons_style": "arrow",
+        "icons_shape": "circle",
+        "section_width": "page-width",
+        "color_scheme": "scheme-1",
+        "padding-block-start": 60,
+        "padding-block-end": 60
+      }
+    }
+  ]
+}
+{% endschema %}
