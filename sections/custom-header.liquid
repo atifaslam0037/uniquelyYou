@@ -487,7 +487,17 @@
   }
 
   #header-component .header-menu,
-  #header-component header-menu { display: flex !important; }
+  #header-component header-menu { display: none !important; }
+
+  /* Beat Shopify's compiled rule: #header-component[data-menu-style=menu] .header__drawer { display:none } */
+  #header-component.uly-header .header__drawer,
+  #header-component.uly-header[data-menu-style] .header__drawer,
+  #header-component.uly-header[data-menu-style='menu'] .header__drawer,
+  #header-component.uly-header[data-menu-style='drawer'] .header__drawer {
+    display: flex !important;
+    visibility: visible !important;
+    min-height: var(--header-drawer-min-height, 44px) !important;
+  }
 
   @media screen and (max-width: 749px) {
     body { --header-height: 56px; }

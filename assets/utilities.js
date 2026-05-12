@@ -706,6 +706,14 @@ export function setHeaderMenuStyle() {
   const headerComponent = /** @type {HTMLElement} | null */ (document.querySelector('#header-component'));
   if (headerComponent) {
     window.requestAnimationFrame(() => {
+      // ULY custom header always uses drawer — never allow 'menu' mode
+      // because Shopify's compiled styles.css has:
+      //   #header-component[data-menu-style=menu] .header__drawer { display:none }
+      // which would hide the hamburger button on desktop in the admin editor.
+      if (headerComponent.classList.contains('uly-header')) {
+        headerComponent.dataset.menuStyle = 'drawer';
+        return;
+      }
       const overflowList = headerComponent?.querySelector('overflow-list');
       const hasReachedMinimum = overflowList && overflowList.hasAttribute('minimum-reached');
       headerComponent.dataset.menuStyle = isTouchDevice() || hasReachedMinimum ? 'drawer' : 'menu';

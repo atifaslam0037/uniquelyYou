@@ -205,18 +205,34 @@
 
 .cart-bubble__background {
   background-color: var(--secondary-accent, #E8612C) !important;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  min-height: 18px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: visible;
 }
 
 .cart-bubble__text {
   color: #fff !important;
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Prevent cart bubble from being clipped by parent overflow */
+.header-actions__action {
+  overflow: visible !important;
+}
+
+.cart-bubble {
+  overflow: visible !important;
+  position: absolute !important;
+  top: -6px !important;
+  right: -6px !important;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -232,8 +248,25 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   7. ACTION WRAPPERS
+   7. ACTION WRAPPERS + DRAWER TRIGGER OVERRIDE
    ══════════════════════════════════════════════════════════════ */
+
+/*
+  CRITICAL: Shopify's server-side compiled styles.css bundle contains:
+    #header-component[data-menu-style=menu] .header__drawer { display:none; min-height:0 }
+  This comes from the Horizon header-drawer {% stylesheet %} block and is injected
+  in the admin editor. We beat it with higher specificity + !important.
+  The JS in utilities.js also prevents data-menu-style ever being set to 'menu'
+  for .uly-header, but this CSS is the guaranteed fallback.
+*/
+#header-component.uly-header .header__drawer,
+#header-component.uly-header[data-menu-style] .header__drawer,
+#header-component.uly-header[data-menu-style='menu'] .header__drawer,
+#header-component.uly-header[data-menu-style='drawer'] .header__drawer {
+  display: flex !important;
+  visibility: visible !important;
+  min-height: var(--header-drawer-min-height, 44px) !important;
+}
 .uly-header-actions-wrapper {
   display: flex;
   align-items: center;
@@ -381,76 +414,84 @@ dropdown-localization-component.uly-localization {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   10. SIDEBAR DRAWER — 14px, global colors, secondary-accent
+   10. SIDEBAR DRAWER
    ══════════════════════════════════════════════════════════════ */
 
+/* Base drawer */
 .uly-drawer {
   font-family: var(--primary-font, 'Geist', sans-serif);
+  position: fixed !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
-/* Drawer header */
-.uly-drawer__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px;
-  border-bottom: 1px solid rgba(var(--color-foreground-rgb), 0.08);
-  flex-shrink: 0;
+/* ── Close button: dark circle, top-right ── */
+.uly-drawer > .menu-drawer__close-button {
+  display: flex !important;
+  position: absolute !important;
+  top: 14px !important;
+  right: 14px !important;
+  left: auto !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  padding: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: var(--color-foreground) !important;
+  border-radius: 50% !important;
+  border: none !important;
+  color: var(--color-background) !important;
+  cursor: pointer !important;
+  z-index: 20 !important;
+  transition: opacity 0.2s ease !important;
 }
 
-.uly-drawer__logo-link {
-  text-decoration: none;
-  display: flex;
-  align-items: center;
+.uly-drawer > .menu-drawer__close-button:hover {
+  opacity: 0.75 !important;
 }
 
-.uly-drawer__logo-img {
-  max-width: 120px;
-  max-height: 44px;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  display: block;
+.uly-drawer > .menu-drawer__close-button svg {
+  width: 16px !important;
+  height: 16px !important;
+  color: var(--color-background) !important;
+  stroke: var(--color-background) !important;
 }
 
-.uly-drawer__logo-text {
-  font-family: var(--primary-font, sans-serif);
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  color: var(--primary-accent, #0E5C66);
+/* Navigation takes remaining space */
+.uly-drawer .menu-drawer__navigation {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-top: 8px;
 }
 
-.uly-drawer__close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  color: var(--color-foreground);
-  opacity: 0.6;
-  transition: opacity 0.2s ease, color 0.2s ease;
-  padding: 0;
-  background: transparent;
-  border: none;
-  cursor: pointer;
+/* ── Top-level menu items: uppercase small caps style ── */
+.uly-drawer .menu-drawer__menu-item--mainlist {
+  font-family: var(--primary-font, sans-serif) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: var(--color-foreground) !important;
+  min-height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease !important;
 }
 
-.uly-drawer__close:hover {
-  opacity: 1;
-  color: var(--secondary-accent, #E8612C);
+.uly-drawer .menu-drawer__menu-item--mainlist:hover {
+  color: var(--color-mint, #5FBFB8) !important;
 }
 
-.uly-drawer__close svg {
-  width: 20px;
-  height: 20px;
-}
-
-/* Sidebar menu items — refined, smaller, no underline */
-.uly-drawer .menu-drawer__menu-item {
+/* Child / parent items */
+.uly-drawer .menu-drawer__menu-item--child,
+.uly-drawer .menu-drawer__menu-item--parent {
   font-family: var(--primary-font, sans-serif) !important;
   font-size: 13px !important;
-  font-weight: 500 !important;
+  font-weight: 400 !important;
   letter-spacing: 0.02em !important;
   text-transform: none !important;
   color: var(--color-foreground) !important;
@@ -458,80 +499,160 @@ dropdown-localization-component.uly-localization {
   transition: color 0.2s ease !important;
 }
 
-.uly-drawer .menu-drawer__menu-item:hover,
-.uly-drawer .menu-drawer__menu-item--active,
-.uly-drawer .menu-drawer__menu-item[aria-current='page'] {
+.uly-drawer .menu-drawer__menu-item--child:hover,
+.uly-drawer .menu-drawer__menu-item--parent:hover {
   color: var(--color-mint, #5FBFB8) !important;
-  background: transparent !important;
-  text-decoration: none !important;
 }
 
-/* Caret icons */
-.uly-drawer .icon-caret svg,
-.uly-drawer .icon-plus svg {
-  color: var(--color-foreground);
-  opacity: 0.5;
-  transition: opacity 0.2s ease;
+/* Caret forward (right arrow on items with children) */
+.uly-drawer .icon-caret--forward svg {
+  width: 10px !important;
+  height: 10px !important;
+  opacity: 0.45;
 }
 
-.uly-drawer .menu-drawer__menu-item:hover .icon-caret svg,
-.uly-drawer .menu-drawer__menu-item:hover .icon-plus svg {
-  opacity: 1;
+.uly-drawer .menu-drawer__menu-item:hover .icon-caret--forward svg {
+  opacity: 0.8;
 }
 
-/* Back button */
+/* ── SUBMENU OVERLAY — full panel slide-in (matches the reference images) ── */
+.uly-drawer .menu-drawer__submenu {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: var(--color-background) !important;
+  z-index: 10 !important;
+  overflow-y: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  /* Slide in from right */
+  transform: translateX(100%) !important;
+  opacity: 1 !important;
+  visibility: hidden !important;
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* When submenu is open (details[open]) */
+.uly-drawer details[open] > .menu-drawer__submenu {
+  transform: translateX(0) !important;
+  visibility: visible !important;
+}
+
+/* ── Submenu top bar: ← MENU title + ✕ close circle ── */
+.uly-drawer .menu-drawer__nav-buttons {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 14px 14px 14px 4px !important;
+  border-bottom: 1px solid rgba(var(--color-foreground-rgb), 0.08) !important;
+  flex-shrink: 0 !important;
+  min-height: 56px !important;
+}
+
+/* Back button: ← MENU */
 .uly-drawer .menu-drawer__back-button {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 8px 12px !important;
   font-family: var(--primary-font, sans-serif) !important;
-  font-size: 14px !important;
+  font-size: 11px !important;
   font-weight: 600 !important;
-  letter-spacing: 0.1em !important;
+  letter-spacing: 0.12em !important;
   text-transform: uppercase !important;
   color: var(--color-foreground) !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  width: auto !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
   transition: color 0.2s ease !important;
 }
 
 .uly-drawer .menu-drawer__back-button:hover {
-  color: var(--secondary-accent, #E8612C) !important;
+  color: var(--color-mint, #5FBFB8) !important;
 }
 
-/* Hide old standalone close button */
-.uly-drawer>.menu-drawer__close-button,
-.uly-drawer>.close-button:first-child {
-  display: none !important;
+.uly-drawer .menu-drawer__back-button > .svg-wrapper {
+  width: 14px !important;
+  height: 14px !important;
+  margin-right: 2px !important;
+  opacity: 0.7;
 }
 
-/* Navigation flex-grow so localization sticks to bottom */
-.uly-drawer .menu-drawer__navigation {
-  flex-grow: 1;
-  overflow-y: auto;
+/* Submenu close button: dark circle (matches top-level close) */
+.uly-drawer .menu-drawer__nav-buttons .menu-drawer__close-button {
+  position: static !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  padding: 0 !important;
+  background: var(--color-foreground) !important;
+  border-radius: 50% !important;
+  border: none !important;
+  color: var(--color-background) !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  transition: opacity 0.2s ease !important;
 }
 
-.menu-drawer.uly-drawer {
-  display: flex;
-  flex-direction: column;
+.uly-drawer .menu-drawer__nav-buttons .menu-drawer__close-button:hover {
+  opacity: 0.75 !important;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   11. MOBILE DRAWER LOCALIZATION BOTTOM BAR
-   ══════════════════════════════════════════════════════════════ */
-.uly-drawer__localization {
-  border-top: 1px solid rgba(var(--color-foreground-rgb), 0.1);
-  margin-top: auto;
+.uly-drawer .menu-drawer__nav-buttons .menu-drawer__close-button svg {
+  width: 16px !important;
+  height: 16px !important;
+  color: var(--color-background) !important;
+  stroke: var(--color-background) !important;
+}
+
+/* Submenu content area */
+.uly-drawer .menu-drawer__inner-submenu {
+  display: flex !important;
+  flex-direction: column !important;
+  flex-grow: 1 !important;
+  overflow-y: auto !important;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   11. LOCALIZATION IN DRAWER
+   Mobile: hidden from header, only in drawer.
+   Desktop: visible in both header and drawer.
+   ────────────────────────────────────────────────────────────── */
+
+/* Utility links wrapper (contains localization) */
+.uly-drawer .menu-drawer__utility-links {
   flex-shrink: 0;
-  background: rgba(var(--color-foreground-rgb), 0.02);
-  /* Hidden by default — shown only on mobile (below) */
-  display: none !important;
+  margin-top: auto;
+  padding: 0;
+  margin-inline-start: 0 !important;
+  border-top: 1px solid rgba(var(--color-foreground-rgb), 0.08);
 }
 
+/* Always show localization inside the drawer */
+.uly-drawer .menu-drawer__localization {
+  display: block !important;
+}
+
+/* Mobile: hide localization from the header right column — only in drawer */
 @media screen and (max-width: 749px) {
-  .uly-drawer__localization {
-    display: block !important;
+  .uly-header__col--right .uly-localization {
+    display: none !important;
   }
 }
 
+/* Desktop: show in both header and drawer */
 @media screen and (min-width: 750px) {
-  .uly-drawer__localization {
-    display: none !important;
+  .uly-header__col--right .uly-localization {
+    display: flex !important;
   }
 }
 
@@ -687,19 +808,5 @@ dropdown-localization-component.uly-localization {
     justify-content: flex-end;
     margin-left: auto;
     z-index: 1;
-  }
-
-  /* Hide localization in header on mobile — moved to drawer bottom */
-  .uly-header__col--right .uly-localization {
-    display: none !important;
-  }
-}
-
-/* ══════════════════════════════════════════════════════════════
-   13. DESKTOP: localization visible in header, not in drawer
-   ══════════════════════════════════════════════════════════════ */
-@media screen and (min-width: 750px) {
-  .uly-header__col--right .uly-localization {
-    display: flex !important;
   }
 }
