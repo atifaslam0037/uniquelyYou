@@ -1,7 +1,8 @@
 {% comment %}
-  Featured Product Card - Avera Style
-  Matches the design with variant swatches and "Choose Options" button
-  Uses theme's native quick-add component for popup functionality
+  Featured Product Card — Horizon Native Quick-Add
+  · Single variant  → quick-add snippet (Add to Cart, works natively)
+  · Multi variant   → styled <a> link to product page (no empty modal)
+  · CSS lives in feature-products.liquid <style> block for admin/live parity
 {% endcomment %}
 
 {% liquid
@@ -16,407 +17,172 @@
     if variant.compare_at_price > variant.price
       assign has_compare_price = true
     endif
-
     assign featured_media = product.featured_media
     assign second_media = product.media[1]
+    assign is_multi_variant = false
+    if product.variants_count > 1
+      assign is_multi_variant = true
+    endif
 
-    # Find color option for swatches
     assign color_option = null
     for option in product.options_with_values
-      assign option_name_downcase = option.name | downcase
-      if option_name_downcase contains 'color' or option_name_downcase contains 'colour'
+      assign option_lc = option.name | downcase
+      if option_lc contains 'color' or option_lc contains 'colour'
         assign color_option = option
         break
       endif
     endfor
   endunless
 
-  # Determine aspect ratio class
   case image_ratio
     when 'square'
-      assign aspect_ratio_class = 'aspect-ratio--square'
-    when 'portrait'
-      assign aspect_ratio_class = 'aspect-ratio--portrait'
+      assign ar_class = 'fpc-ar--square'
     when 'landscape'
-      assign aspect_ratio_class = 'aspect-ratio--landscape'
+      assign ar_class = 'fpc-ar--landscape'
+    when 'adapt'
+      assign ar_class = 'fpc-ar--adapt'
     else
-      assign aspect_ratio_class = 'aspect-ratio--adapt'
+      assign ar_class = 'fpc-ar--portrait'
   endcase
 %}
 
-<div class="featured-product-card{% if onboarding %} featured-product-card--placeholder{% endif %}" data-product-id="{{ product.id }}">
-  {% comment %} Product Media {% endcomment %}
-  <div class="featured-product-card__media {{ aspect_ratio_class }}">
-    {% if onboarding == false and has_compare_price %}
-      <span class="featured-product-card__badge">Sale</span>
-    {% endif %}
+<div
+  class="fpc-native{% if onboarding %} fpc-native--onboarding{% endif %}"
+  data-product-id="{{ product.id }}"
+>
 
-    <a href="{% if onboarding %}#{% else %}{{ product.url }}{% endif %}" class="featured-product-card__media-link">
-      <div class="featured-product-card__images">
-        {% if onboarding %}
-          <div class="featured-product-card__placeholder">
-            {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
-          </div>
-        {% else %}
-          {% if featured_media %}
-            {{
-              featured_media
-              | image_url: width: 900
-              | image_tag:
-                loading: 'lazy',
-                sizes: '(min-width: 1200px) 300px, (min-width: 768px) 45vw, 90vw',
-                widths: '300, 600, 900',
-                class: 'featured-product-card__img featured-product-card__img--primary'
-            }}
-          {% endif %}
+  {%- comment -%} ── MEDIA ── {%- endcomment -%}
+  <div
+    class="fpc-native__media {{ ar_class }}"
+    style="--quick-add-display: flex; --quick-add-mobile-display: none; --quick-add-mobile-opacity: 0;"
+  >
+    {%- comment -%} Sale badge — z-index:50 above layer-raised, pointer-events:none {%- endcomment -%}
+    {% unless onboarding %}
+      {% if has_compare_price %}
+        <span class="fpc-native__badge">{{ 'content.product_badge_sale' | t }}</span>
+      {% endif %}
+    {% endunless %}
 
-          {% if second_media %}
-            {{
-              second_media
-              | image_url: width: 900
-              | image_tag:
-                loading: 'lazy',
-                sizes: '(min-width: 1200px) 300px, (min-width: 768px) 45vw, 90vw',
-                widths: '300, 600, 900',
-                class: 'featured-product-card__img featured-product-card__img--secondary'
-            }}
-          {% endif %}
+    {%- comment -%} Images (both absolutely positioned for consistent sizing) {%- endcomment -%}
+    <a
+      href="{% if onboarding %}#{% else %}{{ product.url }}{% endif %}"
+      class="fpc-native__img-link"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      {% if onboarding %}
+        <div class="fpc-native__placeholder">
+          {{ 'product-1' | placeholder_svg_tag: 'fpc-native__placeholder-svg' }}
+        </div>
+      {% else %}
+        {% if featured_media %}
+          {{
+            featured_media
+            | image_url: width: 900
+            | image_tag:
+              loading: 'lazy',
+              sizes: '(min-width: 1200px) 300px, (min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw',
+              widths: '300, 450, 600, 750, 900',
+              class: 'fpc-native__img fpc-native__img--primary',
+              alt: featured_media.alt | default: product.title
+          }}
         {% endif %}
-      </div>
+        {% if second_media %}
+          {{
+            second_media
+            | image_url: width: 900
+            | image_tag:
+              loading: 'lazy',
+              sizes: '(min-width: 1200px) 300px, (min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw',
+              widths: '300, 450, 600, 750, 900',
+              class: 'fpc-native__img fpc-native__img--secondary',
+              alt: second_media.alt | default: product.title
+          }}
+        {% endif %}
+      {% endif %}
     </a>
 
-    {% comment %} "Choose Options" Button - Uses theme's quick-add component {% endcomment %}
-    {% if onboarding == false and show_quick_add and product.available %}
-      <div class="featured-product-card__quick-add-wrapper">
-        {% render 'quick-add',
-          product: product,
-          section_id: section.id,
-          block: block
-        %}
-      </div>
-    {% endif %}
+    {%- comment -%}
+      Quick-add logic:
+      · Single variant → native quick-add snippet (renders add-to-cart form, works 100%)
+      · Multi variant  → <a> link to product page (avoids empty modal entirely)
+    {%- endcomment -%}
+    {% unless onboarding %}
+      {% if show_quick_add and product.available %}
+        {% if is_multi_variant %}
+          <a
+            href="{{ product.url }}"
+            class="fpc-native__choose-link"
+            aria-label="{{ 'actions.choose' | t }}: {{ product.title }}"
+          >
+            <span class="add-to-cart-text">
+              <span aria-hidden="true" class="svg-wrapper add-to-cart-icon">
+                {{- 'icon-add-to-cart.svg' | inline_asset_content -}}
+              </span>
+              <span class="add-to-cart-text__content is-visually-hidden-mobile">
+                <span><span>{{ 'actions.choose' | t }}</span></span>
+              </span>
+            </span>
+          </a>
+        {% else %}
+          {%- comment -%} Single variant: use the full native quick-add snippet {%- endcomment -%}
+          {% render 'quick-add', product: product, section_id: section.id %}
+        {% endif %}
+      {% endif %}
+    {% endunless %}
   </div>
 
-  {% comment %} Product Info {% endcomment %}
-  <div class="featured-product-card__info">
-    {% if show_vendor and onboarding == false and product.vendor != blank %}
-      <span class="featured-product-card__vendor">{{ product.vendor }}</span>
-    {% endif %}
+  {%- comment -%} ── INFO ── {%- endcomment -%}
+  <div class="fpc-native__info">
+    {% unless onboarding %}
+      {% if show_vendor and product.vendor != blank %}
+        <span class="fpc-native__vendor">{{ product.vendor }}</span>
+      {% endif %}
+    {% endunless %}
 
-    <h3 class="featured-product-card__title">
+    <h3 class="fpc-native__title">
       <a href="{% if onboarding %}#{% else %}{{ product.url }}{% endif %}">
         {% if onboarding %}
-          Product Title
+          {{ 'content.product_card_placeholder' | t }}
         {% else %}
           {{ product.title }}
         {% endif %}
       </a>
     </h3>
 
-    <div class="featured-product-card__price">
+    <div class="fpc-native__price">
       {% if onboarding %}
-        <span class="featured-product-card__price--current">$99.00</span>
+        <span class="fpc-native__price--current">$99.00</span>
       {% else %}
         {% if has_compare_price %}
-          <span class="featured-product-card__price--compare">{{ variant.compare_at_price | money }}</span>
+          <span class="fpc-native__price--compare">{{ variant.compare_at_price | money }}</span>
         {% endif %}
-        <span class="featured-product-card__price--current">{{ variant.price | money }}</span>
+        <span class="fpc-native__price--current{% if has_compare_price %} fpc-native__price--sale{% endif %}">
+          {{ variant.price | money }}
+        </span>
       {% endif %}
     </div>
 
-    {% comment %} Color Swatches {% endcomment %}
-    {% if onboarding == false and color_option and color_option.values.size > 0 %}
-      <div class="featured-product-card__swatches">
-        {% for value in color_option.values limit: 5 %}
-          {% liquid
-            assign swatch_value = value | handle
-            assign swatch_color = swatch_value
-          %}
-          <div
-            class="featured-product-card__swatch"
-            style="background-color: {{ swatch_color }};"
-            title="{{ value }}"
-            role="img"
-            aria-label="Color: {{ value }}"
-          ></div>
-        {% endfor %}
-        {% if color_option.values.size > 5 %}
-          <span class="featured-product-card__swatch-more">+{{ color_option.values.size | minus: 5 }}</span>
-        {% endif %}
-      </div>
-    {% endif %}
+    {% unless onboarding %}
+      {% if color_option and color_option.values.size > 0 %}
+        <div class="fpc-native__swatches">
+          {% for value in color_option.values limit: 5 %}
+            <div
+              class="fpc-native__swatch"
+              style="background-color: {{ value | handle }};"
+              title="{{ value }}"
+              role="img"
+              aria-label="{{ value }}"
+            ></div>
+          {% endfor %}
+          {% if color_option.values.size > 5 %}
+            <span class="fpc-native__swatch-more">+{{ color_option.values.size | minus: 5 }}</span>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endunless %}
   </div>
 </div>
 
-{% stylesheet %}
-  .featured-product-card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    background: var(--color-background);
-    font-family: var(--primary-font, 'Geist', sans-serif);
-    height: 100%;
-  }
-
-  .featured-product-card__media {
-    position: relative;
-    overflow: hidden;
-    background: #f5f5f5;
-    margin-bottom: 12px;
-  }
-
-  .featured-product-card__media-link {
-    display: block;
-    position: relative;
-  }
-
-  /* Aspect Ratios */
-  .aspect-ratio--adapt .featured-product-card__images {
-    aspect-ratio: auto;
-  }
-  .aspect-ratio--square .featured-product-card__images {
-    aspect-ratio: 1 / 1;
-  }
-  .aspect-ratio--portrait .featured-product-card__images {
-    aspect-ratio: 3 / 4;
-  }
-  .aspect-ratio--landscape .featured-product-card__images {
-    aspect-ratio: 4 / 3;
-  }
-
-  .featured-product-card__badge {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: var(--primary-accent, #0E5C66);
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    padding: 6px 12px;
-    border-radius: 4px;
-    z-index: 3;
-  }
-
-  .featured-product-card__images {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-  }
-
-  .featured-product-card__placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 300px;
-    aspect-ratio: 3 / 4;
-  }
-
-  .featured-product-card__placeholder svg {
-    width: 60%;
-    height: 60%;
-    opacity: 0.15;
-  }
-
-  .featured-product-card__img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .featured-product-card__img--primary {
-    position: relative;
-  }
-
-  .featured-product-card__img--secondary {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-  }
-
-  .featured-product-card:hover .featured-product-card__img--secondary {
-    opacity: 1;
-  }
-
-  .featured-product-card:hover .featured-product-card__img--primary {
-    transform: scale(1.05);
-  }
-
-  /* Quick Add Wrapper - "Choose Options" button */
-  .featured-product-card__quick-add-wrapper {
-    position: absolute;
-    bottom: 16px;
-    left: 16px;
-    right: 16px;
-    z-index: 2;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(8px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .featured-product-card:hover .featured-product-card__quick-add-wrapper {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-  }
-
-  .featured-product-card__quick-add-wrapper .quick-add {
-    width: 100%;
-  }
-
-  .featured-product-card__quick-add-wrapper .quick-add__button {
-    width: 100%;
-    padding: 12px 24px;
-    border-radius: 50px;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transition: all 0.2s ease;
-    background: #fff;
-    color: #000;
-    border: none;
-  }
-
-  .featured-product-card__quick-add-wrapper .quick-add__button:hover {
-    background: var(--primary-accent, #0E5C66);
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-  }
-
-  /* Product Info */
-  .featured-product-card__info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 0;
-  }
-
-  .featured-product-card__vendor {
-    display: block;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: rgba(var(--color-foreground-rgb), 0.6);
-    margin-bottom: 2px;
-  }
-
-  .featured-product-card__title {
-    font-size: 15px;
-    font-weight: 400;
-    line-height: 1.4;
-    color: var(--color-foreground);
-    margin: 0;
-  }
-
-  .featured-product-card__title a {
-    text-decoration: none;
-    color: inherit;
-    transition: color 0.2s ease;
-  }
-
-  .featured-product-card__title a:hover {
-    color: var(--secondary-accent, #E8612C);
-  }
-
-  .featured-product-card__price {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--color-foreground);
-    margin-top: 4px;
-  }
-
-  .featured-product-card__price--compare {
-    text-decoration: line-through;
-    color: rgba(var(--color-foreground-rgb), 0.5);
-    margin-right: 8px;
-    font-size: 14px;
-  }
-
-  /* Color Swatches */
-  .featured-product-card__swatches {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 10px;
-  }
-
-  .featured-product-card__swatch {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 2px solid var(--color-background, #fff);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    transition: transform 0.2s ease;
-  }
-
-  .featured-product-card__swatch:hover {
-    transform: scale(1.1);
-  }
-
-  .featured-product-card__swatch-more {
-    font-size: 12px;
-    color: rgba(var(--color-foreground-rgb), 0.6);
-    font-weight: 500;
-  }
-
-  /* Mobile Responsive */
-  @media (max-width: 749px) {
-    .featured-product-card__media {
-      margin-bottom: 10px;
-    }
-
-    .featured-product-card__quick-add-wrapper {
-      bottom: 12px;
-      left: 12px;
-      right: 12px;
-    }
-
-    .featured-product-card__quick-add-wrapper .quick-add__button {
-      padding: 10px 20px;
-      font-size: 13px;
-    }
-
-    .featured-product-card__title {
-      font-size: 14px;
-    }
-
-    .featured-product-card__price {
-      font-size: 14px;
-    }
-
-    /* Always show quick add on mobile (no hover) */
-    .featured-product-card__quick-add-wrapper {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-
-    .featured-product-card__swatch {
-      width: 18px;
-      height: 18px;
-    }
-  }
-
-  /* Reduced Motion */
-  @media (prefers-reduced-motion: reduce) {
-    .featured-product-card__img,
-    .featured-product-card__quick-add-wrapper,
-    .featured-product-card__swatch {
-      transition: none;
-    }
-  }
-{% endstylesheet %}
+{% comment %} Ensure quick-add native button styles are loaded {% endcomment %}
+{% render 'quick-add-styles' %}

@@ -6,8 +6,294 @@
 
 {% liquid
   assign max_items = section.settings.max_products
-  assign collection = collections[section.settings.collection]
+  assign collection = section.settings.collection
 %}
+
+<style>
+  /* ── Section heading ── */
+  .featured-products__heading {
+    font-size: clamp(22px, 3vw, 32px);
+    font-weight: 600;
+    margin: 0;
+    color: var(--color-foreground);
+    font-family: var(--font-body--family, sans-serif);
+  }
+
+  /* ── Card shell ── */
+  .fpc-native {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    font-family: var(--font-body--family, sans-serif);
+  }
+
+  /* ── Media wrapper ── */
+  .fpc-native__media {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-background-alt, #f2f2f2);
+    margin-bottom: 12px;
+    border-radius: var(--style-border-radius-card, 8px);
+    flex-shrink: 0;
+  }
+
+  .fpc-ar--portrait {
+    aspect-ratio: 3 / 4;
+  }
+  .fpc-ar--square {
+    aspect-ratio: 1 / 1;
+  }
+  .fpc-ar--landscape {
+    aspect-ratio: 4 / 3;
+  }
+  .fpc-ar--adapt {
+    aspect-ratio: auto;
+    min-height: 200px;
+  }
+
+  /* ── Sale badge ── */
+  .fpc-native__badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 50;
+    background: var(--color-badge-sale-background, var(--primary-accent, #0e5c66));
+    color: var(--color-badge-sale-foreground, #fff);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 4px;
+    pointer-events: none;
+    line-height: 1.4;
+  }
+
+  /* ── Image link fills entire media div ── */
+  .fpc-native__img-link {
+    display: block;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    text-decoration: none;
+  }
+
+  /* ── CRITICAL FIX: both images position:absolute so real product images
+     (which have explicit width/height attrs from image_tag) are sized by
+     the container's aspect-ratio, NOT their intrinsic dimensions. ── */
+  .fpc-native__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .fpc-native__img--primary {
+    z-index: 1;
+    transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .fpc-native__img--secondary {
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  /* ── Onboarding placeholder ── */
+  .fpc-native__placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-background-alt, #f2f2f2);
+  }
+
+  .fpc-native__placeholder svg {
+    width: 50%;
+    height: 50%;
+    opacity: 0.12;
+  }
+
+  /* ── Hover: image swap + quick-add reveal ── */
+  .fpc-native:hover .fpc-native__img--secondary,
+  .fpc-native:focus-within .fpc-native__img--secondary {
+    opacity: 1;
+  }
+
+  .fpc-native:hover .fpc-native__img--primary,
+  .fpc-native:focus-within .fpc-native__img--primary {
+    transform: scale(1.04);
+  }
+
+  /* Mirror theme product-card:hover .quick-add__button rule */
+  .fpc-native:hover .quick-add__button,
+  .fpc-native:focus-within .quick-add__button {
+    opacity: 1;
+  }
+
+  /* Reveal choose-link on hover */
+  .fpc-native:hover .fpc-native__choose-link,
+  .fpc-native:focus-within .fpc-native__choose-link {
+    opacity: 1;
+  }
+
+  /* ── Multi-variant "Choose Options" link button ──
+     Positioned + styled to match .quick-add__button exactly */
+  .fpc-native__choose-link {
+    position: absolute;
+    z-index: var(--layer-raised, 10);
+    right: 12px;
+    bottom: 12px;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(var(--color-background, #fff) 0 100%) padding-box;
+    padding: 0;
+    border-radius: 50px;
+    border: 2px solid hsl(0 0% 0% / 0.15);
+    height: var(--button-size-md, 40px);
+    cursor: pointer;
+    opacity: 0;
+    overflow: hidden;
+    color: var(--color-foreground);
+    text-decoration: none;
+    backdrop-filter: blur(20px) saturate(180%);
+    transition: opacity var(--animation-speed, 0.2s) ease, scale var(--animation-speed, 0.2s) ease;
+  }
+
+  .fpc-native__choose-link:hover {
+    scale: 1.03;
+  }
+
+  .fpc-native__choose-link .add-to-cart-text {
+    background: var(--color-background, #fff);
+    overflow: hidden;
+    border-radius: 50px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .fpc-native__choose-link .add-to-cart-icon {
+    height: 100%;
+    width: calc(var(--button-size-md, 40px) - 4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── Product info ── */
+  .fpc-native__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .fpc-native__vendor {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--secondary-accent, #e8612c);
+  }
+
+  .fpc-native__title {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.45;
+    margin: 0;
+    color: var(--color-foreground);
+  }
+
+  .fpc-native__title a {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.2s ease;
+  }
+
+  .fpc-native__title a:hover {
+    color: var(--secondary-accent, #e8612c);
+  }
+
+  .fpc-native__price {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-foreground);
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+  }
+
+  .fpc-native__price--compare {
+    text-decoration: line-through;
+    opacity: 0.5;
+    font-weight: 400;
+    font-size: 13px;
+  }
+
+  .fpc-native__price--sale {
+    color: var(--secondary-accent, #e8612c);
+  }
+
+  .fpc-native__swatches {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+
+  .fpc-native__swatch {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--color-background, #fff);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .fpc-native__swatch:hover {
+    transform: scale(1.15);
+  }
+
+  .fpc-native__swatch-more {
+    font-size: 11px;
+    opacity: 0.6;
+    color: var(--color-foreground);
+  }
+
+  @media (max-width: 749px) {
+    .fpc-native__media {
+      margin-bottom: 8px;
+      border-radius: 6px;
+    }
+    .fpc-native__title {
+      font-size: 13px;
+    }
+    .fpc-native__price {
+      font-size: 13px;
+    }
+    .fpc-native__choose-link {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fpc-native__img--primary,
+    .fpc-native__img--secondary,
+    .fpc-native__choose-link,
+    .fpc-native__swatch {
+      transition: none;
+    }
+  }
+</style>
 
 <div class="section-background color-{{ section.settings.color_scheme }}"></div>
 <div
@@ -31,7 +317,7 @@
       {% if section.settings.heading != blank %}
         <h2 class="featured-products__heading">{{ section.settings.heading }}</h2>
       {% endif %}
-      
+
       {% if section.settings.show_view_all and collection != blank %}
         <a href="{{ collection.url }}" class="button button--link">
           {{ 'sections.featured_collection.view_all' | t }}
