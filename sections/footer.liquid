@@ -1,114 +1,201 @@
 {% comment %}
-  Footer Section
-  Multi-column footer with mobile dropdown menus
+  Footer Section — Premium
+  Multi-column layout · Trust bar · Mobile accordion
 {% endcomment %}
 
 <style>
-  /* Footer Section Styles */
+  /* ─────────────────────────────────────────
+     All colors come from your global CSS vars.
+     No external fonts — Geist is loaded globally.
+  ───────────────────────────────────────── */
 
   .footer-wrapper {
-    background-color: #0a1820;
-    color: #ffffff;
+    background-color: var(--primary-accent);
+    color: var(--white);
+    font-family: var(--primary-font);
+    position: relative;
     overflow: hidden;
   }
 
+  /* Mint accent line across the top */
+  .footer-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(95, 191, 184, 0.4) 20%,
+      var(--color-mint) 50%,
+      rgba(95, 191, 184, 0.4) 80%,
+      transparent 100%
+    );
+    z-index: 2;
+  }
+
+  /* Depth glows — brand colors, very subtle */
+  .footer-glow-a {
+    position: absolute;
+    top: -100px;
+    right: -60px;
+    width: 420px;
+    height: 420px;
+    background: radial-gradient(circle, rgba(95, 191, 184, 0.07) 0%, transparent 65%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .footer-glow-b {
+    position: absolute;
+    bottom: -60px;
+    left: 5%;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(232, 97, 44, 0.06) 0%, transparent 65%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Container ── */
   .footer-container {
     max-width: 1440px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 48px;
+    position: relative;
+    z-index: 1;
   }
 
+  /* ── Main grid ── */
   .footer-main {
-    padding: 60px 0 40px;
+    padding: 64px 0 56px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .footer-grid {
     display: grid;
-    grid-template-columns: 1.5fr 1fr 1fr 1fr;
-    gap: 40px;
+    grid-template-columns: 1.8fr 1fr 1fr 1fr;
+    gap: 48px;
+    align-items: start;
   }
 
-  /* Footer Brand Column */
-  .footer-brand {
-    max-width: 400px;
-  }
-
+  /* ── Brand column ── */
   .footer-logo {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
+    gap: 10px;
     text-decoration: none;
     color: inherit;
+    margin-bottom: 14px;
   }
 
-  .footer-logo-image {
-    width: 40px;
-    height: 40px;
+  .footer-logo-img {
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
+    object-fit: cover;
+  }
+
+  /* Geometric mark shown when no logo image */
+  .footer-logo-mark {
+    width: 36px;
+    height: 36px;
+    border: 1.5px solid rgba(95, 191, 184, 0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .footer-logo-mark svg {
+    width: 14px;
+    height: 14px;
+    fill: var(--color-mint);
   }
 
   .footer-logo-text {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
-    font-family: var(--primary-font);
+    letter-spacing: -0.02em;
+    line-height: 1;
   }
-
   .footer-logo-text .highlight {
     color: var(--secondary-accent);
   }
 
-  .footer-description {
-    font-size: 14px;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 24px;
-    font-family: var(--primary-font);
+  .footer-tagline {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(95, 191, 184, 0.7);
+    margin-bottom: 18px;
+    font-weight: 400;
   }
 
+  .footer-rule {
+    width: 28px;
+    height: 1.5px;
+    background: linear-gradient(90deg, var(--color-mint), transparent);
+    margin-bottom: 20px;
+  }
+
+  .footer-description {
+    font-size: 13.5px;
+    line-height: 1.75;
+    color: rgba(255, 255, 255, 0.55);
+    margin-bottom: 28px;
+    font-weight: 400;
+    max-width: 280px;
+  }
+
+  /* Social icons */
   .footer-social {
     display: flex;
-    gap: 12px;
+    gap: 10px;
   }
-
   .footer-social-link {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
-    background-color: rgba(255, 255, 255, 0.1);
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 50%;
-    color: #ffffff;
+    color: rgba(255, 255, 255, 0.5);
     text-decoration: none;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: border-color 0.25s ease, color 0.25s ease, transform 0.2s ease;
   }
-
   .footer-social-link:hover {
-    background-color: var(--secondary-accent);
+    border-color: var(--color-mint);
+    color: var(--color-mint);
     transform: translateY(-2px);
   }
-
   .footer-social-icon {
-    width: 20px;
-    height: 20px;
+    width: 15px;
+    height: 15px;
   }
 
-  /* Footer Menu Column */
-  .footer-menu {
+  /* ── Menu columns ── */
+  .footer-col-heading {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-mint);
+    margin: 0 0 24px;
+    cursor: default;
     display: block;
   }
 
-  .footer-menu-heading {
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: #ffffff;
-    margin-bottom: 20px;
-    font-family: var(--primary-font);
-    cursor: default;
+  /* Orange rule rendered as a separate element below the text */
+  .footer-col-rule {
+    display: block;
+    width: 18px;
+    height: 1.5px;
+    background: var(--secondary-accent);
+    margin-top: 10px;
+    opacity: 0.55;
   }
 
   .footer-menu-toggle {
@@ -122,168 +209,238 @@
   }
 
   .footer-menu-item {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
 
   .footer-menu-link {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.7);
+    font-size: 13.5px;
+    color: rgba(255, 255, 255, 0.55);
     text-decoration: none;
-    font-family: var(--primary-font);
-    transition: color 0.3s ease;
+    font-weight: 400;
+    display: inline-flex;
+    align-items: center;
+    letter-spacing: 0.01em;
+    transition: color 0.2s ease;
+  }
+
+  /* Mint slide-in tick on hover */
+  .footer-menu-link::before {
+    content: '';
     display: inline-block;
+    width: 0;
+    height: 1px;
+    background: var(--color-mint);
+    margin-right: 0;
+    transition: width 0.25s ease, margin-right 0.25s ease;
+    vertical-align: middle;
   }
-
   .footer-menu-link:hover {
-    color: var(--secondary-accent);
+    color: var(--white);
+  }
+  .footer-menu-link:hover::before {
+    width: 10px;
+    margin-right: 6px;
   }
 
-  /* Footer Bottom */
+  /* ── Trust bar ── */
+  .footer-trust-bar {
+    padding: 26px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+
+  .footer-trust-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.38);
+    letter-spacing: 0.03em;
+  }
+  .footer-trust-icon {
+    width: 14px;
+    height: 14px;
+    opacity: 0.38;
+    flex-shrink: 0;
+  }
+  .footer-trust-sep {
+    width: 1px;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.12);
+    flex-shrink: 0;
+  }
+
+  /* ── Footer bottom ── */
   .footer-bottom {
-    padding: 24px 0;
+    padding: 22px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 20px;
   }
 
   .footer-copyright {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.5);
-    font-family: var(--primary-font);
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.28);
+    letter-spacing: 0.02em;
+    font-weight: 400;
   }
 
   .footer-legal {
     display: flex;
-    gap: 24px;
+    align-items: center;
+    gap: 20px;
   }
-
   .footer-legal-link {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.28);
     text-decoration: none;
-    font-family: var(--primary-font);
-    transition: color 0.3s ease;
+    letter-spacing: 0.04em;
+    transition: color 0.2s ease;
   }
-
   .footer-legal-link:hover {
-    color: var(--secondary-accent);
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .footer-legal-sep {
+    width: 1px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.12);
+    flex-shrink: 0;
   }
 
-  /* Tablet Responsive */
+  /* ─────────────────────────────────────────
+     Tablet  768px – 1023px
+  ───────────────────────────────────────── */
   @media (max-width: 1023px) {
     .footer-container {
-      padding: 0 16px;
+      padding: 0 32px;
     }
-
     .footer-main {
-      padding: 50px 0 30px;
+      padding: 52px 0 44px;
     }
-
     .footer-grid {
       grid-template-columns: 1fr 1fr;
-      gap: 32px;
+      gap: 36px 40px;
     }
-
     .footer-brand {
       grid-column: 1 / -1;
-      max-width: 100%;
+    }
+    .footer-description {
+      max-width: 520px;
     }
   }
 
-  /* Mobile Responsive */
+  /* ─────────────────────────────────────────
+     Mobile  ≤ 767px
+  ───────────────────────────────────────── */
   @media (max-width: 767px) {
-    .footer-main {
-      padding: 40px 0 24px;
+    .footer-container {
+      padding: 0 20px;
     }
-
+    .footer-main {
+      padding: 40px 0 0;
+    }
     .footer-grid {
       grid-template-columns: 1fr;
       gap: 0;
     }
-
     .footer-brand {
       margin-bottom: 32px;
     }
-
-    /* Mobile Dropdown */
-    .footer-menu {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    .footer-description {
+      max-width: 100%;
     }
 
-    .footer-menu-heading {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    /* Accordion */
+    .footer-menu {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .footer-col-heading {
       padding: 16px 0;
       margin-bottom: 0;
       cursor: pointer;
-      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-
+    /* Hide the orange rule span on mobile */
+    .footer-col-rule {
+      display: none;
+    }
     .footer-menu-toggle {
-      display: block;
-      width: 24px;
-      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
       position: relative;
-      cursor: pointer;
+      flex-shrink: 0;
     }
-
     .footer-menu-toggle::before,
     .footer-menu-toggle::after {
       content: '';
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 12px;
-      height: 2px;
-      background-color: #ffffff;
-      transition: transform 0.3s ease;
+      width: 10px;
+      height: 1.5px;
+      background: rgba(255, 255, 255, 0.5);
+      transition: transform 0.3s ease, opacity 0.3s ease;
     }
-
     .footer-menu-toggle::before {
       transform: translate(-50%, -50%);
     }
-
     .footer-menu-toggle::after {
       transform: translate(-50%, -50%) rotate(90deg);
     }
-
-    .footer-menu.active .footer-menu-toggle::after {
+    .footer-menu.is-open .footer-menu-toggle::after {
       transform: translate(-50%, -50%) rotate(0deg);
+      opacity: 0;
     }
-
     .footer-menu-list {
       max-height: 0;
       overflow: hidden;
-      transition: max-height 0.3s ease;
+      transition: max-height 0.35s ease, padding-bottom 0.35s ease;
+    }
+    .footer-menu.is-open .footer-menu-list {
+      max-height: 400px;
+      padding-bottom: 18px;
     }
 
-    .footer-menu.active .footer-menu-list {
-      max-height: 500px;
-      padding-bottom: 16px;
+    /* Trust bar wraps */
+    .footer-trust-bar {
+      gap: 14px 20px;
+    }
+    .footer-trust-sep {
+      display: none;
     }
 
-    .footer-menu-item {
-      margin-bottom: 10px;
-    }
-
+    /* Bottom stacks */
     .footer-bottom {
       flex-direction: column;
-      gap: 16px;
+      align-items: center;
       text-align: center;
-      padding: 20px 0;
-    }
-
-    .footer-legal {
-      flex-direction: column;
+      padding: 20px 0 28px;
       gap: 12px;
+    }
+    .footer-legal {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
     }
   }
 
-  /* Accessibility */
+  /* ─────────────────────────────────────────
+     Accessibility
+  ───────────────────────────────────────── */
   @media (prefers-reduced-motion: reduce) {
     .footer-social-link,
     .footer-menu-link,
+    .footer-menu-link::before,
     .footer-menu-list,
     .footer-menu-toggle::before,
     .footer-menu-toggle::after {
@@ -291,39 +448,47 @@
     }
   }
 
-  /* Focus States */
-  .footer-social-link:focus,
-  .footer-menu-link:focus,
-  .footer-legal-link:focus {
-    outline: 2px solid var(--secondary-accent);
-    outline-offset: 2px;
+  .footer-social-link:focus-visible,
+  .footer-menu-link:focus-visible,
+  .footer-legal-link:focus-visible {
+    outline: 2px solid var(--color-mint);
+    outline-offset: 3px;
+    border-radius: 2px;
   }
 
-  /* Section Padding */
+  /* ── Schema-driven overrides ── */
   #footer-{{ section.id }} {
     margin-top: {{ section.settings.margin_top }}px;
   }
-
   #footer-{{ section.id }} .footer-wrapper {
-    background-color: {{ section.settings.background_color | default: '#0a1820' }};
+    background-color: {{ section.settings.background_color | default: '#0E5C66' }};
   }
 </style>
 
 <footer id="footer-{{ section.id }}">
   <div class="footer-wrapper">
+
+    <div class="footer-glow-a" aria-hidden="true"></div>
+    <div class="footer-glow-b" aria-hidden="true"></div>
+
     <div class="footer-container">
+
+      {%- comment -%} ── Main grid ── {%- endcomment -%}
       <div class="footer-main">
         <div class="footer-grid">
-          {%- comment -%} Brand Column {%- endcomment -%}
+
+          {%- comment -%} Brand column {%- endcomment -%}
           <div class="footer-brand">
+
             {% if section.settings.logo != blank %}
               <a href="/" class="footer-logo">
                 <img
-                  src="{{ section.settings.logo | image_url: width: 80 }}"
+                  src="{{ section.settings.logo | image_url: width: 72 }}"
                   alt="{{ shop.name }}"
-                  class="footer-logo-image"
-                  width="40"
-                  height="40"
+                  class="footer-logo-img"
+                  width="36"
+                  height="36"
+                  loading="lazy"
                 >
                 {% if section.settings.show_logo_text %}
                   <span class="footer-logo-text">
@@ -334,12 +499,23 @@
               </a>
             {% elsif section.settings.show_logo_text %}
               <a href="/" class="footer-logo">
+                <div class="footer-logo-mark" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 1l1.8 5.4H16l-5 3.6 1.9 5.8L8 12.2 3.1 15.8 5 10 0 6.4h6.2z"/>
+                  </svg>
+                </div>
                 <span class="footer-logo-text">
                   {{ section.settings.logo_text_before -}}
                   <span class="highlight">{{ section.settings.logo_text_highlight }}</span>
                 </span>
               </a>
             {% endif %}
+
+            {% if section.settings.tagline != blank %}
+              <p class="footer-tagline">{{ section.settings.tagline }}</p>
+            {% endif %}
+
+            <div class="footer-rule" aria-hidden="true"></div>
 
             {% if section.settings.description != blank %}
               <p class="footer-description">{{ section.settings.description }}</p>
@@ -348,72 +524,51 @@
             {% if section.settings.show_social %}
               <div class="footer-social">
                 {% if section.settings.social_instagram != blank %}
-                  <a
-                    href="{{ section.settings.social_instagram }}"
-                    target="_blank"
-                    rel="noopener"
-                    class="footer-social-link"
-                    aria-label="Instagram"
-                  >
-                    <svg class="footer-social-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="2"/>
-                      <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/>
-                      <circle cx="18" cy="6" r="1" fill="currentColor"/>
+                  <a href="{{ section.settings.social_instagram }}" target="_blank" rel="noopener" class="footer-social-link" aria-label="Instagram">
+                    <svg class="footer-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="2" y="2" width="20" height="20" rx="5"/>
+                      <circle cx="12" cy="12" r="4"/>
+                      <circle cx="18" cy="6" r="1" fill="currentColor" stroke="none"/>
                     </svg>
                   </a>
                 {% endif %}
-
                 {% if section.settings.social_twitter != blank %}
-                  <a
-                    href="{{ section.settings.social_twitter }}"
-                    target="_blank"
-                    rel="noopener"
-                    class="footer-social-link"
-                    aria-label="Twitter"
-                  >
-                    <svg class="footer-social-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <a href="{{ section.settings.social_twitter }}" target="_blank" rel="noopener" class="footer-social-link" aria-label="Twitter">
+                    <svg class="footer-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
                     </svg>
                   </a>
                 {% endif %}
-
                 {% if section.settings.social_facebook != blank %}
-                  <a
-                    href="{{ section.settings.social_facebook }}"
-                    target="_blank"
-                    rel="noopener"
-                    class="footer-social-link"
-                    aria-label="Facebook"
-                  >
-                    <svg class="footer-social-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <a href="{{ section.settings.social_facebook }}" target="_blank" rel="noopener" class="footer-social-link" aria-label="Facebook">
+                    <svg class="footer-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
                     </svg>
                   </a>
                 {% endif %}
-
                 {% if section.settings.social_youtube != blank %}
-                  <a
-                    href="{{ section.settings.social_youtube }}"
-                    target="_blank"
-                    rel="noopener"
-                    class="footer-social-link"
-                    aria-label="YouTube"
-                  >
-                    <svg class="footer-social-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M9.75 15.02l5.75-3.27-5.75-3.27v6.54z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <a href="{{ section.settings.social_youtube }}" target="_blank" rel="noopener" class="footer-social-link" aria-label="YouTube">
+                    <svg class="footer-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z"/>
+                      <path d="M9.75 15.02l5.75-3.27-5.75-3.27v6.54z"/>
                     </svg>
                   </a>
                 {% endif %}
               </div>
             {% endif %}
+
           </div>
 
-          {%- comment -%} Menu Columns {%- endcomment -%}
+          {%- comment -%} Menu columns from blocks {%- endcomment -%}
           {% for block in section.blocks %}
-            <div class="footer-menu" data-menu-id="{{ block.id }}" {{ block.shopify_attributes }}>
-              <h3 class="footer-menu-heading" onclick="toggleFooterMenu(this)">
+            <div class="footer-menu" {{ block.shopify_attributes }}>
+              <h3
+                class="footer-col-heading"
+                onclick="footerToggleMenu(this)"
+                aria-expanded="false"
+              >
                 {{ block.settings.heading }}
+                <span class="footer-col-rule" aria-hidden="true"></span>
                 <span class="footer-menu-toggle" aria-hidden="true"></span>
               </h3>
               <ul class="footer-menu-list">
@@ -427,23 +582,63 @@
               </ul>
             </div>
           {% endfor %}
+
         </div>
       </div>
 
-      {%- comment -%} Footer Bottom {%- endcomment -%}
+      {%- comment -%} ── Trust bar ── {%- endcomment -%}
+      {% if section.settings.show_trust_bar %}
+        <div class="footer-trust-bar">
+          {% if section.settings.trust_item_1 != blank %}
+            <div class="footer-trust-item">
+              <svg class="footer-trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              {{ section.settings.trust_item_1 }}
+            </div>
+            <div class="footer-trust-sep" aria-hidden="true"></div>
+          {% endif %}
+          {% if section.settings.trust_item_2 != blank %}
+            <div class="footer-trust-item">
+              <svg class="footer-trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+              </svg>
+              {{ section.settings.trust_item_2 }}
+            </div>
+            <div class="footer-trust-sep" aria-hidden="true"></div>
+          {% endif %}
+          {% if section.settings.trust_item_3 != blank %}
+            <div class="footer-trust-item">
+              <svg class="footer-trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              {{ section.settings.trust_item_3 }}
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {%- comment -%} ── Footer bottom ── {%- endcomment -%}
       <div class="footer-bottom">
         <p class="footer-copyright">
-          &copy; {{ 'now' | date: '%Y' }}
-          {{ shop.name }}. {{ section.settings.copyright_text }}
+          &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}.
+          {% if section.settings.copyright_text != blank %}
+            {{ section.settings.copyright_text }}
+          {% endif %}
         </p>
 
         {% if section.settings.show_legal_links %}
           <div class="footer-legal">
             {% if section.settings.privacy_link != blank %}
               <a href="{{ section.settings.privacy_link }}" class="footer-legal-link">Privacy</a>
+              <div class="footer-legal-sep" aria-hidden="true"></div>
             {% endif %}
             {% if section.settings.terms_link != blank %}
               <a href="{{ section.settings.terms_link }}" class="footer-legal-link">Terms</a>
+              {% if section.settings.cookies_link != blank %}
+                <div class="footer-legal-sep" aria-hidden="true"></div>
+              {% endif %}
             {% endif %}
             {% if section.settings.cookies_link != blank %}
               <a href="{{ section.settings.cookies_link }}" class="footer-legal-link">Cookies</a>
@@ -451,27 +646,27 @@
           </div>
         {% endif %}
       </div>
+
     </div>
   </div>
 </footer>
 
 <script>
-  function toggleFooterMenu(heading) {
-    // Only toggle on mobile
-    if (window.innerWidth <= 767) {
-      const menu = heading.parentElement;
-      menu.classList.toggle('active');
-    }
+  function footerToggleMenu(heading) {
+    if (window.innerWidth > 767) return;
+    var menu = heading.closest('.footer-menu');
+    var isOpen = menu.classList.toggle('is-open');
+    heading.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
   }
 
-  // Close menus on window resize
-  let resizeTimer;
+  var footerResizeTimer;
   window.addEventListener('resize', function () {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(function () {
+    clearTimeout(footerResizeTimer);
+    footerResizeTimer = setTimeout(function () {
       if (window.innerWidth > 767) {
-        document.querySelectorAll('.footer-menu.active').forEach(function (menu) {
-          menu.classList.remove('active');
+        document.querySelectorAll('.footer-menu.is-open').forEach(function (m) {
+          m.classList.remove('is-open');
+          m.querySelector('.footer-col-heading').setAttribute('aria-expanded', 'false');
         });
       }
     }, 250);
@@ -512,10 +707,16 @@
       "default": "you"
     },
     {
+      "type": "text",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Print on demand · Made to order"
+    },
+    {
       "type": "textarea",
       "id": "description",
       "label": "Description",
-      "default": "Print-on-demand clothing for people who like to stand out. Designed with love, made to order."
+      "default": "Clothing for people who refuse to blend in. Every piece is designed with intention and printed the moment you order it."
     },
     {
       "type": "header",
@@ -546,6 +747,34 @@
       "type": "url",
       "id": "social_youtube",
       "label": "YouTube URL"
+    },
+    {
+      "type": "header",
+      "content": "Trust Bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_bar",
+      "label": "Show Trust Bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "trust_item_1",
+      "label": "Trust Item 1",
+      "default": "Free shipping over $75"
+    },
+    {
+      "type": "text",
+      "id": "trust_item_2",
+      "label": "Trust Item 2",
+      "default": "30-day returns"
+    },
+    {
+      "type": "text",
+      "id": "trust_item_3",
+      "label": "Trust Item 3",
+      "default": "Secure checkout"
     },
     {
       "type": "header",
@@ -586,7 +815,7 @@
       "type": "color",
       "id": "background_color",
       "label": "Background Color",
-      "default": "#0a1820"
+      "default": "#0E5C66"
     },
     {
       "type": "range",
@@ -623,24 +852,9 @@
     {
       "name": "Footer",
       "blocks": [
-        {
-          "type": "menu",
-          "settings": {
-            "heading": "SHOP"
-          }
-        },
-        {
-          "type": "menu",
-          "settings": {
-            "heading": "COLLECTIONS"
-          }
-        },
-        {
-          "type": "menu",
-          "settings": {
-            "heading": "HELP"
-          }
-        }
+        { "type": "menu", "settings": { "heading": "SHOP" } },
+        { "type": "menu", "settings": { "heading": "COLLECTIONS" } },
+        { "type": "menu", "settings": { "heading": "HELP" } }
       ]
     }
   ]

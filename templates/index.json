@@ -9,6 +9,76 @@
  */
 {
   "sections": {
+    "custom_hero_banner": {
+      "type": "custom_hero_banner",
+      "blocks": {
+        "slide_x8fGTq": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/83-oranges-scandinavian-earth-art-print-and-hanger-lifestyle-30x30.jpg",
+            "badge": "Limited drop",
+            "heading": "Made for the moments that make you, you.",
+            "text": "<p>Custom prints, sustainable cotton, and designs that don't take themselves too seriously.</p>",
+            "primary_label": "Shop the drop",
+            "primary_link": "",
+            "secondary_label": "Explore collections",
+            "secondary_link": ""
+          }
+        },
+        "slide_btPMHm": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/banner.jpg",
+            "badge": "Limited drop",
+            "heading": "Made for the moments that make you, you.",
+            "text": "<p>Custom prints, sustainable cotton, and designs that don't take themselves too seriously.</p>",
+            "primary_label": "Shop the drop",
+            "primary_link": "",
+            "secondary_label": "Explore collections",
+            "secondary_link": ""
+          }
+        },
+        "slide_xhtbkg": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/banner_0f40b15f-fd73-4764-bdc9-cc85bd603cf5.jpg",
+            "badge": "Limited drop",
+            "heading": "Made for the moments that make you, you.",
+            "text": "<p>Custom prints, sustainable cotton, and designs that don't take themselves too seriously.</p>",
+            "primary_label": "Shop the drop",
+            "primary_link": "",
+            "secondary_label": "Explore collections",
+            "secondary_link": ""
+          }
+        }
+      },
+      "block_order": [
+        "slide_x8fGTq",
+        "slide_btPMHm",
+        "slide_xhtbkg"
+      ],
+      "settings": {
+        "accessibility_label": "Featured collections",
+        "autoplay": false,
+        "autoplay_speed": 3,
+        "copy_width": 720,
+        "heading_size": 88,
+        "mobile_heading_size": 48,
+        "corner_radius": 0,
+        "mobile_corner_radius": 0,
+        "show_overlay": true,
+        "teal": "#004a4e",
+        "teal_dark": "#003d42",
+        "orange": "#ff7a2f",
+        "cream": "#fff3e2",
+        "white": "#ffffff",
+        "primary_button_bg": "#f45f2b",
+        "primary_button_text": "#ffffff",
+        "secondary_button_bg": "#075d60",
+        "secondary_button_text": "#ffffff",
+        "secondary_button_border": "#ffffff"
+      }
+    },
     "hero-banner": {
       "type": "hero",
       "blocks": {
@@ -58,6 +128,7 @@
         "text_YLPk4p",
         "button_H9gpTf"
       ],
+      "disabled": true,
       "name": "t:names.hero",
       "settings": {
         "media_type_1": "image",
@@ -66,6 +137,7 @@
         "custom_mobile_media": false,
         "media_type_1_mobile": "image",
         "media_type_2_mobile": "image",
+        "link": "",
         "open_in_new_tab": false,
         "content_direction": "column",
         "vertical_on_mobile": true,
@@ -181,25 +253,49 @@
         "subheading": "Each collection tells a story. Pick the one that sounds the most like you.",
         "grid_layout": "featured",
         "grid_gap": 8,
-        "border_radius": 0,
+        "border_radius": 16,
         "columns_desktop": 3,
         "columns_tablet": 2,
         "columns_mobile": "2",
         "show_cta": true,
         "cta_text": "Shop collection",
+        "section_background_color": "#ffe8dd",
         "padding_top": 40,
         "padding_bottom": 40
       }
     },
     "feature-products": {
       "type": "feature-products",
-      "settings": {}
+      "settings": {
+        "heading": "Featured Products",
+        "collection": "all",
+        "max_products": 8,
+        "show_vendor": false,
+        "show_view_all": true,
+        "show_quick_add": true,
+        "layout_type": "grid",
+        "columns": 4,
+        "mobile_columns": "2",
+        "carousel_on_mobile": false,
+        "image_ratio": "portrait",
+        "columns_gap": 16,
+        "rows_gap": 16,
+        "icons_style": "arrow",
+        "icons_shape": "circle",
+        "mobile_card_size": "60cqw",
+        "section_width": "page-width",
+        "gap": 28,
+        "color_scheme": "",
+        "padding-block-start": 20,
+        "padding-block-end": 20,
+        "heading_bottom_gap": 16
+      }
     },
     "banner-sec": {
       "type": "banner-sec",
       "settings": {
         "image": "shopify://shop_images/banner.jpg",
-        "overlay_opacity": 30,
+        "overlay_color": "#0e5c66",
         "badge_text": "LIMITED DROP",
         "heading": "Made for the moments that make you, you.",
         "description": "Custom prints, sustainable cotton, and designs that don't take themselves too seriously.",
@@ -213,6 +309,34 @@
         "border_radius": 16,
         "padding_top": 60,
         "padding_bottom": 60
+      }
+    },
+    "feature_products_Q9iNGa": {
+      "type": "feature-products",
+      "name": "Featured Products",
+      "settings": {
+        "heading": "Featured Products",
+        "collection": "all",
+        "max_products": 4,
+        "show_vendor": false,
+        "show_view_all": true,
+        "show_quick_add": true,
+        "layout_type": "grid",
+        "columns": 4,
+        "mobile_columns": "2",
+        "carousel_on_mobile": true,
+        "image_ratio": "portrait",
+        "columns_gap": 16,
+        "rows_gap": 24,
+        "icons_style": "arrow",
+        "icons_shape": "circle",
+        "mobile_card_size": "60cqw",
+        "section_width": "page-width",
+        "gap": 28,
+        "color_scheme": "scheme-1",
+        "padding-block-start": 20,
+        "padding-block-end": 20,
+        "heading_bottom_gap": 16
       }
     },
     "feature-badges": {
@@ -279,18 +403,20 @@
         "background_color": "#0e5c66",
         "badge_color": "#e8612c",
         "button_color": "#e8612c",
-        "border_radius": 0,
+        "border_radius": 16,
         "padding_top": 40,
         "padding_bottom": 40
       }
     }
   },
   "order": [
+    "custom_hero_banner",
     "hero-banner",
     "custom-marquee",
     "collection-grid",
     "feature-products",
     "banner-sec",
+    "feature_products_Q9iNGa",
     "feature-badges",
     "newsletter"
   ]

@@ -5,6 +5,21 @@ import { DialogComponent, DialogCloseEvent } from '@theme/dialog';
 import { mediaQueryLarge, isMobileBreakpoint, getIOSVersion } from '@theme/utilities';
 import VariantPicker from '@theme/variant-picker';
 
+/**
+ * Root markup the quick-add modal expects (from product templates using `product-information-content`).
+ * Fallbacks support older or customized templates that omit `data-product-grid-content`.
+ * @param {Document} doc
+ * @returns {Element | null}
+ */
+function findQuickAddProductRoot(doc) {
+  return (
+    doc.querySelector('[data-product-grid-content]') ??
+    doc.querySelector('.product-information__grid') ??
+    doc.querySelector('[data-testid="product-information"] .product-information__grid') ??
+    doc.querySelector('.product-information .product-information__grid')
+  );
+}
+
 export class QuickAddComponent extends Component {
   /** @type {AbortController | null} */
   #abortController = null;
@@ -99,7 +114,7 @@ export class QuickAddComponent extends Component {
       // Fetch and cache the content
       const html = await this.fetchProductPage(currentUrl);
       if (html) {
-        const gridElement = html.querySelector('[data-product-grid-content]');
+        const gridElement = findQuickAddProductRoot(html);
         if (gridElement) {
           // Cache the cloned element to avoid modifying the original
           productGrid = /** @type {Element} */ (gridElement.cloneNode(true));
@@ -113,9 +128,8 @@ export class QuickAddComponent extends Component {
       const freshContent = /** @type {Element} */ (productGrid.cloneNode(true));
       await this.updateQuickAddModal(freshContent);
       this.#updateVariantPicker(productGrid);
+      this.#openQuickAddModal();
     }
-
-    this.#openQuickAddModal();
   };
 
   #resetScroll() {
@@ -187,9 +201,9 @@ export class QuickAddComponent extends Component {
     } catch (error) {
       if (error.name === 'AbortError') {
         return null;
-      } else {
-        throw error;
       }
+      console.error('[quick-add] Failed to load product page for modal', error);
+      return null;
     } finally {
       this.#abortController = null;
     }

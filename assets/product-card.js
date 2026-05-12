@@ -5,6 +5,10 @@ import { debounce, isDesktopBreakpoint, mediaQueryLarge, yieldToMainThread } fro
 import { ThemeEvents, VariantSelectedEvent, VariantUpdateEvent, SlideshowSelectEvent } from '@theme/events';
 import { morph } from '@theme/morph';
 
+/** Clicks on these should not trigger product card navigation / view transitions */
+const PRODUCT_CARD_INTERACTIVE_SELECTOR =
+  'button, input, label, select, textarea, [tabindex="1"], quick-add-component, product-form-component, add-to-cart-component, variant-picker, swatches-variant-picker-component, dialog, [role="dialog"]';
+
 /**
  * @typedef {object} ProductCardLinkRefs
  * @property {HTMLElement} [cardGallery] - The card gallery element.
@@ -38,7 +42,7 @@ export class ProductCardLink extends Component {
 
     // If the event was on an interactive element, don't do anything, this is not a navigation
     if (event.target instanceof Element) {
-      const interactiveElement = event.target.closest('button, input, label, select, [tabindex="1"]');
+      const interactiveElement = event.target.closest(PRODUCT_CARD_INTERACTIVE_SELECTOR);
       if (interactiveElement) return;
     }
 
@@ -480,7 +484,7 @@ export class ProductCard extends ProductCardLink {
     // Don't navigate if this product card is marked as no-navigation (e.g., in theme editor)
     if (this.hasAttribute('data-no-navigation')) return;
 
-    const interactiveElement = event.target.closest('button, input, label, select, [tabindex="1"]');
+    const interactiveElement = event.target.closest(PRODUCT_CARD_INTERACTIVE_SELECTOR);
 
     // If the click was on an interactive element, do nothing.
     if (interactiveElement) {

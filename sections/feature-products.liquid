@@ -10,32 +10,98 @@
 %}
 
 <style>
-  /* ── Section heading ── */
+  /* ── Section header + space before product grid ── */
+  [data-testid='featured-products'].section-resource-list {
+    row-gap: clamp(10px, 1.2vw, 16px);
+  }
+
+  [data-testid='featured-products'] .section-resource-list__header {
+    margin-bottom: var(--fpc-heading-below-gap, 16px);
+    padding-bottom: 0;
+  }
+
+  /*
+    Section `spacing-style` sets --padding-block-* on the section root; those variables
+    inherit into `.product-grid__card` (theme base.css), which wrongly padded each card.
+    Reset on featured cards only — section padding stays on the outer .spacing-style div.
+  */
+  [data-testid='featured-products'] product-card .product-card__content.product-grid__card {
+    --padding-block-start: 0px;
+    --padding-block-end: 0px;
+    --padding-inline-start: 0px;
+    --padding-inline-end: 0px;
+    padding-block: 0;
+    padding-inline: 0;
+  }
+
+  [data-testid='featured-products'] .section-resource-list__header .button--link {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.45rem 1rem;
+    border-radius: 999px;
+    border: 1px solid #0a0a0a;
+    background: #0a0a0a;
+    color: #fff;
+    transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+  }
+
+  [data-testid='featured-products'] .section-resource-list__header .button--link:hover {
+    background: #1a1a1a;
+    border-color: #1a1a1a;
+    color: #fff;
+  }
+
   .featured-products__heading {
-    font-size: clamp(22px, 3vw, 32px);
+    font-size: clamp(1.25rem, 2.4vw, 1.75rem);
     font-weight: 600;
     margin: 0;
+    letter-spacing: -0.02em;
     color: var(--color-foreground);
     font-family: var(--font-body--family, sans-serif);
   }
 
-  /* ── Card shell ── */
-  .fpc-native {
+  /* ── Card shell (native <product-card> + featured layout) ── */
+  product-card.fpc-native {
     position: relative;
     display: flex;
     flex-direction: column;
     height: 100%;
     font-family: var(--font-body--family, sans-serif);
+    border-radius: calc(var(--style-border-radius-card, 10px) + 2px);
+    transition: transform 0.35s var(--ease-out-cubic, cubic-bezier(0.4, 0, 0.2, 1)),
+     
   }
 
-  /* ── Media wrapper ── */
+  product-card.fpc-native:hover,
+  product-card.fpc-native:focus-within {
+    transform: translateY(-3px);
+  
+  }
+
+
+
+  product-card.fpc-native .product-card__content.fpc-native__stack {
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* ── Media wrapper (vars used by theme .quick-add__button corner math) ── */
   .fpc-native__media {
     position: relative;
     overflow: hidden;
-    background: var(--color-background-alt, #f2f2f2);
+    background: color-mix(in srgb, var(--color-background-alt, #f2f2f2) 88%, var(--color-foreground) 12%);
     margin-bottom: 12px;
-    border-radius: var(--style-border-radius-card, 8px);
+    border-radius: var(--style-border-radius-card, 10px);
     flex-shrink: 0;
+    border: 1px solid color-mix(in srgb, var(--color-foreground) 7%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-foreground) 5%, transparent);
+    transition: box-shadow 0.35s var(--ease-out-cubic, cubic-bezier(0.4, 0, 0.2, 1));
+    --border-radius: var(--style-border-radius-card, 10px);
+    --padding-inline-end: 0px;
+    --padding-block-end: 0px;
   }
 
   .fpc-ar--portrait {
@@ -129,68 +195,38 @@
     transform: scale(1.04);
   }
 
-  /* Mirror theme product-card:hover .quick-add__button rule */
-  .fpc-native:hover .quick-add__button,
-  .fpc-native:focus-within .quick-add__button {
-    opacity: 1;
+  /* Theme rule targets `product-card`; keep reveal + cascade over bundled quick-add */
+  [data-testid='featured-products'] product-card.fpc-native:hover .quick-add__button,
+  [data-testid='featured-products'] product-card.fpc-native:focus-within .quick-add__button {
+    opacity: 1 !important;
   }
 
-  /* Reveal choose-link on hover */
-  .fpc-native:hover .fpc-native__choose-link,
-  .fpc-native:focus-within .fpc-native__choose-link {
-    opacity: 1;
+  /* Same pill control as collection: tighter inset (theme math uses --quick-add-offset + padding) */
+  [data-testid='featured-products'] .fpc-native__media .quick-add {
+    --quick-add-offset: 10px;
   }
 
-  /* ── Multi-variant "Choose Options" link button ──
-     Positioned + styled to match .quick-add__button exactly */
-  .fpc-native__choose-link {
-    position: absolute;
-    z-index: var(--layer-raised, 10);
+  @media screen and (min-width: 750px) {
+    [data-testid='featured-products'] .fpc-native__media .quick-add {
+      --quick-add-offset: 12px;
+    }
+  }
+
+  [data-testid='featured-products'] .fpc-native__media .quick-add__button {
     right: 12px;
     bottom: 12px;
-    display: flex;
-    align-items: center;
-    background: linear-gradient(var(--color-background, #fff) 0 100%) padding-box;
-    padding: 0;
-    border-radius: 50px;
-    border: 2px solid hsl(0 0% 0% / 0.15);
-    height: var(--button-size-md, 40px);
-    cursor: pointer;
-    opacity: 0;
-    overflow: hidden;
-    color: var(--color-foreground);
-    text-decoration: none;
-    backdrop-filter: blur(20px) saturate(180%);
-    transition: opacity var(--animation-speed, 0.2s) ease, scale var(--animation-speed, 0.2s) ease;
-  }
-
-  .fpc-native__choose-link:hover {
-    scale: 1.03;
-  }
-
-  .fpc-native__choose-link .add-to-cart-text {
-    background: var(--color-background, #fff);
-    overflow: hidden;
-    border-radius: 50px;
-    height: 100%;
-    display: flex;
-    align-items: center;
-  }
-
-  .fpc-native__choose-link .add-to-cart-icon {
-    height: 100%;
-    width: calc(var(--button-size-md, 40px) - 4px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    transition-property: scale, translate, opacity;
+    transition-duration: var(--animation-speed, 0.2s);
+    transition-timing-function: var(--ease-out-cubic, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
   /* ── Product info ── */
   .fpc-native__info {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
     flex: 1;
+    padding-top: 2px;
   }
 
   .fpc-native__vendor {
@@ -202,10 +238,11 @@
   }
 
   .fpc-native__title {
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1.45;
+    font-size: clamp(0.9rem, 1.05vw, 1.02rem);
+    font-weight: 600;
+    line-height: 1.28;
     margin: 0;
+    letter-spacing: -0.01em;
     color: var(--color-foreground);
   }
 
@@ -220,12 +257,12 @@
   }
 
   .fpc-native__price {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--color-foreground);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: color-mix(in srgb, var(--color-foreground) 92%, transparent);
     display: flex;
     align-items: baseline;
-    gap: 6px;
+    gap: 8px;
     flex-wrap: wrap;
     margin-top: 2px;
   }
@@ -272,25 +309,32 @@
   @media (max-width: 749px) {
     .fpc-native__media {
       margin-bottom: 8px;
-      border-radius: 6px;
+      border-radius: 8px;
     }
     .fpc-native__title {
-      font-size: 13px;
+      font-size: 0.875rem;
     }
     .fpc-native__price {
-      font-size: 13px;
-    }
-    .fpc-native__choose-link {
-      opacity: 1;
+      font-size: 0.8125rem;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .fpc-native__img--primary,
     .fpc-native__img--secondary,
-    .fpc-native__choose-link,
     .fpc-native__swatch {
       transition: none;
+    }
+
+    product-card.fpc-native,
+    product-card.fpc-native:hover,
+    product-card.fpc-native:focus-within {
+      transform: none;
+      box-shadow: none;
+    }
+
+    [data-testid='featured-products'] product-card.fpc-native .quick-add__button {
+      opacity: 1 !important;
     }
   }
 </style>
@@ -309,6 +353,7 @@
   style="
     {% render 'spacing-style', settings: section.settings %}
     {% render 'gap-style', value: section.settings.gap %}
+    --fpc-heading-below-gap: {{ section.settings.heading_bottom_gap }}px;
   "
 >
   {% comment %} Header {% endcomment %}
@@ -320,7 +365,7 @@
 
       {% if section.settings.show_view_all and collection != blank %}
         <a href="{{ collection.url }}" class="button button--link">
-          {{ 'sections.featured_collection.view_all' | t }}
+          {{ 'actions.view_all' | t }}
         </a>
       {% endif %}
     </div>
@@ -336,7 +381,8 @@
             layout_type: section.settings.layout_type,
             show_vendor: section.settings.show_vendor,
             show_quick_add: section.settings.show_quick_add,
-            image_ratio: section.settings.image_ratio
+            image_ratio: section.settings.image_ratio,
+            card_index: forloop.index0
           %}
         </div>
 
@@ -353,7 +399,8 @@
             layout_type: section.settings.layout_type,
             show_vendor: section.settings.show_vendor,
             show_quick_add: section.settings.show_quick_add,
-            image_ratio: section.settings.image_ratio
+            image_ratio: section.settings.image_ratio,
+            card_index: forloop.index0
           %}
         </div>
 
@@ -427,7 +474,8 @@
       "type": "checkbox",
       "id": "show_quick_add",
       "label": "Enable quick add button",
-      "default": true
+      "default": true,
+      "info": "Uses the same Add / Choose control as collection cards. Turn on Quick add (and Mobile quick add if needed) in Theme settings."
     },
     {
       "type": "header",
@@ -638,22 +686,35 @@
     {
       "type": "range",
       "id": "padding-block-start",
-      "label": "Padding top",
+      "label": "Section padding top",
       "min": 0,
       "max": 120,
       "step": 4,
       "unit": "px",
-      "default": 60
+      "default": 60,
+      "info": "Outer section only. Does not add padding inside product cards."
     },
     {
       "type": "range",
       "id": "padding-block-end",
-      "label": "Padding bottom",
+      "label": "Section padding bottom",
       "min": 0,
       "max": 120,
       "step": 4,
       "unit": "px",
-      "default": 60
+      "default": 60,
+      "info": "Outer section only. Does not add padding inside product cards."
+    },
+    {
+      "type": "range",
+      "id": "heading_bottom_gap",
+      "label": "Space below heading",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 16,
+      "info": "Gap between the heading row and the product grid."
     }
   ],
   "presets": [
@@ -677,7 +738,8 @@
         "section_width": "page-width",
         "color_scheme": "scheme-1",
         "padding-block-start": 60,
-        "padding-block-end": 60
+        "padding-block-end": 60,
+        "heading_bottom_gap": 16
       }
     }
   ]

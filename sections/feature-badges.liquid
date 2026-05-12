@@ -1,28 +1,24 @@
 {% comment %}
   Feature Badges Section
-  Displays promotional features/USPs with icons
+  Displays USPs with icons — styled to brand palette
 {% endcomment %}
 
 <style>
-  /* Feature Badges Section Styles */
-
   .feature-badges-wrapper {
     background-color: var(--white);
+    font-family: var(--primary-font);
     overflow: hidden;
+  }
+
+  .feature-badges-wrapper.has-borders {
+    border-top: 1px solid rgba(14, 92, 102, 0.12);
+    border-bottom: 1px solid rgba(14, 92, 102, 0.12);
   }
 
   .feature-badges-container {
     max-width: 1440px;
     margin: 0 auto;
-    padding: 0 20px;
-  }
-
-  /* Borders for large screens */
-  @media (min-width: 1024px) {
-    .feature-badges-wrapper.has-borders {
-      border-top: 1px solid #e5e5e5;
-      border-bottom: 1px solid #e5e5e5;
-    }
+    padding: 0 48px;
   }
 
   .feature-badges-grid {
@@ -31,58 +27,28 @@
     width: 100%;
   }
 
-  /* Desktop Grid - Centered */
+  /* Desktop */
   @media (min-width: 1024px) {
-    .feature-badges-grid[data-columns-desktop="2"] {
-      grid-template-columns: repeat(2, 1fr);
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .feature-badges-grid[data-columns-desktop="3"] {
-      grid-template-columns: repeat(3, 1fr);
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .feature-badges-grid[data-columns-desktop="4"] {
-      grid-template-columns: repeat(4, 1fr);
-      max-width: 1300px;
-      margin: 0 auto;
-    }
+    .feature-badges-grid[data-columns-desktop="2"] { grid-template-columns: repeat(2, 1fr); max-width: 860px; margin: 0 auto; }
+    .feature-badges-grid[data-columns-desktop="3"] { grid-template-columns: repeat(3, 1fr); max-width: 1060px; margin: 0 auto; }
+    .feature-badges-grid[data-columns-desktop="4"] { grid-template-columns: repeat(4, 1fr); }
   }
 
-  /* Tablet Grid */
+  /* Tablet */
   @media (min-width: 768px) and (max-width: 1023px) {
-    .feature-badges-grid[data-columns-tablet="2"] {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .feature-badges-grid[data-columns-tablet="3"] {
-      grid-template-columns: repeat(3, 1fr);
-    }
-
-    .feature-badges-grid[data-columns-tablet="4"] {
-      grid-template-columns: repeat(4, 1fr);
-    }
+    .feature-badges-grid[data-columns-tablet="2"] { grid-template-columns: repeat(2, 1fr); }
+    .feature-badges-grid[data-columns-tablet="3"] { grid-template-columns: repeat(3, 1fr); }
+    .feature-badges-grid[data-columns-tablet="4"] { grid-template-columns: repeat(4, 1fr); }
   }
 
-  /* Mobile Grid - Always 2 columns */
-  @media (max-width: 767px) {
-    .feature-badges-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-    }
-  }
-
-  /* Badge Item */
+  /* Badge item */
   .feature-badge-item {
     display: flex;
     align-items: flex-start;
     gap: 16px;
-    text-align: left;
   }
 
+  /* Icon circle — pale peach bg, teal icon */
   .feature-badge-icon-wrapper {
     flex-shrink: 0;
     width: 48px;
@@ -92,126 +58,113 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.3s ease, background-color 0.3s ease;
+    transition: transform 0.25s ease, background-color 0.25s ease;
   }
 
   .feature-badge-item:hover .feature-badge-icon-wrapper {
-    transform: scale(1.05);
+    transform: scale(1.06);
     background-color: var(--color-pale-peach);
   }
 
   .feature-badge-icon {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     color: var(--primary-accent);
   }
 
   .feature-badge-content {
     flex: 1;
     min-width: 0;
+    padding-top: 2px;
+  }
+
+  /* Orange accent rule above title */
+  .feature-badge-rule {
+    display: block;
+    width: 16px;
+    height: 1.5px;
+    background: var(--secondary-accent);
+    opacity: 0.65;
+    margin-bottom: 8px;
   }
 
   .feature-badge-title {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
     line-height: 1.3;
     color: var(--black);
-    margin-bottom: 4px;
+    margin: 0 0 4px;
     font-family: var(--primary-font);
   }
 
   .feature-badge-description {
-    font-size: 14px;
-    line-height: 1.5;
-    color: #666;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: rgba(0, 0, 0, 0.5);
+    margin: 0;
     font-family: var(--primary-font);
   }
 
-  /* Tablet Responsive */
+  /* Tablet */
   @media (max-width: 1023px) {
     .feature-badges-container {
-      padding: 0 16px;
+      padding: 0 32px;
     }
-
     .feature-badges-grid {
       gap: 24px;
     }
-
-    .feature-badge-item {
-      gap: 14px;
-    }
-
     .feature-badge-icon-wrapper {
       width: 44px;
       height: 44px;
     }
-
     .feature-badge-icon {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
     }
-
     .feature-badge-title {
-      font-size: 15px;
+      font-size: 14px;
     }
-
     .feature-badge-description {
       font-size: 13px;
     }
   }
 
-  /* Mobile Responsive */
+  /* Mobile */
   @media (max-width: 767px) {
     .feature-badges-container {
-      padding: 0 16px;
+      padding: 0 20px;
     }
-
     .feature-badges-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
       gap: 20px;
     }
-
     .feature-badge-item {
       flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 12px;
+      align-items: flex-start;
+      gap: 10px;
     }
-
     .feature-badge-icon-wrapper {
       width: 40px;
       height: 40px;
     }
-
     .feature-badge-icon {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
     }
-
     .feature-badge-title {
-      font-size: 14px;
+      font-size: 13px;
     }
-
     .feature-badge-description {
       font-size: 12px;
     }
   }
 
-  /* Accessibility */
   @media (prefers-reduced-motion: reduce) {
     .feature-badge-icon-wrapper {
       transition: none;
     }
   }
 
-  /* Print Styles */
-  @media print {
-    .feature-badge-item {
-      break-inside: avoid;
-      page-break-inside: avoid;
-    }
-  }
-
-  /* Section Padding */
   #feature-badges-{{ section.id }} {
     padding-top: {{ section.settings.padding_top }}px;
     padding-bottom: {{ section.settings.padding_bottom }}px;
@@ -226,14 +179,14 @@
 
   @media (max-width: 767px) {
     #feature-badges-{{ section.id }} .feature-badges-grid {
-      gap: {{ section.settings.grid_gap | divided_by: 1.5 }}px;
+      gap: {{ section.settings.grid_gap | divided_by: 1.5 | round }}px;
     }
   }
 </style>
 
 <div
-  class="feature-badges-wrapper {% if section.settings.show_borders %}has-borders{% endif %}"
   id="feature-badges-{{ section.id }}"
+  class="feature-badges-wrapper{% if section.settings.show_borders %} has-borders{% endif %}"
 >
   <div class="feature-badges-container">
     <div
@@ -243,57 +196,59 @@
     >
       {% for block in section.blocks %}
         <div class="feature-badge-item" {{ block.shopify_attributes }}>
+
           <div class="feature-badge-icon-wrapper">
             {% case block.settings.icon %}
               {% when 'shipping' %}
-                <svg class="feature-badge-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M16 3H1V16H16V3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M16 8H20L23 11V16H16V8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M5.5 21C6.88071 21 8 19.8807 8 18.5C8 17.1193 6.88071 16 5.5 16C4.11929 16 3 17.1193 3 18.5C3 19.8807 4.11929 21 5.5 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M18.5 21C19.8807 21 21 19.8807 21 18.5C21 17.1193 19.8807 16 18.5 16C17.1193 16 16 17.1193 16 18.5C16 19.8807 17.1193 21 18.5 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg class="feature-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 3H1V16H16V3Z"/>
+                  <path d="M16 8H20L23 11V16H16V8Z"/>
+                  <circle cx="5.5" cy="18.5" r="2.5"/>
+                  <circle cx="18.5" cy="18.5" r="2.5"/>
                 </svg>
               {% when 'returns' %}
-                <svg class="feature-badge-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg class="feature-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 9L12 2L21 9V20C21 20.5 20.8 21 20.4 21.4C20 21.8 19.5 22 19 22H5C4.5 22 4 21.8 3.6 21.4C3.2 21 3 20.5 3 20V9Z"/>
+                  <path d="M9 22V12H15V22"/>
                 </svg>
               {% when 'print' %}
-                <svg class="feature-badge-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M6 9V2H18V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M6 18H4C3.46957 18 2.96086 17.7893 2.58579 17.4142C2.21071 17.0391 2 16.5304 2 16V11C2 10.4696 2.21071 9.96086 2.58579 9.58579C2.96086 9.21071 3.46957 9 4 9H20C20.5304 9 21.0391 9.21071 21.4142 9.58579C21.7893 9.96086 22 10.4696 22 11V16C22 16.5304 21.7893 17.0391 21.4142 17.4142C21.0391 17.7893 20.5304 18 20 18H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M18 14H6V22H18V14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg class="feature-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9V2H18V9"/>
+                  <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+                  <rect x="6" y="14" width="12" height="8"/>
                 </svg>
               {% when 'artwork' %}
-                <svg class="feature-badge-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg class="feature-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+                  <path d="M2 17L12 22L22 17"/>
+                  <path d="M2 12L12 17L22 12"/>
                 </svg>
               {% when 'check' %}
-                <svg class="feature-badge-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.709 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg class="feature-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                  <path d="M22 4L12 14.01L9 11.01"/>
                 </svg>
               {% when 'star' %}
-                <svg class="feature-badge-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg class="feature-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
                 </svg>
               {% when 'gift' %}
-                <svg class="feature-badge-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M20 12V22H4V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M22 7H2V12H22V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M12 22V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M12 7H7.5C6.83696 7 6.20107 6.73661 5.73223 6.26777C5.26339 5.79893 5 5.16304 5 4.5C5 3.83696 5.26339 3.20107 5.73223 2.73223C6.20107 2.26339 6.83696 2 7.5 2C11 2 12 7 12 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M12 7H16.5C17.163 7 17.7989 6.73661 18.2678 6.26777C18.7366 5.79893 19 5.16304 19 4.5C19 3.83696 18.7366 3.20107 18.2678 2.73223C17.7989 2.26339 17.163 2 16.5 2C13 2 12 7 12 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg class="feature-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 12V22H4V12"/>
+                  <path d="M22 7H2V12H22V7Z"/>
+                  <path d="M12 22V7"/>
+                  <path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/>
+                  <path d="M12 7H16.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/>
                 </svg>
               {% when 'shield' %}
-                <svg class="feature-badge-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg class="feature-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                 </svg>
             {% endcase %}
           </div>
 
           <div class="feature-badge-content">
+            <span class="feature-badge-rule" aria-hidden="true"></span>
             {% if block.settings.title != blank %}
               <h3 class="feature-badge-title">{{ block.settings.title }}</h3>
             {% endif %}
@@ -301,6 +256,7 @@
               <p class="feature-badge-description">{{ block.settings.description }}</p>
             {% endif %}
           </div>
+
         </div>
       {% endfor %}
     </div>
@@ -315,7 +271,7 @@
   "settings": [
     {
       "type": "header",
-      "content": "Layout Settings"
+      "content": "Layout"
     },
     {
       "type": "range",
@@ -347,14 +303,13 @@
     },
     {
       "type": "header",
-      "content": "Section Styling"
+      "content": "Styling"
     },
     {
       "type": "checkbox",
       "id": "show_borders",
-      "label": "Show Top & Bottom Borders (Desktop)",
-      "default": true,
-      "info": "Adds subtle borders on large screens only"
+      "label": "Show Top & Bottom Borders",
+      "default": true
     },
     {
       "type": "color",
@@ -392,38 +347,14 @@
           "id": "icon",
           "label": "Icon",
           "options": [
-            {
-              "value": "shipping",
-              "label": "Shipping Truck"
-            },
-            {
-              "value": "returns",
-              "label": "Returns/Home"
-            },
-            {
-              "value": "print",
-              "label": "Print on Demand"
-            },
-            {
-              "value": "artwork",
-              "label": "Artwork/Layers"
-            },
-            {
-              "value": "check",
-              "label": "Check Mark"
-            },
-            {
-              "value": "star",
-              "label": "Star"
-            },
-            {
-              "value": "gift",
-              "label": "Gift"
-            },
-            {
-              "value": "shield",
-              "label": "Shield/Security"
-            }
+            { "value": "shipping", "label": "Shipping Truck" },
+            { "value": "returns",  "label": "Returns / Home" },
+            { "value": "print",    "label": "Print on Demand" },
+            { "value": "artwork",  "label": "Artwork / Layers" },
+            { "value": "check",    "label": "Check Mark" },
+            { "value": "star",     "label": "Star" },
+            { "value": "gift",     "label": "Gift" },
+            { "value": "shield",   "label": "Shield / Security" }
           ],
           "default": "check"
         },
@@ -446,38 +377,10 @@
     {
       "name": "Feature Badges",
       "blocks": [
-        {
-          "type": "badge",
-          "settings": {
-            "icon": "shipping",
-            "title": "Free US shipping",
-            "description": "On all orders over $75"
-          }
-        },
-        {
-          "type": "badge",
-          "settings": {
-            "icon": "returns",
-            "title": "Easy returns",
-            "description": "30-day hassle-free returns"
-          }
-        },
-        {
-          "type": "badge",
-          "settings": {
-            "icon": "print",
-            "title": "Print-on-demand",
-            "description": "Made to order, less waste"
-          }
-        },
-        {
-          "type": "badge",
-          "settings": {
-            "icon": "artwork",
-            "title": "Original artwork",
-            "description": "Designs you won't see anywhere else"
-          }
-        }
+        { "type": "badge", "settings": { "icon": "shipping", "title": "Free US shipping",    "description": "On all orders over $75" } },
+        { "type": "badge", "settings": { "icon": "print",    "title": "Print-on-demand",     "description": "Made to order, less waste" } },
+        { "type": "badge", "settings": { "icon": "star",     "title": "Original artwork",    "description": "Designs you won't see anywhere else" } },
+        { "type": "badge", "settings": { "icon": "shield",   "title": "Easy returns",        "description": "30-day hassle-free returns" } }
       ]
     }
   ]

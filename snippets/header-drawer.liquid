@@ -68,22 +68,21 @@
     </summary>
     <div
       ref="menuDrawer"
-      class="menu-drawer uly-drawer color-{{ block_settings.color_scheme }}"
+      class="
+        menu-drawer
+        color-{{ block_settings.color_scheme }}
+      "
     >
-      {%- comment -%} ── Avera-style drawer header: logo + close ── {%- endcomment -%}
-      <div class="uly-drawer__header">
-        <div class="uly-drawer__logo-text">Menu</div>
-        <button
-          class="button button-unstyled uly-drawer__close"
-          type="button"
-          aria-label="{{ 'actions.close' | t }}"
-          on:click="/close"
-        >
-          <span class="svg-wrapper header-drawer-icon header-drawer-icon--close">
-            {{- 'icon-close.svg' | inline_asset_content -}}
-          </span>
-        </button>
-      </div>
+      <button
+        class="button close-button menu-drawer__close-button"
+        type="button"
+        aria-label="{{ 'actions.close' | t }}"
+        on:click="/close"
+      >
+        <span class="svg-wrapper header-drawer-icon header-drawer-icon--close">
+          {{- 'icon-close.svg' | inline_asset_content -}}
+        </span>
+      </button>
       <nav
         class="menu-drawer__navigation"
         style="
@@ -92,20 +91,6 @@
         "
         aria-label="{{ 'accessibility.header_navigation_label' | t }}"
       >
-        {%- if desktop_menu != blank -%}
-          <ul class="menu-drawer__menu has-submenu menu-drawer__menu--desktop-links" role="list" style="margin-bottom: 1rem; border-bottom: 1px solid rgba(var(--color-foreground-rgb), 0.08); padding-bottom: 1rem;">
-            {% assign desktop_animation_index = 0 %}
-            {%- for link in desktop_menu.links -%}
-              {% assign desktop_animation_index = desktop_animation_index | plus: 1 %}
-              <li class="menu-drawer__list-item" style="--menu-drawer-animation-index: {{ desktop_animation_index }};">
-                <a href="{{ link.url }}" class="menu-drawer__menu-item menu-drawer__menu-item--mainlist menu-drawer__animated-element focus-inset{% if link.current %} menu-drawer__menu-item--active{% endif %}">
-                  <span class="menu-drawer__menu-item-text wrap-text">{{ link.title | escape }}</span>
-                </a>
-              </li>
-            {%- endfor -%}
-          </ul>
-        {%- endif -%}
-
         <ul
           class="menu-drawer__menu has-submenu"
           role="list"
@@ -113,7 +98,7 @@
           {%- comment -%}
             Handle menus with fewer than 3 levels of links
           {%- endcomment -%}
-          {% if false %}
+          {% if linklist.levels < 3 %}
             {% assign first_accordion_open = false %}
             {% assign animation_index = 0 %}
             {%- for link in linklist.links -%}
@@ -602,7 +587,7 @@
             assign show_country = false
           endif
         %}
-        {% if data_header_drawer_type == 'mobile-drawer' and (show_country or show_language) %}
+        {% if data_header_drawer_type == 'mobile-drawer' and show_country or show_language %}
           {% liquid
             assign background_brightness = block.settings.color_scheme.settings.background | color_brightness
             if background_brightness < 64
@@ -611,47 +596,99 @@
               assign flag_shadow_size = 2
             endif
 
-            assign _loc_font_key = section.settings.localization_font | default: 'body'
-            assign localization_font = '--menu-localization-font: var(--font-[localization_font]--family); ' | replace: '[localization_font]', _loc_font_key
+            assign localization_font = '--menu-localization-font: var(--font-[localization_font]--family); ' | replace: '[localization_font]', section.settings.localization_font
             assign color_shadow = '--color-shadow: rgb(var(--color-foreground-rgb) / var(--opacity-10-25));'
             assign form_style = localization_font | append: color_shadow
           %}
-          {%- comment -%} ── Single combined localization (mobile only — CSS hides on desktop) ── {%- endcomment -%}
-          {%- comment -%} Using ONE form prevents duplicate id="LocalizationForm" which breaks JS {%- endcomment -%}
-          <div class="uly-drawer__localization">
-
-            <drawer-localization-component class="uly-drawer__locale-row">
+          {% if show_language and show_country == false %}
+            <div class="menu-drawer__localization color-{{ settings.popover_color_scheme }}">
+              {% render 'localization-form',
+                show_country: show_country,
+                show_language: show_language,
+                localization_style: 'drawer',
+                form_style: form_style,
+                form_id: block.id
+              %}
+            </div>
+          {% else %}
+            <drawer-localization-component class="menu-drawer__localization">
               <details
-                id="drawer-localization-combined"
+                id="drawer-localization"
                 class="drawer-localization"
                 on:toggle="/toggle"
               >
                 <summary
-                  class="uly-drawer__locale-trigger link focus-inset"
+                  id="HeaderDrawer-localization"
+                  class="drawer-localization__button h3 link focus-inset"
                   aria-expanded="false"
                   on:click="header-drawer/open/submenu"
+                  style="{{ form_style }}"
                 >
-                  <span class="uly-drawer__locale-label">{{ 'accessibility.localization_region_and_language' | t }}</span>
-                  <span class="uly-drawer__locale-value">
-                    {%- if show_country and section.settings.country_selector_style -%}
-                      <span class="icon-flag" style="background-image:url({{ localization.country | image_url: width: 32 }});--size-shadow:{{ flag_shadow_size }}px;"></span>
+                  <div class="drawer-localization__button--label h6">
+                    {%- if show_country -%}
+                      <div class="mobile-localization mobile-localization--country link">
+                        {%- if section.settings.country_selector_style == true -%}
+                          <span
+                            class="icon-flag"
+                            style="
+                              background-image: url({{- localization.country | image_url: width: 32 }});
+                              --size-shadow: {{ flag_shadow_size }}px;
+                              --color-shadow: rgb(var(--color-foreground-rgb) / var(--opacity-30-60));
+                            "
+                          ></span>
+                        {%- endif -%}
+                        <span class="currency-code">
+                          {{- localization.country.currency.iso_code -}}
+                        </span>
+                      </div>
                     {%- endif -%}
-                    {%- if show_country -%}<span>{{ localization.country.currency.iso_code }}</span>{%- endif -%}
-                    {%- if show_country and show_language -%}<span style="opacity:.4;margin:0 2px">/</span>{%- endif -%}
-                    {%- if show_language -%}<span>{{ localization.language.iso_code | upcase }}</span>{%- endif -%}
-                    <span class="svg-wrapper icon-caret icon-caret--forward">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+
+                    {%- if show_country and show_language -%}
+                      <span>/</span>
+                    {%- endif -%}
+
+                    {%- if show_language -%}
+                      <div class="mobile-localization mobile-localization--country link">
+                        <span>
+                          {{ localization.language.iso_code | upcase }}
+                        </span>
+                      </div>
+                    {%- endif -%}
+                  </div>
+                  <span class="svg-wrapper icon-caret icon-caret--forward">
+                    {{- 'icon-caret.svg' | inline_asset_content -}}
                   </span>
                 </summary>
-                <div class="menu-drawer__submenu has-submenu color-{{ settings.drawer_color_scheme }}">
-                  <div class="menu-drawer__nav-buttons" ref="navButtons">
-                    <button class="button menu-drawer__back-button link focus-inset" on:click="header-drawer/back">
-                      <span class="svg-wrapper icon-caret icon-caret--backward">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
-                      {{ 'accessibility.localization_region_and_language' | t }}
+
+                <div
+                  class="menu-drawer__submenu has-submenu color-{{ settings.drawer_color_scheme }}"
+                  style=""
+                >
+                  <div
+                    class="menu-drawer__nav-buttons"
+                    ref="navButtons"
+                  >
+                    <button
+                      class="button menu-drawer__back-button link focus-inset"
+                      on:click="header-drawer/back"
+                    >
+                      <span class="svg-wrapper icon-caret icon-caret--backward">
+                        {{- 'icon-caret.svg' | inline_asset_content -}}
+                      </span>
+                      {{ 'content.localization_region_and_language' | t }}
                     </button>
-                    <button class="button button-unstyled uly-drawer__close" type="button" aria-label="{{ 'actions.close' | t }}" on:click="header-drawer/close">
-                      <span class="svg-wrapper header-drawer-icon header-drawer-icon--close">{{- 'icon-close.svg' | inline_asset_content -}}</span>
+                    <button
+                      class="button close-button menu-drawer__close-button"
+                      type="button"
+                      aria-label="{{ 'actions.close' | t }}"
+                      on:click="header-drawer/close"
+                    >
+                      <span class="svg-wrapper header-drawer-icon header-drawer-icon--close">
+                        {{- 'icon-close.svg' | inline_asset_content -}}
+                      </span>
                     </button>
                   </div>
+
                   {% render 'localization-form',
                     show_country: show_country,
                     show_language: show_language,
@@ -662,22 +699,7 @@
                 </div>
               </details>
             </drawer-localization-component>
-
-          </div>
-        {%- comment -%} end localization {%- endcomment -%}
-
-        {%- if shop.customer_accounts_enabled and section.settings.show_account -%}
-          <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="menu-drawer__account link focus-inset h5" style="display: flex; align-items: center; gap: var(--gap-sm); padding: 1.2rem 3rem; text-decoration: none; color: var(--color-foreground);">
-            <span class="svg-wrapper" style="width: 20px; height: 20px;">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="100%" height="100%">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
-              </svg>
-            </span>
-            <span style="font-family: var(--primary-font); font-size: 0.9rem; font-weight: 500;">
-              {% if customer %}Account{% else %}Log in{% endif %}
-            </span>
-          </a>
+          {% endif %}
         {%- endif -%}
       </div>
 

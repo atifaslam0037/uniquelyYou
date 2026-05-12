@@ -1,8 +1,7 @@
 {% comment %}
-  Featured Product Card — Horizon Native Quick-Add
-  · Single variant  → quick-add snippet (Add to Cart, works natively)
-  · Multi variant   → styled <a> link to product page (no empty modal)
-  · CSS lives in feature-products.liquid <style> block for admin/live parity
+  Featured product card — same quick-add stack as `blocks/_product-card-gallery.liquid` / collection grid:
+  `<product-card>` (theme JS/CSS), then `{% render 'quick-add', section_id: section.id %}`.
+  @param card_index {number} - Loop index for stable placeholder link ids (pass `forloop.index0` from the section).
 {% endcomment %}
 
 {% liquid
@@ -11,18 +10,35 @@
     assign onboarding = true
   endif
 
+  assign card_index = card_index | default: 0
+
+  assign featured_can_quick_add = false
   unless onboarding
-    assign variant = product.selected_or_first_available_variant
+    if show_quick_add and product.available
+      if settings.quick_add or settings.mobile_quick_add
+        assign featured_can_quick_add = true
+      endif
+    endif
+  endunless
+
+  assign has_quick_add = false
+  if featured_can_quick_add and settings.quick_add
+    assign has_quick_add = true
+  endif
+
+  assign has_mobile_quick_add = false
+  if featured_can_quick_add and settings.mobile_quick_add
+    assign has_mobile_quick_add = true
+  endif
+
+  unless onboarding
+    assign variant_to_link = product.selected_or_first_available_variant
     assign has_compare_price = false
-    if variant.compare_at_price > variant.price
+    if variant_to_link.compare_at_price > variant_to_link.price
       assign has_compare_price = true
     endif
     assign featured_media = product.featured_media
     assign second_media = product.media[1]
-    assign is_multi_variant = false
-    if product.variants_count > 1
-      assign is_multi_variant = true
-    endif
 
     assign color_option = null
     for option in product.options_with_values
@@ -32,6 +48,10 @@
         break
       endif
     endfor
+
+    assign product_card_id = 'fpc-link-' | append: section.id | append: '-' | append: product.id
+  else
+    assign product_card_id = 'fpc-link-' | append: section.id | append: '-onboard-' | append: card_index
   endunless
 
   case image_ratio
@@ -46,143 +66,142 @@
   endcase
 %}
 
-<div
-  class="fpc-native{% if onboarding %} fpc-native--onboarding{% endif %}"
-  data-product-id="{{ product.id }}"
+<product-card
+  class="fpc-native product-card{% if onboarding %} fpc-native--onboarding{% endif %}{% if featured_can_quick_add %} fpc-native--has-atc{% endif %}"
+  data-product-id="{% unless onboarding %}{{ product.id }}{% endunless %}"
+  id="fpc-pc-{{ section.id }}-{% if onboarding %}onboard-{{ card_index }}{% else %}{{ product.id }}{% endif %}"
+  {% if onboarding %}
+    data-placeholder="true"
+  {% endif %}
 >
-
-  {%- comment -%} ── MEDIA ── {%- endcomment -%}
-  <div
-    class="fpc-native__media {{ ar_class }}"
-    style="--quick-add-display: flex; --quick-add-mobile-display: none; --quick-add-mobile-opacity: 0;"
+  <a
+    id="{{ product_card_id | md5 }}"
+    {% unless onboarding %}
+      href="{{ variant_to_link.url }}"
+    {% else %}
+      href="#"
+    {% endunless %}
+    class="product-card__link"
+    ref="productCardLink"
   >
-    {%- comment -%} Sale badge — z-index:50 above layer-raised, pointer-events:none {%- endcomment -%}
-    {% unless onboarding %}
-      {% if has_compare_price %}
-        <span class="fpc-native__badge">{{ 'content.product_badge_sale' | t }}</span>
-      {% endif %}
-    {% endunless %}
-
-    {%- comment -%} Images (both absolutely positioned for consistent sizing) {%- endcomment -%}
-    <a
-      href="{% if onboarding %}#{% else %}{{ product.url }}{% endif %}"
-      class="fpc-native__img-link"
-      tabindex="-1"
-      aria-hidden="true"
-    >
+    <span class="visually-hidden">
       {% if onboarding %}
-        <div class="fpc-native__placeholder">
-          {{ 'product-1' | placeholder_svg_tag: 'fpc-native__placeholder-svg' }}
-        </div>
+        {{- 'content.product_card_placeholder' | t -}}
       {% else %}
-        {% if featured_media %}
-          {{
-            featured_media
-            | image_url: width: 900
-            | image_tag:
-              loading: 'lazy',
-              sizes: '(min-width: 1200px) 300px, (min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw',
-              widths: '300, 450, 600, 750, 900',
-              class: 'fpc-native__img fpc-native__img--primary',
-              alt: featured_media.alt | default: product.title
-          }}
-        {% endif %}
-        {% if second_media %}
-          {{
-            second_media
-            | image_url: width: 900
-            | image_tag:
-              loading: 'lazy',
-              sizes: '(min-width: 1200px) 300px, (min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw',
-              widths: '300, 450, 600, 750, 900',
-              class: 'fpc-native__img fpc-native__img--secondary',
-              alt: second_media.alt | default: product.title
-          }}
-        {% endif %}
+        {{- product.title -}}
       {% endif %}
-    </a>
+    </span>
+  </a>
 
-    {%- comment -%}
-      Quick-add logic:
-      · Single variant → native quick-add snippet (renders add-to-cart form, works 100%)
-      · Multi variant  → <a> link to product page (avoids empty modal entirely)
-    {%- endcomment -%}
-    {% unless onboarding %}
-      {% if show_quick_add and product.available %}
-        {% if is_multi_variant %}
-          <a
-            href="{{ product.url }}"
-            class="fpc-native__choose-link"
-            aria-label="{{ 'actions.choose' | t }}: {{ product.title }}"
-          >
-            <span class="add-to-cart-text">
-              <span aria-hidden="true" class="svg-wrapper add-to-cart-icon">
-                {{- 'icon-add-to-cart.svg' | inline_asset_content -}}
-              </span>
-              <span class="add-to-cart-text__content is-visually-hidden-mobile">
-                <span><span>{{ 'actions.choose' | t }}</span></span>
-              </span>
-            </span>
-          </a>
-        {% else %}
-          {%- comment -%} Single variant: use the full native quick-add snippet {%- endcomment -%}
-          {% render 'quick-add', product: product, section_id: section.id %}
+  <div
+    class="product-card__content fpc-native__stack layout-panel-flex layout-panel-flex--column product-grid__card gap-style"
+    style="
+      {% render 'gap-style', value: 4, name: 'product-card-gap' %}
+      --quick-add-display: {% if has_quick_add %}flex{% else %}none{% endif %};
+      --quick-add-mobile-display: {% if has_mobile_quick_add %}flex{% else %}none{% endif %};
+      --quick-add-mobile-opacity: {% if has_mobile_quick_add %}1{% else %}0{% endif %};
+    "
+  >
+    <div class="fpc-native__media {{ ar_class }}">
+      {% unless onboarding %}
+        {% if has_compare_price %}
+          <span class="fpc-native__badge">{{ 'content.product_badge_sale' | t }}</span>
         {% endif %}
-      {% endif %}
-    {% endunless %}
-  </div>
+      {% endunless %}
 
-  {%- comment -%} ── INFO ── {%- endcomment -%}
-  <div class="fpc-native__info">
-    {% unless onboarding %}
-      {% if show_vendor and product.vendor != blank %}
-        <span class="fpc-native__vendor">{{ product.vendor }}</span>
-      {% endif %}
-    {% endunless %}
-
-    <h3 class="fpc-native__title">
-      <a href="{% if onboarding %}#{% else %}{{ product.url }}{% endif %}">
+      <a
+        href="{% if onboarding %}#{% else %}{{ product.url }}{% endif %}"
+        class="fpc-native__img-link"
+        tabindex="-1"
+        aria-hidden="true"
+      >
         {% if onboarding %}
-          {{ 'content.product_card_placeholder' | t }}
+          <div class="fpc-native__placeholder">
+            {{ 'product-1' | placeholder_svg_tag: 'fpc-native__placeholder-svg' }}
+          </div>
         {% else %}
-          {{ product.title }}
+          {% if featured_media %}
+            {{
+              featured_media
+              | image_url: width: 900
+              | image_tag:
+                loading: 'lazy',
+                sizes: '(min-width: 1200px) 300px, (min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw',
+                widths: '300, 450, 600, 750, 900',
+                class: 'fpc-native__img fpc-native__img--primary',
+                alt: featured_media.alt | default: product.title
+            }}
+          {% endif %}
+          {% if second_media %}
+            {{
+              second_media
+              | image_url: width: 900
+              | image_tag:
+                loading: 'lazy',
+                sizes: '(min-width: 1200px) 300px, (min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw',
+                widths: '300, 450, 600, 750, 900',
+                class: 'fpc-native__img fpc-native__img--secondary',
+                alt: second_media.alt | default: product.title
+            }}
+          {% endif %}
         {% endif %}
       </a>
-    </h3>
 
-    <div class="fpc-native__price">
-      {% if onboarding %}
-        <span class="fpc-native__price--current">$99.00</span>
-      {% else %}
-        {% if has_compare_price %}
-          <span class="fpc-native__price--compare">{{ variant.compare_at_price | money }}</span>
-        {% endif %}
-        <span class="fpc-native__price--current{% if has_compare_price %} fpc-native__price--sale{% endif %}">
-          {{ variant.price | money }}
-        </span>
+      {% if featured_can_quick_add %}
+        {% render 'quick-add', product: product, section_id: section.id %}
       {% endif %}
     </div>
 
-    {% unless onboarding %}
-      {% if color_option and color_option.values.size > 0 %}
-        <div class="fpc-native__swatches">
-          {% for value in color_option.values limit: 5 %}
-            <div
-              class="fpc-native__swatch"
-              style="background-color: {{ value | handle }};"
-              title="{{ value }}"
-              role="img"
-              aria-label="{{ value }}"
-            ></div>
-          {% endfor %}
-          {% if color_option.values.size > 5 %}
-            <span class="fpc-native__swatch-more">+{{ color_option.values.size | minus: 5 }}</span>
-          {% endif %}
-        </div>
-      {% endif %}
-    {% endunless %}
-  </div>
-</div>
+    <div class="fpc-native__info">
+      {% unless onboarding %}
+        {% if show_vendor and product.vendor != blank %}
+          <span class="fpc-native__vendor">{{ product.vendor }}</span>
+        {% endif %}
+      {% endunless %}
 
-{% comment %} Ensure quick-add native button styles are loaded {% endcomment %}
+      <h3 class="fpc-native__title">
+        <a href="{% if onboarding %}#{% else %}{{ product.url }}{% endif %}">
+          {% if onboarding %}
+            {{ 'content.product_card_placeholder' | t }}
+          {% else %}
+            {{ product.title }}
+          {% endif %}
+        </a>
+      </h3>
+
+      <div class="fpc-native__price">
+        {% if onboarding %}
+          <span class="fpc-native__price--current">$99.00</span>
+        {% else %}
+          {% if has_compare_price %}
+            <span class="fpc-native__price--compare">{{ variant_to_link.compare_at_price | money }}</span>
+          {% endif %}
+          <span class="fpc-native__price--current{% if has_compare_price %} fpc-native__price--sale{% endif %}">
+            {{ variant_to_link.price | money }}
+          </span>
+        {% endif %}
+      </div>
+
+      {% unless onboarding %}
+        {% if color_option and color_option.values.size > 0 %}
+          <div class="fpc-native__swatches">
+            {% for value in color_option.values limit: 5 %}
+              <div
+                class="fpc-native__swatch"
+                style="background-color: {{ value | handle }};"
+                title="{{ value }}"
+                role="img"
+                aria-label="{{ value }}"
+              ></div>
+            {% endfor %}
+            {% if color_option.values.size > 5 %}
+              <span class="fpc-native__swatch-more">+{{ color_option.values.size | minus: 5 }}</span>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endunless %}
+    </div>
+  </div>
+</product-card>
+
 {% render 'quick-add-styles' %}

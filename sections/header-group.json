@@ -35,7 +35,7 @@
       "settings": {
         "speed": 5,
         "section_width": "page-width",
-        "color_scheme": "scheme-1",
+        "color_scheme": "scheme-2",
         "divider_width": 1,
         "padding-block-start": 15,
         "padding-block-end": 15
@@ -43,12 +43,13 @@
     },
     "header_section": {
       "type": "custom-header",
-      "blocks": {},
       "settings": {
         "logo_max_width": 180,
         "menu": "main-menu",
-        "customer_account_menu": "customer-account-main-menu",
+        "desktop_menu": "",
         "show_search": true,
+        "show_account": true,
+        "show_cart": true,
         "show_country": true,
         "country_selector_style": true,
         "show_language": true,
@@ -58,6 +59,8 @@
         "menu_style": "text",
         "image_border_radius": 4,
         "color_scheme": "scheme-1",
+        "enable_transparent_home": true,
+        "sticky_style": "glassmorphism",
         "actions_display_style": "icon",
         "enable_sticky_header": "always"
       }

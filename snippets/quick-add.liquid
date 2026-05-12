@@ -5,10 +5,16 @@
   @param {string} section_id - The section ID
   @param {object} [block] - The block object
   @param {string} [color_scheme] - The color scheme to use
+  @param {boolean} [force_add_only] - When true, always use first available variant add-to-cart (no “Choose” modal), e.g. featured product grids.
 {%- enddoc -%}
 
 {% liquid
-  assign product_form_id = 'QuickAdd-ProductForm-' | append: product.id | append: '-' | append: block.id
+  if block != blank
+    assign quick_add_id_suffix = block.id
+  else
+    assign quick_add_id_suffix = section_id
+  endif
+  assign product_form_id = 'QuickAdd-ProductForm-' | append: product.id | append: '-' | append: quick_add_id_suffix
   assign add_to_cart_text = 'actions.add' | t
   assign choose_options_text = 'actions.choose' | t
   assign color_scheme = color_scheme | default: settings.quick_add_color_scheme
@@ -22,9 +28,13 @@
     assign can_add_to_cart = false
   endif
 
-  assign quick_add_button = 'choose'
-  if product.variants_count == 1 or product.options.size == 1 and product.selected_variant
+  if force_add_only
     assign quick_add_button = 'add'
+  else
+    assign quick_add_button = 'choose'
+    if product.variants_count == 1 or product.options.size == 1 and product.selected_variant
+      assign quick_add_button = 'add'
+    endif
   endif
 %}
 
