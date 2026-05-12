@@ -29,15 +29,7 @@
   endif
 %}
 
-{% if sticky %}
-  <style>
-    #shopify-section-{{ section.id }} {
-      position: sticky;
-      top: 0;
-      z-index: 200;
-    }
-  </style>
-{% endif %}
+{%- comment -%} Sticky positioning uses .header-section rules in the stylesheet (top: -1px) so the header intersection observer matches Horizon. {%- endcomment -%}
 
 {%- comment -%} ── Logo ── {%- endcomment -%}
 {% capture logo %}
@@ -202,17 +194,22 @@
   <div class="uly-header__underlay uly-header__underlay--closed"></div>
   <div class="uly-header__underlay uly-header__underlay--open"></div>
 
-  <div class="uly-header__row color-{{ section.settings.color_scheme }} section section--full-width-margin">
+  <div
+    class="uly-header__row color-{{ section.settings.color_scheme }} section section--full-width-margin"
+    ref="headerRowTop"
+  >
     <div class="uly-header__inner spacing-style">
       {%- comment -%} LEFT COLUMN — Hamburger + Search + Desktop Menu {%- endcomment -%}
       <div class="uly-header__col uly-header__col--left">
-        {% render 'header-drawer',
-          linklist: section.settings.menu,
-          desktop_menu: section.settings.desktop_menu,
-          section: section,
-          block: section,
-          data_header_drawer_type: 'mobile-drawer'
-        %}
+        <div class="header__drawer" ref="headerDrawerContainer" data-skip-node-update="true">
+          {% render 'header-drawer',
+            linklist: section.settings.menu,
+            desktop_menu: section.settings.desktop_menu,
+            section: section,
+            block: section,
+            data_header_drawer_type: 'mobile-drawer'
+          %}
+        </div>
         {{ search_markup }}
         {%- if section.settings.desktop_menu != blank -%}
           <nav class="uly-header__inline-menu desktop:visible mobile:hidden">
@@ -244,6 +241,9 @@
       </div>
     </div>
   </div>
+
+  {%- comment -%} Satisfies header-component requiredRefs (desktop mega-menu lives in inline nav / drawer instead). {%- endcomment -%}
+  <div ref="headerMenu" class="uly-header-menu-placeholder" hidden aria-hidden="true"></div>
 </header-component>
 
 {%- comment -%} ── Header controller: drawer mode + scroll-based transparency ── {%- endcomment -%}
@@ -305,6 +305,21 @@
     --header-height: 64px;
     --header-group-height: var(--header-height);
     --transparent-header-offset-boolean: 0;
+  }
+
+  /* Same as Horizon header: header group does not create a layout box so sticky/stacking match storefront preview */
+  #header-group:has(#header-component[sticky]) {
+    display: contents;
+  }
+
+  .uly-header .header__drawer {
+    display: flex;
+    align-items: center;
+    min-height: var(--header-drawer-min-height, 44px);
+  }
+
+  .uly-header-menu-placeholder {
+    display: none !important;
   }
 
   .uly-header {

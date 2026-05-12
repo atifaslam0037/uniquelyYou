@@ -17,6 +17,21 @@
   --account-offset-top: calc(var(--header-group-height, 64px) + (var(--header-height, 64px) * var(--transparent-header-offset-boolean, 0)));
 }
 
+/* Match Horizon header-group behavior so sticky header, drawer, and overlays layout the same in editor and live preview */
+#header-group:has(#header-component[sticky]) {
+  display: contents;
+}
+
+.uly-header .header__drawer {
+  display: flex;
+  align-items: center;
+  min-height: var(--header-drawer-min-height, 44px);
+}
+
+.uly-header-menu-placeholder {
+  display: none !important;
+}
+
 .uly-header[data-sticky-state='active'] {
   --account-offset-top: calc(var(--header-height, 64px) - 1px);
 }
@@ -288,8 +303,12 @@
 
 .uly-list-menu__item:hover,
 .uly-list-menu__item--active {
-  color: var(--color-mint, #5FBFB8);
+  color: var(--secondary-accent, #E8612C);
   text-decoration: none;
+}
+
+.uly-list-menu__item:after {
+  display: none !important;
 }
 
 /* ══════════════════════════════════════════════════════════════
