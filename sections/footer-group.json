@@ -43,20 +43,10 @@
       ],
       "name": "t:names.footer",
       "settings": {
-        "show_logo_text": true,
-        "logo_text_before": "uniquely",
-        "logo_text_highlight": "you",
-        "description": "Print-on-demand clothing for people who like to stand out. Designed with love, made to order.",
         "show_social": true,
-        "social_instagram": "#",
-        "social_twitter": "#",
         "social_facebook": "#",
-        "social_youtube": "#",
+        "social_instagram": "#",
         "copyright_text": "All rights reserved.",
-        "show_legal_links": true,
-        "privacy_link": "#",
-        "terms_link": "#",
-        "cookies_link": "#",
         "background_color": "#0a1820",
         "margin_top": 0
       }

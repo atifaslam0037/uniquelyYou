@@ -1,0 +1,34 @@
+/* ================================================================
+   ULY EDITOR FIXES — uly-editor-fixes.css
+   Loaded from layout/theme.liquid after content_for_header.
+   Applies identically in both admin editor and live storefront.
+   Keep this file minimal — only things that genuinely differ
+   between the two environments belong here.
+   ================================================================ */
+
+/*
+  EDITOR-ONLY: Transparent header must stay readable.
+  In the admin editor the iframe never scrolls, so without this
+  fix all icons/text would be white-on-white (invisible).
+  The .shopify-design-mode class is added to <html> only in the
+  admin editor, so this block has zero effect on the live site.
+*/
+.shopify-design-mode .uly-header--transparent .uly-header__underlay--closed {
+  background: var(--color-background) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+.shopify-design-mode .uly-header--transparent .uly-logo__text,
+.shopify-design-mode .uly-header--transparent .uly-logo__img,
+.shopify-design-mode .uly-header--transparent .uly-list-menu__item,
+.shopify-design-mode .uly-header--transparent .header-drawer-icon svg,
+.shopify-design-mode .uly-header--transparent .search-action button svg,
+.shopify-design-mode .uly-header--transparent .header-actions__cart-icon svg,
+.shopify-design-mode .uly-header--transparent .account-button svg,
+.shopify-design-mode .uly-header--transparent .header-actions__action {
+  color: var(--color-foreground) !important;
+  stroke: var(--color-foreground) !important;
+  opacity: 1 !important;
+}

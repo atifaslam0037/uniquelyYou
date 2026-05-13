@@ -83,6 +83,7 @@
   --color-account-icon: rgb(255, 255, 255);
 }
 
+
 .uly-header--transparent:not([data-scrolled='true']) .uly-logo__text,
 .uly-header--transparent:not([data-scrolled='true']) .uly-list-menu__item,
 .uly-header--transparent:not([data-scrolled='true']) .header-drawer-icon svg,
@@ -92,6 +93,11 @@
 .uly-header--transparent:not([data-scrolled='true']) .account-button svg {
   color: rgb(255, 255, 255) !important;
   stroke: rgb(255, 255, 255) !important;
+}
+
+.uly-header--transparent:not([data-scrolled='true']) .menu-drawer__close-button svg {
+  color: #000 !important;
+  stroke: #000 !important;
 }
 
 /* Glassmorphism on scroll */
@@ -267,6 +273,7 @@
   visibility: visible !important;
   min-height: var(--header-drawer-min-height, 44px) !important;
 }
+
 .uly-header-actions-wrapper {
   display: flex;
   align-items: center;
@@ -304,7 +311,7 @@
 
 #header-component .header-menu,
 #header-component header-menu {
-  display: flex !important;
+  display: none !important;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -426,7 +433,7 @@ dropdown-localization-component.uly-localization {
 }
 
 /* ── Close button: dark circle, top-right ── */
-.uly-drawer > .menu-drawer__close-button {
+.uly-drawer>.menu-drawer__close-button {
   display: flex !important;
   position: absolute !important;
   top: 14px !important;
@@ -447,11 +454,11 @@ dropdown-localization-component.uly-localization {
   transition: opacity 0.2s ease !important;
 }
 
-.uly-drawer > .menu-drawer__close-button:hover {
+.uly-drawer>.menu-drawer__close-button:hover {
   opacity: 0.75 !important;
 }
 
-.uly-drawer > .menu-drawer__close-button svg {
+.uly-drawer>.menu-drawer__close-button svg {
   width: 16px !important;
   height: 16px !important;
   color: var(--color-background) !important;
@@ -531,11 +538,11 @@ dropdown-localization-component.uly-localization {
   opacity: 1 !important;
   visibility: hidden !important;
   transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-              visibility 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    visibility 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 /* When submenu is open (details[open]) */
-.uly-drawer details[open] > .menu-drawer__submenu {
+.uly-drawer details[open]>.menu-drawer__submenu {
   transform: translateX(0) !important;
   visibility: visible !important;
 }
@@ -577,7 +584,7 @@ dropdown-localization-component.uly-localization {
   color: var(--color-mint, #5FBFB8) !important;
 }
 
-.uly-drawer .menu-drawer__back-button > .svg-wrapper {
+.uly-drawer .menu-drawer__back-button>.svg-wrapper {
   width: 14px !important;
   height: 14px !important;
   margin-right: 2px !important;

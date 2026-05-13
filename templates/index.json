@@ -369,7 +369,7 @@
         "badge_BUKqdH": {
           "type": "badge",
           "settings": {
-            "icon": "shield",
+            "icon": "check",
             "title": "Easy returns",
             "description": "30-day hassle-free returns"
           }
@@ -382,9 +382,6 @@
         "badge_BUKqdH"
       ],
       "settings": {
-        "columns_desktop": 4,
-        "columns_tablet": 2,
-        "grid_gap": 32,
         "show_borders": true,
         "background_color": "",
         "padding_top": 40,

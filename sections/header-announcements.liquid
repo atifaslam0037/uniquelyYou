@@ -1,5 +1,3 @@
-
-
 {% if section.blocks.size > 1 %}
   <script
     src="{{ 'announcement-bar.js' | asset_url }}"
@@ -114,7 +112,8 @@
   }
 
   .announcement-bar__text:first-child {
-    margin: 0;
+    margin: 0 auto;
+    text-align: center;
   }
 
   .announcement-bar__link {

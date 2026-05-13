@@ -1,0 +1,54 @@
+{
+  "sections": {
+    "about-hero": {
+      "type": "about-hero",
+      "settings": {
+        "badge_text": "About Us",
+        "badge_bg_color": "#E8612C",
+        "badge_text_color": "#FFFFFF",
+        "heading": "Made for the moments that make you, you.",
+        "heading_size": 60,
+        "heading_color": "#0E5C66",
+        "description": "Uniquely You was created to celebrate individuality through custom apparel that speaks your story. We believe what you wear should feel like you—authentic, meaningful, and effortlessly you.",
+        "text_color": "#333333",
+        "button_label": "Our Story",
+        "button_link": "",
+        "button_bg": "#E8612C",
+        "button_color": "#FFFFFF",
+        "text_alignment": "left",
+        "enable_overlay": true,
+        "overlay_color": "#FFE8DD",
+        "overlay_opacity": 70,
+        "overlay_direction": "to_right",
+        "hero_height": 480,
+        "mobile_height": 500,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "about-story": {
+      "type": "about-story",
+      "settings": {
+        "badge_text": "Our Story",
+        "badge_color": "#E8612C",
+        "heading": "It started with a simple idea.",
+        "heading_size": 40,
+        "heading_color": "#0E5C66",
+        "description": "<p>We wanted a place where creativity meets quality—where you can express what matters most to you through designs that are fun, thoughtful, and made to last.</p><p>From original one-liners to custom creations, every piece is printed on premium materials with care and purpose.</p><p>This isn't just a brand. It's a community of people who choose authenticity, kindness, and self-expression—together.</p>",
+        "text_color": "#444444",
+        "signature_name": "Todd & Fran",
+        "signature_role": "Founders of Uniquely You",
+        "reverse_layout": false,
+        "column_gap": 80,
+        "image_radius": 12,
+        "bg_color": "#FFFFFF",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "about-hero",
+    "about-story"
+  ]
+}

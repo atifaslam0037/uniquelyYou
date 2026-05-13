@@ -1,675 +1,680 @@
 {% comment %}
-  Footer Section — Premium
-  Multi-column layout · Trust bar · Mobile accordion
+  Footer Section — Clean rebuild
+  Brand · Menu columns · Newsletter + Payments
 {% endcomment %}
 
 <style>
-  /* ─────────────────────────────────────────
-     All colors come from your global CSS vars.
-     No external fonts — Geist is loaded globally.
-  ───────────────────────────────────────── */
+  @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
 
-  .footer-wrapper {
-    background-color: var(--primary-accent);
-    color: var(--white);
-    font-family: var(--primary-font);
-    position: relative;
-    overflow: hidden;
+  .ft-wrap {
+    background-color: {{ section.settings.background_color | default: '#0d5c66' }};
+    color: #ffffff;
+    font-family: var(--primary-font, sans-serif);
   }
 
-  /* Mint accent line across the top */
-  .footer-wrapper::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(95, 191, 184, 0.4) 20%,
-      var(--color-mint) 50%,
-      rgba(95, 191, 184, 0.4) 80%,
-      transparent 100%
-    );
-    z-index: 2;
-  }
-
-  /* Depth glows — brand colors, very subtle */
-  .footer-glow-a {
-    position: absolute;
-    top: -100px;
-    right: -60px;
-    width: 420px;
-    height: 420px;
-    background: radial-gradient(circle, rgba(95, 191, 184, 0.07) 0%, transparent 65%);
-    pointer-events: none;
-    z-index: 0;
-  }
-  .footer-glow-b {
-    position: absolute;
-    bottom: -60px;
-    left: 5%;
-    width: 320px;
-    height: 320px;
-    background: radial-gradient(circle, rgba(232, 97, 44, 0.06) 0%, transparent 65%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* ── Container ── */
-  .footer-container {
+  .ft-inner {
     max-width: 1440px;
     margin: 0 auto;
     padding: 0 48px;
-    position: relative;
-    z-index: 1;
   }
 
-  /* ── Main grid ── */
-  .footer-main {
-    padding: 64px 0 56px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  /* ── Main body: flexbox row ── */
+  .ft-body {
+    padding: 52px 0 44px;
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
   }
 
-  .footer-grid {
-    display: grid;
-    grid-template-columns: 1.8fr 1fr 1fr 1fr;
-    gap: 48px;
-    align-items: start;
+  /* ── Brand ── */
+  .ft-brand {
+    flex: 0 0 210px;
+    min-width: 0;
+    padding-right: 0;
+    margin-right: 56px;
   }
 
-  /* ── Brand column ── */
-  .footer-logo {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
+  .ft-logo-link {
+    display: inline-block;
     text-decoration: none;
-    color: inherit;
+    color: #fff;
     margin-bottom: 14px;
+    line-height: 1.1;
   }
 
-  .footer-logo-img {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-
-  /* Geometric mark shown when no logo image */
-  .footer-logo-mark {
-    width: 36px;
-    height: 36px;
-    border: 1.5px solid rgba(95, 191, 184, 0.5);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .footer-logo-mark svg {
-    width: 14px;
-    height: 14px;
-    fill: var(--color-mint);
-  }
-
-  .footer-logo-text {
-    font-size: 22px;
+  .ft-logo-script {
+    font-family: 'Dancing Script', cursive;
+    font-size: 26px;
     font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1;
-  }
-  .footer-logo-text .highlight {
-    color: var(--secondary-accent);
   }
 
-  .footer-tagline {
-    font-size: 10px;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: rgba(95, 191, 184, 0.7);
-    margin-bottom: 18px;
-    font-weight: 400;
+  .ft-logo-bold {
+    font-family: var(--primary-font, sans-serif);
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
   }
 
-  .footer-rule {
-    width: 28px;
-    height: 1.5px;
-    background: linear-gradient(90deg, var(--color-mint), transparent);
-    margin-bottom: 20px;
+  .ft-tagline {
+    font-size: 13px;
+    line-height: 1.65;
+    color: rgba(255,255,255,0.58);
+    margin: 0 0 20px;
   }
 
-  .footer-description {
-    font-size: 13.5px;
-    line-height: 1.75;
-    color: rgba(255, 255, 255, 0.55);
-    margin-bottom: 28px;
-    font-weight: 400;
-    max-width: 280px;
-  }
-
-  /* Social icons */
-  .footer-social {
+  .ft-social {
     display: flex;
-    gap: 10px;
+    gap: 16px;
+    align-items: center;
   }
-  .footer-social-link {
+
+  .ft-social-link {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 50%;
-    color: rgba(255, 255, 255, 0.5);
-    text-decoration: none;
-    transition: border-color 0.25s ease, color 0.25s ease, transform 0.2s ease;
+    transition: color 0.2s;
   }
-  .footer-social-link:hover {
-    border-color: var(--color-mint);
-    color: var(--color-mint);
-    transform: translateY(-2px);
-  }
-  .footer-social-icon {
-    width: 15px;
-    height: 15px;
-  }
+
+  .ft-social-link:hover { color: #fff; }
+  .ft-social-link svg { width: 19px; height: 19px; }
 
   /* ── Menu columns ── */
-  .footer-col-heading {
-    font-size: 10px;
+  .ft-menus {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .ft-col {
+    flex: 0 0 auto;
+    min-width: 120px;
+    padding: 0 28px;
+  }
+
+  .ft-col:first-child { padding-left: 0; }
+  .ft-col:last-child  { padding-right: 0; }
+
+  .ft-col-head {
+    font-size: 14.5px;
     font-weight: 600;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--color-mint);
-    margin: 0 0 24px;
+    color: #fff;
+    margin: 0 0 16px;
+    line-height: 1.2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     cursor: default;
-    display: block;
+    user-select: none;
   }
 
-  /* Orange rule rendered as a separate element below the text */
-  .footer-col-rule {
-    display: block;
-    width: 18px;
-    height: 1.5px;
-    background: var(--secondary-accent);
-    margin-top: 10px;
-    opacity: 0.55;
-  }
+  .ft-toggle { display: none; }
 
-  .footer-menu-toggle {
-    display: none;
-  }
-
-  .footer-menu-list {
+  .ft-list {
     list-style: none;
     padding: 0;
     margin: 0;
   }
 
-  .footer-menu-item {
+  .ft-list li { margin-bottom: 9px; }
+
+  .ft-list a {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    transition: color 0.2s;
+    line-height: 1.4;
+    display: inline-block;
+  }
+
+  .ft-list a:hover { color: #fff; }
+
+  /* ── Vertical divider ── */
+  .ft-divider {
+    flex: 0 0 1px;
+    background: rgba(255,255,255,0.14);
+    align-self: stretch;
+    margin: 0 44px;
+  }
+
+  /* ── Right panel ── */
+  .ft-right {
+    flex: 0 0 280px;
+    min-width: 0;
+  }
+
+  .ft-right-head {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 6px;
+    line-height: 1.3;
+  }
+
+  .ft-right-sub {
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.52);
+    margin: 0 0 16px;
+    line-height: 1.55;
+  }
+
+  /* Newsletter */
+  .ft-nl-form {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
     margin-bottom: 10px;
   }
 
-  .footer-menu-link {
-    font-size: 13.5px;
-    color: rgba(255, 255, 255, 0.55);
-    text-decoration: none;
-    font-weight: 400;
+  /* High-specificity overrides — beats theme global:
+     input:not([type='checkbox'],[type='radio']) { background-color: var(--color-input-background) }
+  */
+  .ft-wrap .ft-nl-form input.ft-nl-input,
+  .ft-wrap .ft-nl-form input.ft-nl-input:not([type='checkbox'],[type='radio']) {
+    flex: 1 1 0;
+    min-width: 0;
+    background-color: transparent !important;
+    background: transparent !important;
+    border: 1.5px solid rgba(255,255,255,0.4) !important;
+    border-color: rgba(255,255,255,0.4) !important;
+    border-radius: 7px !important;
+    box-shadow: none !important;
+    outline: none !important;
+    padding: 11px 14px;
+    font-size: 13px;
+    color: #fff !important;
+    font-family: inherit;
+    transition: border-color 0.25s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .ft-wrap .ft-nl-form input.ft-nl-input::placeholder {
+    color: rgba(255,255,255,0.4) !important;
+    opacity: 1;
+  }
+
+  .ft-wrap .ft-nl-form input.ft-nl-input:focus,
+  .ft-wrap .ft-nl-form input.ft-nl-input:focus-visible {
+    background-color: transparent !important;
+    background: transparent !important;
+    border-color: rgba(255,255,255,0.85) !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  .ft-nl-btn {
+    flex-shrink: 0;
+    background: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 11px 20px;
+    color: #0a4a52;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+    letter-spacing: 0.01em;
+  }
+
+  .ft-nl-btn:hover { background: rgba(255,255,255,0.88); }
+  .ft-nl-btn:disabled { opacity: 0.6; cursor: default; }
+
+  .ft-nl-msg {
+    font-size: 11.5px;
+    min-height: 16px;
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  .ft-nl-msg.ok  { display: block; color: #7de8c8; }
+  .ft-nl-msg.err { display: block; color: #f8a08a; }
+
+  /* Payments */
+  .ft-pay-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.35);
+    margin: 16px 0 10px;
+    font-weight: 600;
+  }
+
+  .ft-pay-row {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .ft-pay-pill {
+    background: #fff;
+    border-radius: 5px;
+    width: 48px;
+    height: 30px;
     display: inline-flex;
     align-items: center;
-    letter-spacing: 0.01em;
-    transition: color 0.2s ease;
-  }
-
-  /* Mint slide-in tick on hover */
-  .footer-menu-link::before {
-    content: '';
-    display: inline-block;
-    width: 0;
-    height: 1px;
-    background: var(--color-mint);
-    margin-right: 0;
-    transition: width 0.25s ease, margin-right 0.25s ease;
-    vertical-align: middle;
-  }
-  .footer-menu-link:hover {
-    color: var(--white);
-  }
-  .footer-menu-link:hover::before {
-    width: 10px;
-    margin-right: 6px;
-  }
-
-  /* ── Trust bar ── */
-  .footer-trust-bar {
-    padding: 26px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 28px;
-    flex-wrap: wrap;
+    overflow: hidden;
   }
 
-  .footer-trust-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.38);
-    letter-spacing: 0.03em;
-  }
-  .footer-trust-icon {
-    width: 14px;
-    height: 14px;
-    opacity: 0.38;
-    flex-shrink: 0;
-  }
-  .footer-trust-sep {
-    width: 1px;
-    height: 14px;
-    background: rgba(255, 255, 255, 0.12);
-    flex-shrink: 0;
+  .ft-pay-pill svg {
+    width: 36px;
+    height: 22px;
+    display: block;
   }
 
-  /* ── Footer bottom ── */
-  .footer-bottom {
-    padding: 22px 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
+  /* ── Bottom bar ── */
+  .ft-bottom {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding: 18px 0;
+    text-align: center;
   }
 
-  .footer-copyright {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.28);
-    letter-spacing: 0.02em;
-    font-weight: 400;
+  .ft-copy {
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.36);
   }
 
-  .footer-legal {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-  .footer-legal-link {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.28);
-    text-decoration: none;
-    letter-spacing: 0.04em;
-    transition: color 0.2s ease;
-  }
-  .footer-legal-link:hover {
-    color: rgba(255, 255, 255, 0.7);
-  }
-  .footer-legal-sep {
-    width: 1px;
-    height: 10px;
-    background: rgba(255, 255, 255, 0.12);
-    flex-shrink: 0;
-  }
+  /* ═══════════
+     Tablet
+  ═══════════ */
+  @media (max-width: 1199px) {
+    .ft-inner { padding: 0 28px; }
 
-  /* ─────────────────────────────────────────
-     Tablet  768px – 1023px
-  ───────────────────────────────────────── */
-  @media (max-width: 1023px) {
-    .footer-container {
-      padding: 0 32px;
-    }
-    .footer-main {
-      padding: 52px 0 44px;
-    }
-    .footer-grid {
-      grid-template-columns: 1fr 1fr;
-      gap: 36px 40px;
-    }
-    .footer-brand {
-      grid-column: 1 / -1;
-    }
-    .footer-description {
-      max-width: 520px;
-    }
-  }
+    .ft-body { flex-wrap: wrap; padding: 44px 0 32px; }
 
-  /* ─────────────────────────────────────────
-     Mobile  ≤ 767px
-  ───────────────────────────────────────── */
-  @media (max-width: 767px) {
-    .footer-container {
-      padding: 0 20px;
-    }
-    .footer-main {
-      padding: 40px 0 0;
-    }
-    .footer-grid {
-      grid-template-columns: 1fr;
-      gap: 0;
-    }
-    .footer-brand {
+    .ft-brand {
+      flex: 0 0 100%;
+      margin-right: 0;
       margin-bottom: 32px;
     }
-    .footer-description {
-      max-width: 100%;
+
+    .ft-menus {
+      flex: 0 0 100%;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      gap: 28px 0;
     }
 
-    /* Accordion */
-    .footer-menu {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    .ft-col {
+      flex: 0 0 25%;
+      padding: 0 16px 0 0;
+      min-width: 0;
     }
-    .footer-col-heading {
-      padding: 16px 0;
+
+    .ft-col:first-child { padding-left: 0; }
+    .ft-col:last-child  { padding-right: 0; }
+
+    .ft-divider { display: none; }
+
+    .ft-right {
+      flex: 0 0 100%;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 28px;
+    }
+
+    .ft-nl-wrap { max-width: 420px; }
+  }
+
+  /* ═══════════
+     Mobile
+  ═══════════ */
+  @media (max-width: 767px) {
+    .ft-inner { padding: 0 18px; }
+    .ft-body { padding: 36px 0 0; }
+
+    .ft-brand { margin-bottom: 8px; }
+
+    .ft-menus { flex-direction: column; gap: 0; }
+
+    .ft-col {
+      flex: 0 0 100%;
+      padding: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .ft-col-head {
+      padding: 14px 0;
       margin-bottom: 0;
       cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
-    /* Hide the orange rule span on mobile */
-    .footer-col-rule {
-      display: none;
-    }
-    .footer-menu-toggle {
+
+    .ft-toggle {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       position: relative;
       flex-shrink: 0;
     }
-    .footer-menu-toggle::before,
-    .footer-menu-toggle::after {
+
+    .ft-toggle::before,
+    .ft-toggle::after {
       content: '';
       position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 10px;
-      height: 1.5px;
-      background: rgba(255, 255, 255, 0.5);
-      transition: transform 0.3s ease, opacity 0.3s ease;
+      top: 50%; left: 50%;
+      width: 10px; height: 1.5px;
+      background: rgba(255,255,255,0.5);
+      transition: transform 0.28s, opacity 0.28s;
     }
-    .footer-menu-toggle::before {
-      transform: translate(-50%, -50%);
-    }
-    .footer-menu-toggle::after {
-      transform: translate(-50%, -50%) rotate(90deg);
-    }
-    .footer-menu.is-open .footer-menu-toggle::after {
-      transform: translate(-50%, -50%) rotate(0deg);
+
+    .ft-toggle::before { transform: translate(-50%,-50%); }
+    .ft-toggle::after  { transform: translate(-50%,-50%) rotate(90deg); }
+
+    .ft-col.open .ft-toggle::after {
+      transform: translate(-50%,-50%) rotate(0);
       opacity: 0;
     }
-    .footer-menu-list {
+
+    .ft-list {
       max-height: 0;
       overflow: hidden;
-      transition: max-height 0.35s ease, padding-bottom 0.35s ease;
+      transition: max-height 0.32s ease, padding-bottom 0.32s ease;
     }
-    .footer-menu.is-open .footer-menu-list {
+
+    .ft-col.open .ft-list {
       max-height: 400px;
-      padding-bottom: 18px;
+      padding-bottom: 14px;
     }
 
-    /* Trust bar wraps */
-    .footer-trust-bar {
-      gap: 14px 20px;
-    }
-    .footer-trust-sep {
-      display: none;
+    .ft-right {
+      flex: 0 0 100%;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 24px;
     }
 
-    /* Bottom stacks */
-    .footer-bottom {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 20px 0 28px;
-      gap: 12px;
-    }
-    .footer-legal {
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 14px;
-    }
+    .ft-nl-wrap { max-width: 100%; }
+    .ft-bottom { padding: 18px 0 28px; }
   }
 
-  /* ─────────────────────────────────────────
-     Accessibility
-  ───────────────────────────────────────── */
   @media (prefers-reduced-motion: reduce) {
-    .footer-social-link,
-    .footer-menu-link,
-    .footer-menu-link::before,
-    .footer-menu-list,
-    .footer-menu-toggle::before,
-    .footer-menu-toggle::after {
+    .ft-social-link, .ft-list a, .ft-nl-btn,
+    .ft-nl-wrap, .ft-list, .ft-toggle::before, .ft-toggle::after {
       transition: none;
     }
   }
-
-  .footer-social-link:focus-visible,
-  .footer-menu-link:focus-visible,
-  .footer-legal-link:focus-visible {
-    outline: 2px solid var(--color-mint);
-    outline-offset: 3px;
-    border-radius: 2px;
-  }
-
-  /* ── Schema-driven overrides ── */
-  #footer-{{ section.id }} {
-    margin-top: {{ section.settings.margin_top }}px;
-  }
-  #footer-{{ section.id }} .footer-wrapper {
-    background-color: {{ section.settings.background_color | default: '#0E5C66' }};
-  }
 </style>
 
-<footer id="footer-{{ section.id }}">
-  <div class="footer-wrapper">
-
-    <div class="footer-glow-a" aria-hidden="true"></div>
-    <div class="footer-glow-b" aria-hidden="true"></div>
-
-    <div class="footer-container">
-
-      {%- comment -%} ── Main grid ── {%- endcomment -%}
-      <div class="footer-main">
-        <div class="footer-grid">
-
-          {%- comment -%} Brand column {%- endcomment -%}
-          <div class="footer-brand">
-
+<footer id="footer-{{ section.id }}" style="margin-top:{{ section.settings.margin_top }}px;">
+  <div class="ft-wrap">
+    <div class="ft-inner">
+      <div class="ft-body">
+        <!-- Brand -->
+        <div class="ft-brand">
+          <a href="/" class="ft-logo-link" aria-label="{{ shop.name }}">
             {% if section.settings.logo != blank %}
-              <a href="/" class="footer-logo">
-                <img
-                  src="{{ section.settings.logo | image_url: width: 72 }}"
-                  alt="{{ shop.name }}"
-                  class="footer-logo-img"
-                  width="36"
-                  height="36"
-                  loading="lazy"
-                >
-                {% if section.settings.show_logo_text %}
-                  <span class="footer-logo-text">
-                    {{ section.settings.logo_text_before -}}
-                    <span class="highlight">{{ section.settings.logo_text_highlight }}</span>
-                  </span>
-                {% endif %}
-              </a>
-            {% elsif section.settings.show_logo_text %}
-              <a href="/" class="footer-logo">
-                <div class="footer-logo-mark" aria-hidden="true">
-                  <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8 1l1.8 5.4H16l-5 3.6 1.9 5.8L8 12.2 3.1 15.8 5 10 0 6.4h6.2z"/>
-                  </svg>
-                </div>
-                <span class="footer-logo-text">
-                  {{ section.settings.logo_text_before -}}
-                  <span class="highlight">{{ section.settings.logo_text_highlight }}</span>
-                </span>
-              </a>
-            {% endif %}
-
-            {% if section.settings.tagline != blank %}
-              <p class="footer-tagline">{{ section.settings.tagline }}</p>
-            {% endif %}
-
-            <div class="footer-rule" aria-hidden="true"></div>
-
-            {% if section.settings.description != blank %}
-              <p class="footer-description">{{ section.settings.description }}</p>
-            {% endif %}
-
-            {% if section.settings.show_social %}
-              <div class="footer-social">
-                {% if section.settings.social_instagram != blank %}
-                  <a href="{{ section.settings.social_instagram }}" target="_blank" rel="noopener" class="footer-social-link" aria-label="Instagram">
-                    <svg class="footer-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect x="2" y="2" width="20" height="20" rx="5"/>
-                      <circle cx="12" cy="12" r="4"/>
-                      <circle cx="18" cy="6" r="1" fill="currentColor" stroke="none"/>
-                    </svg>
-                  </a>
-                {% endif %}
-                {% if section.settings.social_twitter != blank %}
-                  <a href="{{ section.settings.social_twitter }}" target="_blank" rel="noopener" class="footer-social-link" aria-label="Twitter">
-                    <svg class="footer-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
-                    </svg>
-                  </a>
-                {% endif %}
-                {% if section.settings.social_facebook != blank %}
-                  <a href="{{ section.settings.social_facebook }}" target="_blank" rel="noopener" class="footer-social-link" aria-label="Facebook">
-                    <svg class="footer-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
-                    </svg>
-                  </a>
-                {% endif %}
-                {% if section.settings.social_youtube != blank %}
-                  <a href="{{ section.settings.social_youtube }}" target="_blank" rel="noopener" class="footer-social-link" aria-label="YouTube">
-                    <svg class="footer-social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z"/>
-                      <path d="M9.75 15.02l5.75-3.27-5.75-3.27v6.54z"/>
-                    </svg>
-                  </a>
-                {% endif %}
-              </div>
-            {% endif %}
-
-          </div>
-
-          {%- comment -%} Menu columns from blocks {%- endcomment -%}
-          {% for block in section.blocks %}
-            <div class="footer-menu" {{ block.shopify_attributes }}>
-              <h3
-                class="footer-col-heading"
-                onclick="footerToggleMenu(this)"
-                aria-expanded="false"
+              <img
+                src="{{ section.settings.logo | image_url: width: 200 }}"
+                alt="{{ shop.name }}"
+                style="max-height:46px;width:auto;display:block;"
+                loading="lazy"
               >
+            {% else %}
+              <span class="ft-logo-script">{{ section.settings.logo_script }}</span
+              ><span class="ft-logo-bold"> {{ section.settings.logo_bold }}</span>
+            {% endif %}
+          </a>
+
+          {% if section.settings.tagline != blank %}
+            <p class="ft-tagline">{{ section.settings.tagline }}</p>
+          {% endif %}
+
+          {% if section.settings.show_social %}
+            <div class="ft-social">
+              {% if section.settings.social_facebook != blank %}
+                <a
+                  href="{{ section.settings.social_facebook }}"
+                  target="_blank"
+                  rel="noopener"
+                  class="ft-social-link"
+                  aria-label="Facebook"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+                  </svg>
+                </a>
+              {% endif %}
+              {% if section.settings.social_instagram != blank %}
+                <a
+                  href="{{ section.settings.social_instagram }}"
+                  target="_blank"
+                  rel="noopener"
+                  class="ft-social-link"
+                  aria-label="Instagram"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect x="2" y="2" width="20" height="20" rx="5"/>
+                    <circle cx="12" cy="12" r="4"/>
+                    <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+                  </svg>
+                </a>
+              {% endif %}
+              {% if section.settings.social_tiktok != blank %}
+                <a
+                  href="{{ section.settings.social_tiktok }}"
+                  target="_blank"
+                  rel="noopener"
+                  class="ft-social-link"
+                  aria-label="TikTok"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.79 1.54V6.79a4.85 4.85 0 01-1.02-.1z"/>
+                  </svg>
+                </a>
+              {% endif %}
+              {% if section.settings.social_pinterest != blank %}
+                <a
+                  href="{{ section.settings.social_pinterest }}"
+                  target="_blank"
+                  rel="noopener"
+                  class="ft-social-link"
+                  aria-label="Pinterest"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.08 3.16 9.43 7.63 11.17-.1-.95-.2-2.4.04-3.44.22-.94 1.41-5.96 1.41-5.96s-.36-.72-.36-1.78c0-1.67.97-2.91 2.17-2.91 1.02 0 1.52.77 1.52 1.69 0 1.03-.66 2.57-.99 4-.28 1.19.6 2.17 1.78 2.17 2.13 0 3.77-2.25 3.77-5.5 0-2.87-2.06-4.88-5.01-4.88-3.41 0-5.42 2.56-5.42 5.21 0 1.03.4 2.14.89 2.74a.36.36 0 01.08.34l-.33 1.36c-.05.22-.17.27-.4.16C3.3 15.7 2 13.04 2 11c0-3.79 2.75-7.26 7.93-7.26 4.16 0 7.4 2.97 7.4 6.93 0 4.14-2.61 7.46-6.23 7.46-1.22 0-2.36-.63-2.75-1.38l-.75 2.85c-.27 1.04-1 2.35-1.49 3.15C9.57 23.81 10.76 24 12 24c6.63 0 12-5.37 12-12S18.63 0 12 0z"/>
+                  </svg>
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Menu columns -->
+        <div class="ft-menus">
+          {% for block in section.blocks %}
+            <div class="ft-col" {{ block.shopify_attributes }}>
+              <h3 class="ft-col-head" onclick="ftToggle(this)" aria-expanded="false">
                 {{ block.settings.heading }}
-                <span class="footer-col-rule" aria-hidden="true"></span>
-                <span class="footer-menu-toggle" aria-hidden="true"></span>
+                <span class="ft-toggle" aria-hidden="true"></span>
               </h3>
-              <ul class="footer-menu-list">
+              <ul class="ft-list">
                 {% if block.settings.menu != blank %}
                   {% for link in linklists[block.settings.menu].links %}
-                    <li class="footer-menu-item">
-                      <a href="{{ link.url }}" class="footer-menu-link">{{ link.title }}</a>
+                    <li>
+                      <a href="{{ link.url }}">{{ link.title }}</a>
                     </li>
                   {% endfor %}
                 {% endif %}
               </ul>
             </div>
           {% endfor %}
-
         </div>
-      </div>
 
-      {%- comment -%} ── Trust bar ── {%- endcomment -%}
-      {% if section.settings.show_trust_bar %}
-        <div class="footer-trust-bar">
-          {% if section.settings.trust_item_1 != blank %}
-            <div class="footer-trust-item">
-              <svg class="footer-trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-              {{ section.settings.trust_item_1 }}
-            </div>
-            <div class="footer-trust-sep" aria-hidden="true"></div>
-          {% endif %}
-          {% if section.settings.trust_item_2 != blank %}
-            <div class="footer-trust-item">
-              <svg class="footer-trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-                <polyline points="9 22 9 12 15 12 15 22"/>
-              </svg>
-              {{ section.settings.trust_item_2 }}
-            </div>
-            <div class="footer-trust-sep" aria-hidden="true"></div>
-          {% endif %}
-          {% if section.settings.trust_item_3 != blank %}
-            <div class="footer-trust-item">
-              <svg class="footer-trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-              </svg>
-              {{ section.settings.trust_item_3 }}
-            </div>
-          {% endif %}
-        </div>
-      {% endif %}
+        <!-- Divider -->
+        <div class="ft-divider" aria-hidden="true"></div>
 
-      {%- comment -%} ── Footer bottom ── {%- endcomment -%}
-      <div class="footer-bottom">
-        <p class="footer-copyright">
-          &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}.
-          {% if section.settings.copyright_text != blank %}
-            {{ section.settings.copyright_text }}
-          {% endif %}
-        </p>
+        <!-- Right: newsletter + payments -->
+        <div class="ft-right">
+          <h3 class="ft-right-head">{{ section.settings.nl_heading }}</h3>
+          <p class="ft-right-sub">{{ section.settings.nl_sub }}</p>
 
-        {% if section.settings.show_legal_links %}
-          <div class="footer-legal">
-            {% if section.settings.privacy_link != blank %}
-              <a href="{{ section.settings.privacy_link }}" class="footer-legal-link">Privacy</a>
-              <div class="footer-legal-sep" aria-hidden="true"></div>
-            {% endif %}
-            {% if section.settings.terms_link != blank %}
-              <a href="{{ section.settings.terms_link }}" class="footer-legal-link">Terms</a>
-              {% if section.settings.cookies_link != blank %}
-                <div class="footer-legal-sep" aria-hidden="true"></div>
-              {% endif %}
-            {% endif %}
-            {% if section.settings.cookies_link != blank %}
-              <a href="{{ section.settings.cookies_link }}" class="footer-legal-link">Cookies</a>
-            {% endif %}
+          <div class="ft-nl-form">
+            <input
+              type="email"
+              class="ft-nl-input"
+              id="ft-nl-email-{{ section.id }}"
+              placeholder="{{ section.settings.nl_placeholder | default: 'Your email address' }}"
+              autocomplete="email"
+              aria-label="Email address"
+            >
+            <button
+              type="button"
+              class="ft-nl-btn"
+              id="ft-nl-btn-{{ section.id }}"
+              onclick="ftSubscribe('{{ section.id }}')"
+            >
+              {{ section.settings.nl_btn | default: 'Subscribe' }}
+            </button>
           </div>
-        {% endif %}
+          <p class="ft-nl-msg" id="ft-nl-msg-{{ section.id }}" aria-live="polite"></p>
+
+          {% if section.settings.show_payments %}
+            <p class="ft-pay-label">Secure payments</p>
+            <div class="ft-pay-row">
+              <!-- Visa -->
+              <div class="ft-pay-pill" title="Visa">
+                <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" aria-label="Visa">
+                  <rect width="38" height="24" rx="3" fill="#fff"/>
+                  <path d="M16.2 7.4l-2.6 9.2h-2.1l2.6-9.2h2.1zm8.8 5.9l1.1-3 .6 3h-1.7zm2.3 3.3H29l-1.6-9.2H25.6c-.5 0-.9.3-1.1.7l-3.3 8.5h2.3l.46-1.25h2.8l.27 1.25zM21 13.7c0-2.2-3-2.3-3-3.3 0-.3.3-.6.9-.7.6-.1 1.5.1 2.2.4l.4-1.8c-.5-.2-1.3-.4-2.3-.4-2.4 0-4 1.3-4 3.1 0 1.3 1.2 2.1 2.1 2.5.9.4 1.2.7 1.2 1.1 0 .6-.7.9-1.4.9-1.1 0-1.8-.3-2.4-.6l-.4 1.8c.5.2 1.4.5 2.5.5 2.4 0 4-1.2 4-3.3zm-9.6-6.3l-3.5 9.2H5.7L4 8.9C5.2 9.6 6.2 11 6.5 12l.2.9 2.1-5.5H11.4z" fill="#1a1f71"/>
+                </svg>
+              </div>
+
+              <!-- Mastercard -->
+              <div class="ft-pay-pill" title="Mastercard">
+                <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" aria-label="Mastercard">
+                  <rect width="38" height="24" rx="3" fill="#fff"/>
+                  <circle cx="15" cy="12" r="6" fill="#eb001b"/>
+                  <circle cx="23" cy="12" r="6" fill="#f79e1b"/>
+                  <path d="M19 7.8a6 6 0 010 8.4 6 6 0 010-8.4z" fill="#ff5f00"/>
+                </svg>
+              </div>
+
+              <!-- Amex -->
+              <div class="ft-pay-pill" title="American Express">
+                <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" aria-label="American Express">
+                  <rect width="38" height="24" rx="3" fill="#2671b9"/>
+                  <path d="M8 15V9h5l1 2.5L15 9h5v6h-2v-4l-1.5 2.5h-1L14 11v4H8zm2-1.5h1.5v-2l1 2h1l1-2v2H16v-2.5h-1.5l-.75 1.75L13 11H11.5v2.5H10zm7.5 1.5V9H22l1.5 4 1.5-4h4.5v6h-2v-4l-1.5 4h-1.5l-1.5-4v4H17.5zm2-1.5H21V11l1.5 4h.5l1.5-4v4H26V10.5h-2l-1 3-1-3h-2v3z" fill="#fff"/>
+                </svg>
+              </div>
+
+              <!-- PayPal -->
+              <div class="ft-pay-pill" title="PayPal">
+                <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" aria-label="PayPal">
+                  <rect width="38" height="24" rx="3" fill="#fff"/>
+                  <path d="M23.8 8.2c.3 1.8-.8 3.8-2.4 4.6-.5.2-1 .3-1.6.3h-1.5l-.5 3H16l1.8-9.1h3.5c1.2 0 2.1.6 2.5 1.2z" fill="#009cde"/>
+                  <path d="M26.2 9c.3 1.9-.8 4-2.5 4.8-.5.2-1 .4-1.6.4h-1.5l-.5 2.8H18l1.8-9.2h3.5c1.3 0 2.3.6 2.9 1.2z" fill="#012169"/>
+                  <path d="M14 8h3.5c1.2 0 2.1.6 2.5 1.2.3 1.8-.8 3.8-2.4 4.6-.5.2-1 .3-1.6.3h-1.5l-.5 3H12l2-9.1z" fill="#009cde"/>
+                </svg>
+              </div>
+
+              <!-- Apple Pay -->
+              <div class="ft-pay-pill" title="Apple Pay">
+                <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" aria-label="Apple Pay">
+                  <rect width="38" height="24" rx="3" fill="#000"/>
+                  <!-- Apple logo mark -->
+                  <path d="M16.5 8.3c.4-.5.7-1.1.6-1.8-.6.1-1.3.4-1.7.9-.4.4-.7 1-.6 1.7.6 0 1.3-.3 1.7-.8z" fill="#fff"/>
+                  <path d="M17.1 9.1c-.9-.1-1.7.5-2.2.5-.5 0-1.2-.5-2-.5-1 0-2 .6-2.5 1.5-1.1 1.8-.3 4.5.8 6 .5.7 1.1 1.5 1.9 1.5.8 0 1-.5 2-.5s1.2.5 2 .5c.8 0 1.3-.7 1.8-1.4.6-.8.8-1.6.8-1.7-.1 0-1.5-.6-1.5-2.1 0-1.3 1.1-1.9 1.1-2-.6-.9-1.5-1-1.9-1.1-.1 0-.1 0-.3.3z" fill="#fff"/>
+                  <!-- Pay text -->
+                  <path d="M22 10.5h1.2l-.6-1.7-.6 1.7zm.5-3l2 5h-1l-.4-1.2h-1.7l-.4 1.2h-1l2-5H22.5zM25 7.5h1v5h-1v-5zm2 0h1v2.5l2-2.5h1.2l-2.2 2.6 2.3 2.4H28l-2-2.1v2.1h-1v-5z" fill="#fff"/>
+                </svg>
+              </div>
+            </div>
+          {% endif %}
+        </div>
       </div>
 
+      <!-- Bottom bar -->
+      <div class="ft-bottom">
+        <p class="ft-copy">
+          &copy; {{ 'now' | date: '%Y' }}
+          {{ shop.name }}. {{ section.settings.copyright_text }}
+        </p>
+      </div>
     </div>
   </div>
 </footer>
 
 <script>
-  function footerToggleMenu(heading) {
-    if (window.innerWidth > 767) return;
-    var menu = heading.closest('.footer-menu');
-    var isOpen = menu.classList.toggle('is-open');
-    heading.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  function ftSubscribe(id) {
+    var inp = document.getElementById('ft-nl-email-' + id);
+    var msg = document.getElementById('ft-nl-msg-' + id);
+    var btn = document.getElementById('ft-nl-btn-' + id);
+    var email = inp.value.trim();
+
+    msg.className = 'ft-nl-msg';
+    msg.textContent = '';
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      msg.textContent = 'Please enter a valid email address.';
+      msg.classList.add('err');
+      return;
+    }
+
+    var orig = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '...';
+
+    var body = new URLSearchParams();
+    body.set('form_type', 'customer');
+    body.set('utf8', '✓');
+    body.set('contact[email]', email);
+    body.set('contact[tags]', 'newsletter');
+
+    fetch('/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+      redirect: 'follow',
+    })
+      .then(function (r) {
+        /* Shopify redirects on success — treat any non-5xx as success */
+        if (r.status < 500) {
+          msg.textContent = "You're subscribed — thanks!";
+          msg.classList.add('ok');
+          inp.value = '';
+        } else {
+          throw new Error();
+        }
+      })
+      .catch(function () {
+        msg.textContent = 'Could not subscribe right now. Please try again.';
+        msg.classList.add('err');
+      })
+      .finally(function () {
+        btn.disabled = false;
+        btn.textContent = orig;
+      });
   }
 
-  var footerResizeTimer;
+  function ftToggle(h) {
+    if (window.innerWidth > 767) return;
+    var c = h.closest('.ft-col');
+    var o = c.classList.toggle('open');
+    h.setAttribute('aria-expanded', o);
+  }
+
+  var _ftRT;
   window.addEventListener('resize', function () {
-    clearTimeout(footerResizeTimer);
-    footerResizeTimer = setTimeout(function () {
+    clearTimeout(_ftRT);
+    _ftRT = setTimeout(function () {
       if (window.innerWidth > 767) {
-        document.querySelectorAll('.footer-menu.is-open').forEach(function (m) {
-          m.classList.remove('is-open');
-          m.querySelector('.footer-col-heading').setAttribute('aria-expanded', 'false');
+        document.querySelectorAll('.ft-col.open').forEach(function (c) {
+          c.classList.remove('open');
+          c.querySelector('.ft-col-head').setAttribute('aria-expanded', 'false');
         });
       }
-    }, 250);
+    }, 200);
   });
 </script>
 
@@ -679,144 +684,33 @@
   "tag": "footer",
   "class": "section-footer",
   "settings": [
-    {
-      "type": "header",
-      "content": "Brand"
-    },
-    {
-      "type": "image_picker",
-      "id": "logo",
-      "label": "Logo Image"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_logo_text",
-      "label": "Show Logo Text",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "logo_text_before",
-      "label": "Logo Text (Part 1)",
-      "default": "uniquely"
-    },
-    {
-      "type": "text",
-      "id": "logo_text_highlight",
-      "label": "Logo Text (Highlighted)",
-      "default": "you"
-    },
-    {
-      "type": "text",
-      "id": "tagline",
-      "label": "Tagline",
-      "default": "Print on demand · Made to order"
-    },
+    { "type": "header", "content": "Brand" },
+    { "type": "image_picker", "id": "logo", "label": "Logo Image (overrides text)" },
+    { "type": "text", "id": "logo_script", "label": "Logo — Script part", "default": "Uniquely" },
+    { "type": "text", "id": "logo_bold", "label": "Logo — Bold part", "default": "YOU" },
     {
       "type": "textarea",
-      "id": "description",
-      "label": "Description",
-      "default": "Clothing for people who refuse to blend in. Every piece is designed with intention and printed the moment you order it."
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Wear Your One-Liner. Live Your Uniqueness."
     },
-    {
-      "type": "header",
-      "content": "Social Media"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_social",
-      "label": "Show Social Icons",
-      "default": true
-    },
-    {
-      "type": "url",
-      "id": "social_instagram",
-      "label": "Instagram URL"
-    },
-    {
-      "type": "url",
-      "id": "social_twitter",
-      "label": "Twitter URL"
-    },
-    {
-      "type": "url",
-      "id": "social_facebook",
-      "label": "Facebook URL"
-    },
-    {
-      "type": "url",
-      "id": "social_youtube",
-      "label": "YouTube URL"
-    },
-    {
-      "type": "header",
-      "content": "Trust Bar"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_trust_bar",
-      "label": "Show Trust Bar",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "trust_item_1",
-      "label": "Trust Item 1",
-      "default": "Free shipping over $75"
-    },
-    {
-      "type": "text",
-      "id": "trust_item_2",
-      "label": "Trust Item 2",
-      "default": "30-day returns"
-    },
-    {
-      "type": "text",
-      "id": "trust_item_3",
-      "label": "Trust Item 3",
-      "default": "Secure checkout"
-    },
-    {
-      "type": "header",
-      "content": "Footer Bottom"
-    },
-    {
-      "type": "text",
-      "id": "copyright_text",
-      "label": "Copyright Text",
-      "default": "All rights reserved."
-    },
-    {
-      "type": "checkbox",
-      "id": "show_legal_links",
-      "label": "Show Legal Links",
-      "default": true
-    },
-    {
-      "type": "url",
-      "id": "privacy_link",
-      "label": "Privacy Policy Link"
-    },
-    {
-      "type": "url",
-      "id": "terms_link",
-      "label": "Terms of Service Link"
-    },
-    {
-      "type": "url",
-      "id": "cookies_link",
-      "label": "Cookies Policy Link"
-    },
-    {
-      "type": "header",
-      "content": "Styling"
-    },
-    {
-      "type": "color",
-      "id": "background_color",
-      "label": "Background Color",
-      "default": "#0E5C66"
-    },
+    { "type": "header", "content": "Social Media" },
+    { "type": "checkbox", "id": "show_social", "label": "Show Social Icons", "default": true },
+    { "type": "url", "id": "social_facebook", "label": "Facebook URL" },
+    { "type": "url", "id": "social_instagram", "label": "Instagram URL" },
+    { "type": "url", "id": "social_tiktok", "label": "TikTok URL" },
+    { "type": "url", "id": "social_pinterest", "label": "Pinterest URL" },
+    { "type": "header", "content": "Newsletter" },
+    { "type": "text", "id": "nl_heading", "label": "Heading", "default": "Stay in the loop!" },
+    { "type": "text", "id": "nl_sub", "label": "Subtext", "default": "New drops, exclusive deals & stories." },
+    { "type": "text", "id": "nl_placeholder", "label": "Input placeholder", "default": "Your email address" },
+    { "type": "text", "id": "nl_btn", "label": "Button label", "default": "Subscribe" },
+    { "type": "header", "content": "Payments" },
+    { "type": "checkbox", "id": "show_payments", "label": "Show payment icons", "default": true },
+    { "type": "header", "content": "Footer Bottom" },
+    { "type": "text", "id": "copyright_text", "label": "Copyright suffix", "default": "All rights reserved." },
+    { "type": "header", "content": "Styling" },
+    { "type": "color", "id": "background_color", "label": "Background Color", "default": "#0d5c66" },
     {
       "type": "range",
       "id": "margin_top",
@@ -831,20 +725,10 @@
   "blocks": [
     {
       "type": "menu",
-      "name": "Footer Menu",
+      "name": "Menu Column",
       "settings": [
-        {
-          "type": "text",
-          "id": "heading",
-          "label": "Heading",
-          "default": "MENU"
-        },
-        {
-          "type": "link_list",
-          "id": "menu",
-          "label": "Menu",
-          "info": "Select a menu from Navigation"
-        }
+        { "type": "text", "id": "heading", "label": "Column Heading", "default": "Menu" },
+        { "type": "link_list", "id": "menu", "label": "Menu", "info": "Select from Navigation" }
       ]
     }
   ],
@@ -852,9 +736,10 @@
     {
       "name": "Footer",
       "blocks": [
-        { "type": "menu", "settings": { "heading": "SHOP" } },
-        { "type": "menu", "settings": { "heading": "COLLECTIONS" } },
-        { "type": "menu", "settings": { "heading": "HELP" } }
+        { "type": "menu", "settings": { "heading": "Shop" } },
+        { "type": "menu", "settings": { "heading": "Customer Care" } },
+        { "type": "menu", "settings": { "heading": "Company" } },
+        { "type": "menu", "settings": { "heading": "Legal" } }
       ]
     }
   ]

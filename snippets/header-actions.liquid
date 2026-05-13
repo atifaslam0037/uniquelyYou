@@ -294,7 +294,6 @@
     -webkit-font-smoothing: antialiased;
   }
 
-
   .account-button__fallback {
     width: 28px;
     height: 28px;
@@ -519,7 +518,7 @@
 
   header-actions {
     display: flex;
-
+    gap: 8px;
     @media screen and (max-width: 749px) {
       justify-self: flex-end;
     }
@@ -552,6 +551,9 @@
     --cart-bubble-right: 2.5px;
 
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .header-actions__cart-icon .cart-bubble {
@@ -573,6 +575,8 @@
     border-radius: var(--style-border-radius-buttons-primary);
     aspect-ratio: auto;
     padding: var(--cart-padding);
+    position: relative !important;
+    inset: 0 !important;
   }
 
   .cart-drawer__heading .cart-bubble[data-maintain-ratio] {

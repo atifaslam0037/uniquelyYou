@@ -44,9 +44,10 @@
     "header_section": {
       "type": "custom-header",
       "settings": {
+        "logo_image": "shopify://shop_images/Update_logo_to_circle_202605071215_1.webp",
         "logo_max_width": 180,
         "menu": "main-menu",
-        "desktop_menu": "",
+        "desktop_menu": "primary-menu",
         "show_search": true,
         "show_account": true,
         "show_cart": true,
