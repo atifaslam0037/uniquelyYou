@@ -1,27 +1,38 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "about-hero": {
       "type": "about-hero",
       "settings": {
+        "image": "shopify://shop_images/aboutHero.png",
+        "image_mobile": "shopify://shop_images/about-hero_moblier.png",
+        "bg_color": "#ffe8dd",
+        "enable_overlay": false,
+        "overlay_color": "#000000",
+        "overlay_direction": "to_right",
+        "overlay_opacity": 70,
         "badge_text": "About Us",
-        "badge_bg_color": "#E8612C",
-        "badge_text_color": "#FFFFFF",
+        "badge_color": "#e8612c",
         "heading": "Made for the moments that make you, you.",
         "heading_size": 60,
-        "heading_color": "#0E5C66",
+        "heading_color": "#0e5c66",
         "description": "Uniquely You was created to celebrate individuality through custom apparel that speaks your story. We believe what you wear should feel like you—authentic, meaningful, and effortlessly you.",
         "text_color": "#333333",
         "button_label": "Our Story",
         "button_link": "",
-        "button_bg": "#E8612C",
-        "button_color": "#FFFFFF",
+        "button_bg": "#e8612c",
+        "button_color": "#ffffff",
         "text_alignment": "left",
-        "enable_overlay": true,
-        "overlay_color": "#FFE8DD",
-        "overlay_opacity": 70,
-        "overlay_direction": "to_right",
-        "hero_height": 480,
-        "mobile_height": 500,
+        "hero_height": 520,
+        "mobile_height": 580,
         "padding_top": 0,
         "padding_bottom": 0
       }
@@ -29,26 +40,142 @@
     "about-story": {
       "type": "about-story",
       "settings": {
+        "image_radius": 12,
         "badge_text": "Our Story",
-        "badge_color": "#E8612C",
+        "badge_color": "#e8612c",
         "heading": "It started with a simple idea.",
         "heading_size": 40,
-        "heading_color": "#0E5C66",
+        "heading_color": "#0e5c66",
         "description": "<p>We wanted a place where creativity meets quality—where you can express what matters most to you through designs that are fun, thoughtful, and made to last.</p><p>From original one-liners to custom creations, every piece is printed on premium materials with care and purpose.</p><p>This isn't just a brand. It's a community of people who choose authenticity, kindness, and self-expression—together.</p>",
         "text_color": "#444444",
         "signature_name": "Todd & Fran",
         "signature_role": "Founders of Uniquely You",
         "reverse_layout": false,
         "column_gap": 80,
-        "image_radius": 12,
-        "bg_color": "#FFFFFF",
+        "bg_color": "#ffffff",
         "padding_top": 80,
         "padding_bottom": 80
+      }
+    },
+    "about-values": {
+      "type": "about-values",
+      "blocks": {
+        "val_heart": {
+          "type": "value",
+          "settings": {
+            "icon": "heart",
+            "title": "Be Uniquely You",
+            "description": "We celebrate individuality and encourage you to embrace what makes you different."
+          }
+        },
+        "val_leaf": {
+          "type": "value",
+          "settings": {
+            "icon": "leaf",
+            "title": "Quality You Can Feel",
+            "description": "We use premium materials and print with care so your favorites last."
+          }
+        },
+        "val_globe": {
+          "type": "value",
+          "settings": {
+            "icon": "globe",
+            "title": "Made Responsibly",
+            "description": "Sustainable production and thoughtful choices for a better tomorrow."
+          }
+        },
+        "val_users": {
+          "type": "value",
+          "settings": {
+            "icon": "users",
+            "title": "Community First",
+            "description": "We're here to inspire connection, positivity, and creativity in everything we do."
+          }
+        }
+      },
+      "block_order": [
+        "val_heart",
+        "val_leaf",
+        "val_globe",
+        "val_users"
+      ],
+      "settings": {
+        "heading": "What We Stand For",
+        "heading_size": 36,
+        "heading_color": "#0e5c66",
+        "columns": 4,
+        "icon_color": "#0e5c66",
+        "title_color": "#111111",
+        "text_color": "#333333",
+        "bg_color": "#ffe8dd",
+        "padding_top": 56,
+        "padding_bottom": 72
+      }
+    },
+    "about-process": {
+      "type": "about-process",
+      "blocks": {
+        "step_1": {
+          "type": "step",
+          "settings": {
+            "icon": "lightbulb",
+            "title": "1. Inspired Ideas",
+            "description": "We create original designs that speak to everyday moments, feelings, and fun."
+          }
+        },
+        "step_2": {
+          "type": "step",
+          "settings": {
+            "icon": "printer",
+            "title": "2. Premium Printing",
+            "description": "We print on high-quality apparel using eco-friendly inks that look great and last."
+          }
+        },
+        "step_3": {
+          "type": "step",
+          "settings": {
+            "icon": "box",
+            "title": "3. Made to Order",
+            "description": "Each item is made just for you—no overproduction, no waste."
+          }
+        },
+        "step_4": {
+          "type": "step",
+          "settings": {
+            "icon": "truck",
+            "title": "4. Delivered to You",
+            "description": "Fast, reliable shipping gets your new favorite piece right to your door."
+          }
+        }
+      },
+      "block_order": ["step_1", "step_2", "step_3", "step_4"],
+      "settings": {
+        "badge_text": "Our Process",
+        "badge_color": "#E8612C",
+        "heading": "Thoughtful from start to finish.",
+        "heading_size": 40,
+        "description": "Every design is created with intention and printed on demand to reduce waste and ensure quality.",
+        "btn_label": "Learn More",
+        "btn_link": "",
+        "btn_bg": "#E8612C",
+        "btn_color": "#FFFFFF",
+        "left_bg": "#0E5C66",
+        "right_bg": "#FFFFFF",
+        "icon_bg": "#E8F4F5",
+        "icon_color": "#0E5C66",
+        "step_title_color": "#111111",
+        "step_text_color": "#666666",
+        "card_radius": 16,
+        "section_bg": "#F9F5F2",
+        "padding_top": 72,
+        "padding_bottom": 72
       }
     }
   },
   "order": [
     "about-hero",
-    "about-story"
+    "about-story",
+    "about-values",
+    "about-process"
   ]
 }

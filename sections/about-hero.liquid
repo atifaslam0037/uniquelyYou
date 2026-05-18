@@ -239,6 +239,7 @@
 
 <div class="about-hero-section" id="about-hero-{{ section.id }}">
   <div class="about-hero__wrap">
+
     {%- comment -%} Desktop background image {%- endcomment -%}
     <div class="about-hero__img about-hero__img--desktop" aria-hidden="true">
       {%- if section.settings.image != blank -%}
@@ -285,6 +286,7 @@
 
     {%- comment -%} Text content {%- endcomment -%}
     <div class="about-hero__content">
+
       {%- if section.settings.badge_text != blank -%}
         <span class="about-hero__badge">{{ section.settings.badge_text }}</span>
       {%- endif -%}
@@ -305,6 +307,7 @@
           {{- section.settings.button_label -}}
         </a>
       {%- endif -%}
+
     </div>
   </div>
 </div>
@@ -470,9 +473,9 @@
       "id": "text_alignment",
       "label": "Text Alignment",
       "options": [
-        { "value": "left", "label": "Left" },
+        { "value": "left",   "label": "Left"   },
         { "value": "center", "label": "Center" },
-        { "value": "right", "label": "Right" }
+        { "value": "right",  "label": "Right"  }
       ],
       "default": "left"
     },

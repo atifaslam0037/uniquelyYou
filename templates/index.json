@@ -57,6 +57,7 @@
         "slide_btPMHm",
         "slide_xhtbkg"
       ],
+      "disabled": true,
       "settings": {
         "accessibility_label": "Featured collections",
         "autoplay": false,
@@ -86,7 +87,7 @@
           "type": "text",
           "name": "t:names.heading",
           "settings": {
-            "text": "<p>Browse our latest products</p>",
+            "text": "<p>New arrivals</p>",
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "left",
@@ -112,7 +113,7 @@
           "type": "button",
           "name": "t:names.button",
           "settings": {
-            "label": "Shop all",
+            "label": "Shop New Arrival",
             "link": "shopify://collections/all",
             "open_in_new_tab": false,
             "style_class": "button-secondary",
@@ -128,10 +129,10 @@
         "text_YLPk4p",
         "button_H9gpTf"
       ],
-      "disabled": true,
       "name": "t:names.hero",
       "settings": {
         "media_type_1": "image",
+        "image_1": "shopify://shop_images/banner_0f40b15f-fd73-4764-bdc9-cc85bd603cf5.jpg",
         "media_type_2": "image",
         "stack_media_on_mobile": false,
         "custom_mobile_media": false,
@@ -148,7 +149,7 @@
         "vertical_alignment_flex_direction_column": "flex-end",
         "gap": 24,
         "section_width": "page-width",
-        "section_height": "medium",
+        "section_height": "full-screen",
         "section_height_custom": 50,
         "color_scheme": "scheme-6",
         "toggle_overlay": true,
@@ -205,65 +206,6 @@
         "padding_bottom": 16
       }
     },
-    "collection-grid": {
-      "type": "feature-collection",
-      "blocks": {
-        "collection_RGUtKw": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "custom_title": "",
-            "show_product_count": true
-          }
-        },
-        "collection_w6mVRc": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "custom_title": "",
-            "show_product_count": true
-          }
-        },
-        "collection_FRBwUK": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "custom_title": "",
-            "show_product_count": true
-          }
-        },
-        "collection_RjrMpD": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "custom_title": "",
-            "show_product_count": true
-          }
-        }
-      },
-      "block_order": [
-        "collection_RGUtKw",
-        "collection_w6mVRc",
-        "collection_FRBwUK",
-        "collection_RjrMpD"
-      ],
-      "settings": {
-        "eyebrow_text": "SHOP BY",
-        "heading": "One-liner collections",
-        "subheading": "Each collection tells a story. Pick the one that sounds the most like you.",
-        "grid_layout": "featured",
-        "grid_gap": 8,
-        "border_radius": 16,
-        "columns_desktop": 3,
-        "columns_tablet": 2,
-        "columns_mobile": "2",
-        "show_cta": true,
-        "cta_text": "Shop collection",
-        "section_background_color": "#ffe8dd",
-        "padding_top": 40,
-        "padding_bottom": 40
-      }
-    },
     "feature-products": {
       "type": "feature-products",
       "settings": {
@@ -285,10 +227,69 @@
         "mobile_card_size": "60cqw",
         "section_width": "page-width",
         "gap": 28,
-        "color_scheme": "",
+        "color_scheme": "scheme-04ee9128-a3fd-4957-8e63-9aaebc0295fa",
         "padding-block-start": 20,
         "padding-block-end": 20,
         "heading_bottom_gap": 16
+      }
+    },
+    "collection-grid": {
+      "type": "feature-collection",
+      "blocks": {
+        "collection_RGUtKw": {
+          "type": "collection",
+          "settings": {
+            "collection": "all",
+            "custom_title": "",
+            "show_product_count": true
+          }
+        },
+        "collection_w6mVRc": {
+          "type": "collection",
+          "settings": {
+            "collection": "all",
+            "custom_title": "",
+            "show_product_count": true
+          }
+        },
+        "collection_FRBwUK": {
+          "type": "collection",
+          "settings": {
+            "collection": "all",
+            "custom_title": "",
+            "show_product_count": true
+          }
+        },
+        "collection_RjrMpD": {
+          "type": "collection",
+          "settings": {
+            "collection": "all",
+            "custom_title": "",
+            "show_product_count": true
+          }
+        }
+      },
+      "block_order": [
+        "collection_RGUtKw",
+        "collection_w6mVRc",
+        "collection_FRBwUK",
+        "collection_RjrMpD"
+      ],
+      "settings": {
+        "eyebrow_text": "SHOP BY",
+        "heading": "One-liner collections",
+        "subheading": "Each collection tells a story. Pick the one that sounds the most like you.",
+        "grid_layout": "featured",
+        "grid_gap": 8,
+        "border_radius": 0,
+        "columns_desktop": 3,
+        "columns_tablet": 2,
+        "columns_mobile": "2",
+        "show_cta": true,
+        "cta_text": "Shop collection",
+        "section_background_color": "rgba(0,0,0,0)",
+        "padding_top": 40,
+        "padding_bottom": 40
       }
     },
     "banner-sec": {
@@ -410,8 +411,8 @@
     "custom_hero_banner",
     "hero-banner",
     "custom-marquee",
-    "collection-grid",
     "feature-products",
+    "collection-grid",
     "banner-sec",
     "feature_products_Q9iNGa",
     "feature-badges",
