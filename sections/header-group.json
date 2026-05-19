@@ -7,7 +7,7 @@
  * made to this file may be overwritten.
  * ------------------------------------------------------------
  */
-{
+ {
   "type": "header",
   "name": "Header",
   "sections": {
@@ -35,7 +35,7 @@
       "settings": {
         "speed": 5,
         "section_width": "page-width",
-        "color_scheme": "scheme-2",
+        "color_scheme": "scheme-1",
         "divider_width": 1,
         "padding-block-start": 15,
         "padding-block-end": 15
@@ -44,25 +44,24 @@
     "header_section": {
       "type": "custom-header",
       "settings": {
-        "logo_image": "shopify://shop_images/Update_logo_to_circle_202605071215_1.webp",
-        "logo_max_width": 180,
         "menu": "main-menu",
-        "desktop_menu": "primary-menu",
+        "shop_all_label": "",
+        "shop_all_suffix": "",
+        "search_placeholder": "Find what makes you unique!",
+        "show_search_placeholder": false,
+        "show_social": true,
         "show_search": true,
         "show_account": true,
         "show_cart": true,
         "show_country": true,
         "country_selector_style": true,
         "show_language": true,
-        "drawer_accordion": true,
-        "drawer_accordion_expand_first": false,
-        "drawer_dividers": true,
+        "drawer_accordion": false,
+        "drawer_dividers": false,
         "menu_style": "text",
-        "image_border_radius": 4,
         "color_scheme": "scheme-1",
         "enable_transparent_home": true,
         "sticky_style": "glassmorphism",
-        "actions_display_style": "icon",
         "enable_sticky_header": "always"
       }
     }

@@ -1,17 +1,15 @@
 /* ================================================================
    ULY EDITOR FIXES — uly-editor-fixes.css
-   Loaded from layout/theme.liquid after content_for_header.
+   Loaded globally from layout/theme.liquid after content_for_header.
    Applies identically in both admin editor and live storefront.
-   Keep this file minimal — only things that genuinely differ
-   between the two environments belong here.
+   Keep this file minimal.
    ================================================================ */
 
 /*
   EDITOR-ONLY: Transparent header must stay readable.
-  In the admin editor the iframe never scrolls, so without this
-  fix all icons/text would be white-on-white (invisible).
-  The .shopify-design-mode class is added to <html> only in the
-  admin editor, so this block has zero effect on the live site.
+  In the admin editor the iframe never scrolls so icons/text would be
+  invisible (white on white). The .shopify-design-mode class is added to
+  <html> only inside the admin editor — zero effect on the live storefront.
 */
 .shopify-design-mode .uly-header--transparent .uly-header__underlay--closed {
   background: var(--color-background) !important;
@@ -31,4 +29,29 @@
   color: var(--color-foreground) !important;
   stroke: var(--color-foreground) !important;
   opacity: 1 !important;
+}
+
+/*
+  EDITOR-ONLY: Localization always in header row, never in bar.
+  On the live store the media queries in custom-header.css handle this.
+  In the editor iframe, the viewport is always "desktop" width so the
+  mobile media query never fires — localization could end up showing
+  in both slots. This rule ensures only the header slot is visible.
+*/
+.shopify-design-mode .uly-localization-slot--header { display: flex !important; }
+.shopify-design-mode .uly-localization-slot--bar    { display: none !important; }
+
+/*
+  QUICK-ADD MODAL: fallback for browsers / iframes without
+  scroll-driven animation support (admin editor, Firefox < 116).
+*/
+@supports not (animation-timeline: scroll(self)) {
+  .quick-add-modal__content .product-details {
+    mask-image: none;
+  }
+  .quick-add-modal__content .product-details :is(.buy-buttons-block)::before,
+  .quick-add-modal__content .product-details .buy-buttons-block__bar::before {
+    --quick-add-modal-mask-end-progressive-enhanced: 48px;
+    height: calc(var(--gap-2xs, 4px) + 48px);
+  }
 }

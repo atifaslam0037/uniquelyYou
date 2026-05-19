@@ -14,149 +14,38 @@
   endif
 
   assign show_language = section.settings.show_language
-  if localization.available_languages.size <= 1
-    assign show_language = false
-  endif
+  unless request.design_mode
+    if localization.available_languages.size <= 1
+      assign show_language = false
+    endif
+  endunless
 
   assign show_country = section.settings.show_country
-  if localization.available_countries.size <= 1
-    assign show_country = false
+  unless request.design_mode
+    if localization.available_countries.size <= 1
+      assign show_country = false
+    endif
+  endunless
+
+  assign show_localization = false
+  if show_language or show_country
+    assign show_localization = true
   endif
 
   assign is_transparent_home = false
   if section.settings.enable_transparent_home and request.page_type == 'index'
     assign is_transparent_home = true
   endif
+
+  assign sidebar_menu = section.settings.menu
+  assign shop_trigger_label = section.settings.shop_all_label
+  if shop_trigger_label == blank and sidebar_menu != blank
+    assign shop_trigger_label = sidebar_menu.title
+  endif
+  if shop_trigger_label == blank
+    assign shop_trigger_label = 'Shop All'
+  endif
 %}
-
-{%- comment -%} Sticky positioning uses .header-section rules in the stylesheet (top: -1px) so the header intersection observer matches Horizon. {%- endcomment -%}
-
-{%- comment -%} ── Logo ── {%- endcomment -%}
-{% capture logo %}
-  <a href="{{ routes.root_url }}" class="uly-logo" aria-label="{{ shop.name }}">
-    {%- assign logo_img = section.settings.logo_image | default: settings.logo -%}
-    {%- if logo_img -%}
-      {%- assign logo_alt = logo_img.alt | default: shop.name -%}
-      {{
-        logo_img
-        | image_url: width: section.settings.logo_max_width
-        | image_tag:
-          class: 'uly-logo__img',
-          alt: logo_alt,
-          loading: 'eager',
-          fetchpriority: 'high',
-          widths: '120, 180, 240, 300',
-          sizes: '(max-width: 749px) 140px, 220px'
-      }}
-    {%- else -%}
-      <span class="uly-logo__text">{{ shop.name }}</span>
-    {%- endif -%}
-  </a>
-{% endcapture %}
-
-{%- comment -%} ── Search (native Horizon modal trigger) ── {%- endcomment -%}
-{% capture search_markup %}
-  {% render 'search', style: search_style, display_style: section.settings.actions_display_style %}
-{% endcapture %}
-
-{%- comment -%} ── Cart + Account (native Horizon cart drawer + custom account link) ── {%- endcomment -%}
-{% capture actions_markup %}
-  <div class="uly-header-actions-wrapper{% if section.settings.show_account == false %} hide-account{% endif %}{% if section.settings.show_cart == false %} hide-cart{% endif %}">
-    {% render 'header-actions',
-      section: section,
-      customer_account_menu: section.settings.customer_account_menu.handle,
-      display_style: section.settings.actions_display_style
-    %}
-  </div>
-{% endcapture %}
-
-{%- comment -%} ── Avera-style Localization (flag + ISO code dropdown) ── {%- endcomment -%}
-{% capture localization_markup %}
-  {% liquid
-    assign localization_font = '--menu-localization-font: var(--primary-font); '
-    assign localization_font_size = '--menu-localization-font-size: 0.875rem; '
-    assign color_shadow = '--color-shadow: rgb(var(--color-foreground-rgb) / var(--opacity-10-25));'
-    assign form_style = localization_font | append: localization_font_size | append: color_shadow
-  %}
-  {% if show_language and show_country == false %}
-    <div class="uly-localization">
-      {% render 'localization-form',
-        show_country: show_country,
-        show_language: show_language,
-        localization_style: 'dropdown',
-        form_style: form_style,
-        form_id: section.id
-      %}
-    </div>
-  {% elsif show_country %}
-    <dropdown-localization-component class="uly-localization dropdown-localization">
-      <button
-        type="button"
-        class="button uly-localization__btn dropdown-localization__button localization-selector header-actions__action"
-        aria-expanded="false"
-        aria-controls="uly-localization-results"
-        ref="button"
-        on:click="/toggleSelector"
-        style="{{ form_style }}"
-      >
-        {%- if show_country -%}
-          {%- if section.settings.country_selector_style -%}
-            {% liquid
-              assign bg_brightness = section.settings.color_scheme.settings.background | color_brightness
-              if bg_brightness < 64
-                assign shadow_size = 4
-              else
-                assign shadow_size = 2
-              endif
-            %}
-            <span
-              class="icon-flag"
-              style="
-                background-image: url({{ localization.country | image_url: width: 32 }});
-                --size-shadow: {{ shadow_size }}px;
-                --color-shadow: rgb(var(--color-foreground-rgb) / var(--opacity-30-60));
-              "
-            ></span>
-          {%- endif -%}
-          <span class="currency-code" data-testid="localization-currency-code">
-            {{- localization.country.currency.iso_code -}}
-          </span>
-        {%- endif -%}
-
-        <span class="visually-hidden">
-          {{- 'accessibility.localization_region_and_language' | t -}}
-        </span>
-
-        {%- if show_country and show_language -%}
-          <span>/</span>
-        {%- endif -%}
-
-        {%- if show_language -%}
-          <span>{{ localization.language.iso_code | upcase }}</span>
-        {%- endif -%}
-
-        <span class="svg-wrapper icon-caret">
-          {{- 'icon-caret.svg' | inline_asset_content -}}
-        </span>
-      </button>
-
-      <div
-        id="uly-localization-results"
-        class="localization-wrapper right-bound color-{{ settings.popover_color_scheme }}"
-        hidden
-        ref="panel"
-      >
-        {% render 'localization-form',
-          show_country: show_country,
-          show_language: show_language,
-          localization_style: 'dropdown',
-          form_style: form_style,
-          form_id: section.id
-        %}
-      </div>
-    </dropdown-localization-component>
-  {% endif %}
-{% endcapture %}
 
 {%- comment -%} ── Structured Data ── {%- endcomment -%}
 <script type="application/ld+json">
@@ -177,9 +66,7 @@
   class="uly-header color-{{ section.settings.color_scheme }}{% if is_transparent_home %} uly-header--transparent{% endif %}{% if section.settings.sticky_style == 'glassmorphism' %} uly-header--glass{% endif %}"
   data-theme-color="rgb({{ section.settings.color_scheme.settings.background.rgb }})"
   data-sticky-style="{{ section.settings.sticky_style | default: 'glassmorphism' }}"
-  {% if sticky %}
-    sticky="{{ sticky }}"
-  {% endif %}
+  {% if sticky %}sticky="{{ sticky }}"{% endif %}
   data-scroll-direction="none"
   data-skip-node-update
   style="
@@ -194,133 +81,240 @@
   <div class="uly-header__underlay uly-header__underlay--closed"></div>
   <div class="uly-header__underlay uly-header__underlay--open"></div>
 
-  <div
-    class="uly-header__row color-{{ section.settings.color_scheme }} section section--full-width-margin"
-    ref="headerRowTop"
-  >
-    <div class="uly-header__inner spacing-style">
-      {%- comment -%} LEFT COLUMN — Hamburger + Search + Desktop Menu {%- endcomment -%}
-      <div class="uly-header__col uly-header__col--left">
-        <div class="header__drawer" ref="headerDrawerContainer" data-skip-node-update="true">
-          {% render 'header-drawer',
-            linklist: section.settings.menu,
-            desktop_menu: section.settings.desktop_menu,
-            section: section,
-            block: section,
-            data_header_drawer_type: 'mobile-drawer'
-          %}
+  <div class="uly-header__shell">
+
+    {%- comment -%} ── TOP ROW: Logo | Search + Social + Localization + Actions ── {%- endcomment -%}
+    <div class="uly-header__row color-{{ section.settings.color_scheme }} section section--full-width-margin" ref="headerRowTop">
+      <div class="uly-header__inner spacing-style">
+
+        {%- comment -%} LEFT: Logo only {%- endcomment -%}
+        <div class="uly-header__col uly-header__col--left">
+          <a href="{{ routes.root_url }}" class="uly-logo" aria-label="{{ shop.name }}">
+            {%- assign logo_img = section.settings.logo_image | default: settings.logo -%}
+            {%- if logo_img != blank -%}
+              {{
+                logo_img
+                | image_url: width: section.settings.logo_max_width
+                | image_tag:
+                  class: 'uly-logo__img',
+                  alt: logo_img.alt | default: shop.name,
+                  loading: 'eager',
+                  fetchpriority: 'high',
+                  widths: '120, 180, 240, 300',
+                  sizes: '(max-width: 749px) 140px, 220px'
+              }}
+            {%- else -%}
+              <span class="uly-logo__text">{{ shop.name }}</span>
+            {%- endif -%}
+          </a>
         </div>
-        {{ search_markup }}
-        {%- if section.settings.desktop_menu != blank -%}
-          <nav class="uly-header__inline-menu desktop:visible mobile:hidden">
-            <ul class="uly-list-menu list-unstyled" role="list">
-              {%- for link in section.settings.desktop_menu.links -%}
-                <li>
-                  <a
-                    href="{{ link.url }}"
-                    class="uly-list-menu__item focus-inset{% if link.current %} uly-list-menu__item--active{% endif %}"
-                  >
-                    <span>{{ link.title | escape }}</span>
-                  </a>
-                </li>
-              {%- endfor -%}
-            </ul>
-          </nav>
-        {%- endif -%}
-      </div>
 
-      {%- comment -%} CENTER COLUMN — Logo {%- endcomment -%}
-      <div class="uly-header__col uly-header__col--center">
-        {{ logo }}
-      </div>
+        {%- comment -%} RIGHT: Search → Social → Localization → Actions {%- endcomment -%}
+        <div class="uly-header__col uly-header__col--right">
 
-      {%- comment -%} RIGHT COLUMN — Account, Cart, Localization {%- endcomment -%}
-      <div class="uly-header__col uly-header__col--right">
-        {{ localization_markup }}
-        {{ actions_markup }}
+          {%- comment -%} 1. Search {%- endcomment -%}
+          {% render 'header-inline-search', section: section %}
+
+          {%- comment -%} 2. Social icons {%- endcomment -%}
+          {% render 'header-social-icons', section: section %}
+
+          {%- comment -%} 3. Localization — desktop only, hidden on mobile via CSS {%- endcomment -%}
+          {%- if show_localization -%}
+            <div class="uly-localization-slot uly-localization-slot--header">
+              {% render 'uly-header-localization',
+                section: section,
+                show_country: show_country,
+                show_language: show_language,
+                id_suffix: ''
+              %}
+            </div>
+          {%- endif -%}
+
+          {%- comment -%} 4. Account + Cart {%- endcomment -%}
+          <div class="uly-header-actions-wrapper{% if section.settings.show_account == false %} hide-account{% endif %}{% if section.settings.show_cart == false %} hide-cart{% endif %}">
+            {% render 'header-actions',
+              section: section,
+              customer_account_menu: section.settings.customer_account_menu,
+              display_style: section.settings.actions_display_style
+            %}
+          </div>
+
+        </div>
       </div>
     </div>
+
+    {%- comment -%} ── SHOP ALL BAR ── {%- endcomment -%}
+    <div class="uly-header__bar section section--full-width-margin">
+
+      <button
+        type="button"
+        id="uly-shop-drawer-trigger"
+        class="uly-shop-bar__trigger"
+        aria-expanded="false"
+        aria-controls="Details-menu-drawer-container"
+      >
+        <span class="uly-shop-bar__label">{{ shop_trigger_label | escape }}</span>
+        <span class="uly-shop-bar__arrow" aria-hidden="true">&rsaquo;</span>
+        {%- if section.settings.shop_all_suffix != blank -%}
+          <span class="uly-shop-bar__suffix">{{ section.settings.shop_all_suffix | escape }}</span>
+        {%- endif -%}
+      </button>
+
+      {%- comment -%}
+        Mobile localization: only render if localization is enabled.
+        Hidden on desktop via CSS.
+      {%- endcomment -%}
+      {%- if show_localization -%}
+        <div class="uly-localization-slot uly-localization-slot--bar">
+          {% render 'uly-header-localization',
+            section: section,
+            show_country: show_country,
+            show_language: show_language,
+            id_suffix: '-mobile'
+          %}
+        </div>
+      {%- endif -%}
+
+    </div>
+
+    {%- comment -%} ── DRAWER HOST ── {%- endcomment -%}
+    <div class="header__drawer uly-drawer-host" ref="headerDrawerContainer" data-skip-node-update="true">
+      {% render 'header-drawer',
+        linklist: section.settings.menu,
+        class: 'uly-drawer uly-drawer--hidden-trigger',
+        section: section,
+        block: section,
+        data_header_drawer_type: 'mobile-drawer'
+      %}
+    </div>
+
   </div>
 
-  {%- comment -%} Satisfies header-component requiredRefs (desktop mega-menu lives in inline nav / drawer instead). {%- endcomment -%}
+  {%- comment -%} Satisfies header-component requiredRefs {%- endcomment -%}
   <div ref="headerMenu" class="uly-header-menu-placeholder" hidden aria-hidden="true"></div>
 </header-component>
 
-{%- comment -%} ── Header controller: drawer mode + scroll-based transparency ── {%- endcomment -%}
 <script>
   (function () {
     'use strict';
 
-    var header = document.getElementById('header-component');
-    if (!header) return;
+    function initHeader() {
+      var header = document.getElementById('header-component');
+      if (!header) return;
 
-    // 1. Always force drawer / sidebar mode regardless of Shopify's detection
-    header.dataset.menuStyle = 'drawer';
+      // Always force drawer mode — prevents Shopify's compiled CSS rule
+      // #header-component[data-menu-style=menu] .header__drawer { display:none }
+      header.dataset.menuStyle = 'drawer';
 
-    // 2. Scroll-based transparent header logic
-    //    We use data-scrolled (our attribute) because Shopify's header.js sets
-    //    data-sticky-state="active" immediately on load for sticky="always",
-    //    which would always suppress the transparent state before the user scrolls.
-    var isTransparent = header.classList.contains('uly-header--transparent');
-    var THRESHOLD = 20; // px from top before switching to solid/glassmorphism
+      // Scroll-based transparent header
+      var isTransparent = header.classList.contains('uly-header--transparent');
+      var THRESHOLD = 20;
 
-    function onScroll() {
-      if (window.scrollY > THRESHOLD) {
-        header.setAttribute('data-scrolled', 'true');
-      } else {
-        header.removeAttribute('data-scrolled');
-      }
-    }
-
-    if (isTransparent) {
-      window.addEventListener('scroll', onScroll, { passive: true });
-      onScroll(); // Set correct initial state without waiting for a scroll event
-    }
-
-    // 3. Shopify Theme Editor live-reload: re-run when section is updated
-    document.addEventListener('shopify:section:load', function (e) {
-      if (e.detail && e.detail.sectionId === '{{ section.id }}') {
-        var h = document.getElementById('header-component');
-        if (h) {
-          h.dataset.menuStyle = 'drawer';
-          if (h.classList.contains('uly-header--transparent')) {
-            window.addEventListener('scroll', onScroll, { passive: true });
-            onScroll();
-          }
+      function onScroll() {
+        if (window.scrollY > THRESHOLD) {
+          header.setAttribute('data-scrolled', 'true');
+        } else {
+          header.removeAttribute('data-scrolled');
         }
       }
+
+      if (isTransparent) {
+        if (header._ulyScrollHandler) {
+          window.removeEventListener('scroll', header._ulyScrollHandler);
+        }
+        header._ulyScrollHandler = onScroll;
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+      }
+
+      // Sync CSS height variables
+      function syncHeights() {
+        var row = header.querySelector('.uly-header__row');
+        var bar = header.querySelector('.uly-header__bar');
+        var rowH = row ? row.offsetHeight : 64;
+        var barH = bar ? bar.offsetHeight : 40;
+        var total = rowH + barH;
+        document.body.style.setProperty('--uly-shop-bar-height', barH + 'px');
+        document.body.style.setProperty('--header-height', total + 'px');
+        document.body.style.setProperty('--header-group-height', total + 'px');
+      }
+
+      syncHeights();
+      window.addEventListener('resize', syncHeights);
+      requestAnimationFrame(syncHeights);
+      setTimeout(syncHeights, 300);
+
+      if (typeof ResizeObserver !== 'undefined') {
+        var ro = new ResizeObserver(syncHeights);
+        var row = header.querySelector('.uly-header__row');
+        var bar = header.querySelector('.uly-header__bar');
+        if (row) ro.observe(row);
+        if (bar) ro.observe(bar);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initHeader);
+    } else {
+      initHeader();
+    }
+
+    document.addEventListener('shopify:section:load', function () {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(initHeader);
+      });
+    });
+
+    document.addEventListener('shopify:block:select', function () {
+      requestAnimationFrame(initHeader);
     });
   })();
 </script>
 
+<script src="{{ 'uly-shop-drawer.js' | asset_url }}" type="module"></script>
 <script src="{{ 'header.js' | asset_url }}" type="module"></script>
 {{ 'custom-header.css' | asset_url | stylesheet_tag }}
 
 {% stylesheet %}
-  /* ============================================================
-     ULY CUSTOM HEADER — Admin Editor styles (mirrors custom-header.css)
-  ============================================================ */
+  /* ── Admin editor critical overrides ── */
 
   body {
-    --header-height: 64px;
-    --header-group-height: var(--header-height);
+    --header-height: 104px;
+    --uly-shop-bar-height: 40px;
+    --header-row-height: 64px;
+    --header-group-height: 104px;
     --transparent-header-offset-boolean: 0;
   }
 
-  /* Same as Horizon header: header group does not create a layout box so sticky/stacking match storefront preview */
   #header-group:has(#header-component[sticky]) {
     display: contents;
   }
 
-  .uly-header .header__drawer {
-    display: flex;
-    align-items: center;
-    min-height: var(--header-drawer-min-height, 44px);
+  .header-section:has(.uly-header--transparent) {
+    height: 0;
+    min-height: 0;
+    overflow: visible;
   }
 
-  .uly-header-menu-placeholder {
-    display: none !important;
+  .uly-header .header__drawer.uly-drawer-host {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    min-height: 0 !important;
+    display: block !important;
+    pointer-events: none;
+    z-index: var(--layer-menu-drawer);
+    border: 0;
   }
+
+  .uly-header .header__drawer.uly-drawer-host header-drawer,
+  .uly-header .header__drawer.uly-drawer-host .menu-drawer-container {
+    pointer-events: auto;
+  }
+
+  .uly-header-menu-placeholder { display: none !important; }
 
   .uly-header {
     --header-padding: 0 var(--padding-lg);
@@ -328,6 +322,8 @@
     background: transparent;
     font-family: var(--primary-font, sans-serif);
   }
+
+  .uly-header__shell { position: relative; }
 
   .header-section:has(> #header-component[sticky='always']),
   .header-section:has(> #header-component[sticky='scroll-up'][data-sticky-state='active']) {
@@ -346,23 +342,21 @@
     z-index: var(--layer-lowest);
     background: var(--color-background);
   }
-  .uly-header__underlay--open {
-    height: var(--full-open-header-height, 0px);
-    background: var(--color-background);
-  }
+  .uly-header__underlay--open { height: 0; display: none; }
 
   .uly-header__row {
     position: relative;
     background-color: transparent;
+    border-block: 1px solid rgba(var(--color-foreground-rgb), 0.85);
+    background-color: var(--color-background);
   }
 
   .uly-header__inner {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    grid-template-areas: 'left center right';
+    grid-template-columns: minmax(100px, auto) minmax(0, 1fr);
     align-items: center;
-    height: var(--header-height);
-    padding: var(--header-padding);
+    min-height: var(--header-row-height, 64px);
+    padding: 0.5rem var(--padding-lg, 1.5rem);
     gap: var(--gap-md, 1rem);
   }
 
@@ -371,36 +365,219 @@
     align-items: center;
     gap: var(--gap-sm, 0.5rem);
   }
-  .uly-header__col--left {
-    grid-area: left;
-  }
-  .uly-header__col--center {
-    grid-area: center;
-    justify-content: center;
-  }
+  .uly-header__col--left { justify-content: flex-start; }
   .uly-header__col--right {
-    grid-area: right;
+    display: flex;
+    align-items: center;
     justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    min-width: 0;
   }
 
-  /* LOGO — contained within header height */
+  .uly-header__col--right > * {
+    flex-shrink: 0;
+  }
+
+  .uly-localization-slot--header {
+    order: 3;
+    margin-inline: 0.15rem;
+  }
+
+  .uly-header-actions-wrapper {
+    order: 4;
+  }
+
+  /* Beat Shopify's compiled rule that hides .header__drawer when data-menu-style=menu */
+  #header-component.uly-header .header__drawer,
+  #header-component.uly-header[data-menu-style] .header__drawer,
+  #header-component.uly-header[data-menu-style='menu'] .header__drawer,
+  #header-component.uly-header[data-menu-style='drawer'] .header__drawer {
+    display: block !important;
+    visibility: visible !important;
+    min-height: 0 !important;
+  }
+
+  #header-component .header-menu,
+  #header-component header-menu { display: none !important; }
+
+  .uly-header--transparent:not([data-scrolled='true']) .uly-header__row {
+    background-color: transparent !important;
+    border-block-color: rgba(255,255,255,0.35) !important;
+  }
+
+  /* SHOP ALL BAR — padding matches .uly-header__inner so trigger lines up with logo */
+  .uly-header__bar {
+    position: relative;
+    z-index: calc(var(--layer-sticky, 200) + 1);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    min-height: var(--uly-shop-bar-height, 40px);
+    padding: 0.35rem var(--padding-lg, 1.5rem);
+    /* IMPORTANT: must be auto — pointer-events:none was blocking trigger clicks */
+    pointer-events: auto;
+  }
+
+  @media screen and (max-width: 749px) {
+    .uly-header__bar {
+      justify-content: space-between;
+      padding: 0.35rem 1rem;
+    }
+  }
+
+  .uly-localization-slot {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    pointer-events: auto;
+  }
+
+  /* Localization slot visibility */
+  .uly-localization-slot--bar { display: none !important; }
+  .uly-localization-slot--header { display: flex; }
+
+  .uly-shop-bar__trigger {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-family: var(--primary-font, sans-serif);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: rgb(255,255,255);
+    text-shadow: 0 1px 8px rgba(0,0,0,0.35);
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .uly-shop-bar__trigger:hover { opacity: 0.85; }
+
+  .uly-drawer--hidden-trigger .header__icon--summary {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0,0,0,0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+  }
+
+  /* Drawer open state */
+  .menu-drawer-container.menu-open > .menu-drawer,
+  .menu-drawer-container[open] > .menu-drawer {
+    transform: translateX(0) !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: flex !important;
+  }
+
+  .menu-drawer-container.menu-open > .menu-drawer__backdrop {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  /* Gradient sidebar drawer */
+  header-drawer.uly-drawer .menu-drawer {
+    position: fixed !important;
+    left: 0 !important;
+    top: var(--header-group-height, 104px) !important;
+    height: calc(100dvh - var(--header-group-height, 104px)) !important;
+    width: min(380px, 58vw) !important;
+    max-width: 380px !important;
+    border-right: none !important;
+    box-shadow: none !important;
+    background: #0E5C66;
+    background: linear-gradient(90deg, rgba(14, 92, 102, 1) 0%, rgba(14, 92, 102, 0.67) 48%, rgba(14, 92, 102, 0.45) 100%) !important;
+    --color-foreground: 255 255 255;
+    --color-foreground-rgb: 255, 255, 255;
+    --menu-top-level-font-color: rgb(255, 255, 255);
+    --menu-parent-font-color: rgba(255, 255, 255, 0.85);
+    --menu-child-font-color: rgba(255, 255, 255, 0.85);
+    color: #fff;
+    overflow: hidden !important;
+    padding-top: 0 !important;
+  }
+
+  header-drawer.uly-drawer .menu-drawer__submenu {
+    background: #0E5C66;
+    background: linear-gradient(90deg, rgba(14, 92, 102, 1) 0%, rgba(14, 92, 102, 0.67) 48%, rgba(14, 92, 102, 0.1) 100%) !important;
+  }
+
+  header-drawer.uly-drawer .menu-drawer a,
+  header-drawer.uly-drawer .menu-drawer button,
+  header-drawer.uly-drawer .menu-drawer__menu-item,
+  header-drawer.uly-drawer .menu-drawer__menu-item-text,
+  header-drawer.uly-drawer .menu-drawer__menu-item--mainlist,
+  header-drawer.uly-drawer .menu-drawer__menu-item--parent,
+  header-drawer.uly-drawer .menu-drawer__menu-item--child,
+  header-drawer.uly-drawer .menu-drawer__back-button,
+  header-drawer.uly-drawer .drawer-localization__button {
+    color: #fff !important;
+    --menu-top-level-font-color: #fff;
+    --menu-parent-font-color: rgba(255, 255, 255, 0.85);
+    --menu-child-font-color: rgba(255, 255, 255, 0.85);
+  }
+
+  header-drawer.uly-drawer .menu-drawer__list-item--divider {
+    border-block-end-color: rgba(255, 255, 255, 0.12) !important;
+  }
+
+  header-drawer.uly-drawer .menu-drawer__menu {
+    padding-inline: 1.75rem 2.5rem !important;
+  }
+
+  /* Localization in drawer: mobile only */
+  .uly-drawer .menu-drawer__utility-links { display: none; }
+
+  @media screen and (max-width: 749px) {
+    .uly-drawer .menu-drawer__utility-links {
+      display: flex !important;
+      flex-direction: column;
+      flex-shrink: 0;
+      margin-top: auto;
+      padding: 12px 1.75rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .uly-drawer .menu-drawer__localization { display: block !important; }
+    .uly-drawer .menu-drawer__utility-links * {
+      color: #fff !important;
+      --color-foreground: 255 255 255;
+    }
+  }
+
+  header-drawer.uly-drawer .menu-drawer__menu--childlist {
+    list-style: disc;
+    padding-inline-start: 1.35rem;
+  }
+
+  header-drawer.uly-drawer .menu-drawer__menu--childlist .menu-drawer__menu--childlist {
+    list-style: circle;
+    padding-inline-start: 1.1rem;
+  }
+
+  /* LOGO */
   .uly-logo {
     display: flex;
     align-items: center;
     text-decoration: none;
     color: var(--color-foreground);
-    max-height: calc(var(--header-height, 64px) - 12px);
+    max-height: calc(var(--header-row-height, 64px) - 12px);
     transition: opacity 0.2s ease;
   }
-  .uly-logo:hover {
-    opacity: 0.8;
-  }
+  .uly-logo:hover { opacity: 0.8; }
   .uly-logo__img {
     display: block;
     width: auto;
     height: 100%;
     max-width: var(--logo-max-width, 120px);
-    max-height: calc(var(--header-height, 64px) - 12px);
+    max-height: calc(var(--header-row-height, 64px) - 12px);
     object-fit: contain;
   }
   .uly-logo__text {
@@ -412,50 +589,7 @@
     white-space: nowrap;
   }
 
-  /* Desktop menu — 14px + secondary-accent hover */
-  .uly-header__inline-menu {
-    display: flex;
-  }
-  .uly-list-menu {
-    display: flex;
-    gap: var(--gap-lg, 1.5rem);
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  .uly-list-menu__item {
-    color: var(--color-foreground);
-    text-decoration: none;
-    font-family: var(--primary-font, sans-serif);
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    padding: 4px 0;
-    display: block;
-    position: relative;
-    transition: color 0.3s ease;
-  }
-  .uly-list-menu__item::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: var(--secondary-accent, #e8612c);
-    transition: width 0.3s ease;
-  }
-  .uly-list-menu__item:hover,
-  .uly-list-menu__item--active {
-    color: var(--secondary-accent, #e8612c);
-  }
-  .uly-list-menu__item:hover::after,
-  .uly-list-menu__item--active::after {
-    width: 100%;
-  }
-
-  /* Localization — anchored dropdown panel */
+  /* Localization dropdown button */
   dropdown-localization-component.uly-localization {
     position: relative;
     display: inline-flex;
@@ -464,24 +598,23 @@
   .uly-localization .dropdown-localization__button {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     font-family: var(--primary-font, sans-serif);
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 4px 6px;
     background: transparent !important;
-    border: 1.5px solid var(--primary-accent, #0e5c66) !important;
+    border: none !important;
+    box-shadow: none !important;
     border-radius: 6px;
     cursor: pointer;
-    color: var(--primary-accent, #0e5c66);
+    color: var(--color-foreground);
     white-space: nowrap;
-    transition: background-color 0.25s ease, color 0.25s ease;
+    min-height: 40px;
+    transition: background-color 0.2s ease;
   }
   .uly-localization .dropdown-localization__button:hover {
-    background: var(--primary-accent, #0e5c66) !important;
-    color: var(--secondary-accent, #e8612c) !important;
+    background: rgba(var(--color-foreground-rgb), 0.06) !important;
   }
   .uly-localization .localization-wrapper {
     position: absolute !important;
@@ -493,97 +626,36 @@
     overflow-y: auto !important;
     border-radius: 10px !important;
     border: 1px solid rgba(var(--color-foreground-rgb), 0.1) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15) !important;
     background-color: var(--color-background) !important;
     z-index: 9999 !important;
   }
-  .uly-localization .icon-flag {
-    width: 18px;
-    height: 18px;
-    clip-path: circle(50%);
-    background-size: cover;
-    flex-shrink: 0;
-  }
-  .uly-localization .icon-caret {
-    width: 10px;
-    height: 10px;
-    flex-shrink: 0;
-    transition: transform 0.2s ease;
-  }
-  .uly-localization .dropdown-localization__button[aria-expanded='true'] .icon-caret svg {
-    transform: rotate(180deg);
-  }
 
-  /* Action icons */
-  .uly-header__col--right .header-actions__action {
-    color: var(--color-foreground);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s ease;
-  }
-  .uly-header__col--right .header-actions__action:hover {
-    color: var(--secondary-accent, #e8612c);
-  }
+  /* Admin editor: always show localization in header row, never in bar */
+  .shopify-design-mode .uly-localization-slot--header { display: flex !important; }
+  .shopify-design-mode .uly-localization-slot--bar    { display: none !important; }
 
-  .uly-header__col--left .menu-drawer-container .header__icon--summary {
-    color: var(--color-foreground);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: var(--padding-sm, 0.5rem);
-    cursor: pointer;
-  }
-
-  #header-component .header-menu,
-  #header-component header-menu {
-    display: none !important;
-  }
-
-  /* Beat Shopify's compiled rule: #header-component[data-menu-style=menu] .header__drawer { display:none } */
-  #header-component.uly-header .header__drawer,
-  #header-component.uly-header[data-menu-style] .header__drawer,
-  #header-component.uly-header[data-menu-style='menu'] .header__drawer,
-  #header-component.uly-header[data-menu-style='drawer'] .header__drawer {
-    display: flex !important;
-    visibility: visible !important;
-    min-height: var(--header-drawer-min-height, 44px) !important;
-  }
-
+  /* Mobile */
   @media screen and (max-width: 749px) {
     body {
       --header-height: 56px;
+      --uly-shop-bar-height: 40px;
     }
     .uly-header__inner {
-      display: flex !important;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 1rem;
-      position: relative;
+      grid-template-columns: auto 1fr;
+      padding: 0.35rem 1rem;
+      gap: 0.35rem;
     }
-    .uly-header__col--center {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      pointer-events: none;
-      z-index: 0;
-    }
-    .uly-header__col--center .uly-logo {
-      pointer-events: all;
-    }
-    .uly-header__col--right .uly-localization {
-      display: none !important;
-    }
-    .uly-header__col--left .uly-header__inline-menu {
-      display: none !important;
-    }
+    .uly-header__col--right { gap: 0.15rem; }
+    .uly-localization-slot--header { display: none !important; }
+    .uly-localization-slot--bar { display: flex !important; }
+    .uly-header__bar { padding: 0.35rem 1rem; }
   }
+
+  /* Desktop */
   @media screen and (min-width: 750px) {
-    .uly-header__col--right .uly-localization {
-      display: flex !important;
-    }
+    .uly-localization-slot--header { display: flex !important; }
+    .uly-localization-slot--bar { display: none !important; }
   }
 {% endstylesheet %}
 
@@ -609,7 +681,7 @@
     {
       "type": "image_picker",
       "id": "logo_image",
-      "label": "Custom logo image",
+      "label": "Logo image",
       "info": "Overrides the global logo setting."
     },
     {
@@ -629,26 +701,104 @@
     {
       "type": "link_list",
       "id": "menu",
-      "label": "Sidebar Menu",
+      "label": "Sidebar menu",
       "default": "main-menu",
-      "info": "This menu appears inside the hamburger drawer."
+      "info": "Nested links appear in the gradient sidebar when Shop All is clicked."
     },
     {
-      "type": "link_list",
-      "id": "desktop_menu",
-      "label": "Desktop Horizontal Menu",
-      "info": "This menu appears horizontally on desktop devices."
+      "type": "text",
+      "id": "shop_all_label",
+      "label": "Shop button label",
+      "info": "Leave blank to use the navigation menu title.",
+      "default": "Shop All"
     },
-
+    {
+      "type": "text",
+      "id": "shop_all_suffix",
+      "label": "Shop button suffix",
+      "info": "Optional text after the arrow, e.g. Collections:",
+      "default": "test"
+    },
     {
       "type": "header",
-      "content": "Icons"
+      "content": "Search"
     },
     {
       "type": "checkbox",
       "id": "show_search",
       "label": "Show search icon",
       "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search_placeholder",
+      "label": "Show search placeholder text",
+      "default": false,
+      "visible_if": "{{ section.settings.show_search }}"
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Search placeholder text",
+      "default": "Find what makes you unique!",
+      "visible_if": "{{ section.settings.show_search and section.settings.show_search_placeholder }}"
+    },
+    {
+      "type": "header",
+      "content": "Social Media"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social",
+      "label": "Show social icons",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "social_facebook",
+      "label": "Facebook URL"
+    },
+    {
+      "type": "url",
+      "id": "social_instagram",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "url",
+      "id": "social_tiktok",
+      "label": "TikTok URL"
+    },
+    {
+      "type": "url",
+      "id": "social_pinterest",
+      "label": "Pinterest URL"
+    },
+    {
+      "type": "header",
+      "content": "Language & Currency"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_country",
+      "label": "Show country/currency selector",
+      "default": true,
+      "info": "Requires multiple markets in Shopify Markets. Always visible in the theme editor when enabled."
+    },
+    {
+      "type": "checkbox",
+      "id": "country_selector_style",
+      "label": "Show country flag",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_language",
+      "label": "Show language selector",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Action Icons"
     },
     {
       "type": "checkbox",
@@ -664,46 +814,19 @@
     },
     {
       "type": "header",
-      "content": "Language & Currency"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_country",
-      "label": "Show country/currency selector",
-      "info": "Manage countries in your Shopify Markets settings.",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "country_selector_style",
-      "label": "Show country flag",
-      "default": true,
-      "visible_if": "{{ section.settings.show_country }}"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_language",
-      "label": "Show language selector",
-      "info": "Manage languages in your Shopify Language settings.",
-      "default": true
-    },
-    {
-      "type": "header",
       "content": "Sidebar Menu Options"
     },
     {
       "type": "checkbox",
       "id": "drawer_accordion",
       "label": "Accordion sub-menus",
-      "info": "Expand/collapse sub-menu items in the sidebar.",
-      "default": true
+      "default": false
     },
     {
       "type": "checkbox",
       "id": "drawer_accordion_expand_first",
       "label": "Auto-expand first item",
-      "default": false,
-      "visible_if": "{{ section.settings.drawer_accordion }}"
+      "default": false
     },
     {
       "type": "checkbox",
@@ -731,8 +854,7 @@
       "max": 20,
       "step": 1,
       "unit": "px",
-      "default": 4,
-      "visible_if": "{{ section.settings.menu_style != 'text' }}"
+      "default": 4
     },
     {
       "type": "color_scheme",
@@ -748,14 +870,12 @@
       "type": "checkbox",
       "id": "enable_transparent_home",
       "label": "Transparent header on homepage",
-      "info": "Shows the hero image through the header bar on the homepage.",
       "default": true
     },
     {
       "type": "select",
       "id": "sticky_style",
       "label": "Sticky header background",
-      "info": "Applies when the header becomes sticky after scrolling.",
       "options": [
         { "value": "glassmorphism", "label": "Glass (blur + teal tint)" },
         { "value": "solid", "label": "Solid color scheme background" }

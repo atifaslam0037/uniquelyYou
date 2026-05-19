@@ -13,51 +13,20 @@
   "sections": {
     "footer_m9NzUG": {
       "type": "footer",
-      "blocks": {
-        "menu_yJHk7L": {
-          "type": "menu",
-          "settings": {
-            "heading": "SHOP",
-            "menu": "main-menu"
-          }
-        },
-        "menu_PUTVEL": {
-          "type": "menu",
-          "settings": {
-            "heading": "SHOP",
-            "menu": "main-menu"
-          }
-        },
-        "menu_eBFjnU": {
-          "type": "menu",
-          "settings": {
-            "heading": "SHOP",
-            "menu": "primary-menu"
-          }
-        }
-      },
-      "block_order": [
-        "menu_yJHk7L",
-        "menu_PUTVEL",
-        "menu_eBFjnU"
-      ],
       "name": "t:names.footer",
       "settings": {
+        "logo": "shopify://shop_images/uniquely-you.png",
+        "logo_width": 210,
+        "logo_height": 0,
         "logo_script": "Uniquely",
         "logo_bold": "YOU",
-        "tagline": "Wear Your One-Liner. Live Your Uniqueness.",
-        "show_social": true,
-        "social_facebook": "",
-        "social_instagram": "",
-        "social_tiktok": "",
-        "social_pinterest": "",
+        "copyright_text": "All rights reserved.",
         "nl_heading": "Stay in the loop!",
         "nl_sub": "New drops, exclusive deals & stories.",
         "nl_placeholder": "Your email address",
-        "nl_btn": "Subscribe",
-        "show_payments": true,
-        "copyright_text": "All rights reserved.",
-        "background_color": "#0a1820",
+        "menu_links": "customer-account-main-menu",
+        "menu_links_align": "right",
+        "background_color": "#146f74",
         "margin_top": 0
       }
     }

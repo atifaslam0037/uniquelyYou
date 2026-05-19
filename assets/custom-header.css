@@ -1,6 +1,6 @@
 /* ==============================================================
-   UNIQUELY YOU — Custom Header Stylesheet v5
-   Brand tokens (from global-variables.css):
+   UNIQUELY YOU — Custom Header Stylesheet v6
+   Tokens:
      --color-mint:           #5FBFB8
      --color-deep-teal:      #0E5C66
      --color-vibrant-orange: #E8612C
@@ -11,29 +11,39 @@
    ============================================================== */
 
 /* ══════════════════════════════════════════════════════════════
-   1. ACCOUNT POPUP POSITION
+   1. HEADER GROUP LAYOUT (mirrors Horizon)
    ══════════════════════════════════════════════════════════════ */
-.uly-header {
-  --account-offset-top: calc(var(--header-group-height, 64px) + (var(--header-height, 64px) * var(--transparent-header-offset-boolean, 0)));
-}
 
-/* Match Horizon header-group behavior so sticky header, drawer, and overlays layout the same in editor and live preview */
 #header-group:has(#header-component[sticky]) {
   display: contents;
 }
 
-.uly-header .header__drawer {
-  display: flex;
-  align-items: center;
-  min-height: var(--header-drawer-min-height, 44px);
+.header-section:has(.uly-header--transparent) {
+  height: 0;
+  min-height: 0;
+  overflow: visible;
+}
+
+/* Drawer host: zero-size fixed container so the drawer can overlay */
+.uly-header .header__drawer.uly-drawer-host {
+  position: fixed;
+  inset: 0 auto auto 0;
+  width: 0;
+  height: 0;
+  overflow: visible;
+  min-height: 0 !important;
+  display: block !important;
+  pointer-events: none;
+  z-index: var(--layer-menu-drawer);
+}
+
+.uly-header .header__drawer.uly-drawer-host header-drawer,
+.uly-header .header__drawer.uly-drawer-host .menu-drawer-container {
+  pointer-events: auto;
 }
 
 .uly-header-menu-placeholder {
   display: none !important;
-}
-
-.uly-header[data-sticky-state='active'] {
-  --account-offset-top: calc(var(--header-height, 64px) - 1px);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -51,10 +61,6 @@
 .uly-header[data-scroll-direction='up'][sticky='scroll-up'],
 .uly-header[data-sticky-state='active'] {
   transform: translateY(0);
-}
-
-.uly-header__row {
-  position: relative;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -80,24 +86,26 @@
 .uly-header--transparent:not([data-scrolled='true']) {
   --color-foreground: rgb(255, 255, 255);
   --color-foreground-rgb: 255, 255, 255;
-  --color-account-icon: rgb(255, 255, 255);
 }
 
+.uly-header--transparent:not([data-scrolled='true']) .uly-header__row {
+  background-color: transparent !important;
+  border-block-color: rgba(255, 255, 255, 0.35) !important;
+}
 
 .uly-header--transparent:not([data-scrolled='true']) .uly-logo__text,
-.uly-header--transparent:not([data-scrolled='true']) .uly-list-menu__item,
-.uly-header--transparent:not([data-scrolled='true']) .header-drawer-icon svg,
+.uly-header--transparent:not([data-scrolled='true']) .uly-logo__img,
+.uly-header--transparent:not([data-scrolled='true']) .uly-header-search__trigger,
+.uly-header--transparent:not([data-scrolled='true']) .uly-header-search__icon,
+.uly-header--transparent:not([data-scrolled='true']) .uly-header-search__icon svg,
+.uly-header--transparent:not([data-scrolled='true']) .uly-header-social__link,
 .uly-header--transparent:not([data-scrolled='true']) .uly-localization .dropdown-localization__button,
 .uly-header--transparent:not([data-scrolled='true']) .search-action button svg,
 .uly-header--transparent:not([data-scrolled='true']) .header-actions__cart-icon svg,
+.uly-header--transparent:not([data-scrolled='true']) .header-actions__action svg,
 .uly-header--transparent:not([data-scrolled='true']) .account-button svg {
   color: rgb(255, 255, 255) !important;
   stroke: rgb(255, 255, 255) !important;
-}
-
-.uly-header--transparent:not([data-scrolled='true']) .menu-drawer__close-button svg {
-  color: #000 !important;
-  stroke: #000 !important;
 }
 
 /* Glassmorphism on scroll */
@@ -110,8 +118,7 @@
   transition: background 0.35s ease, backdrop-filter 0.35s ease;
 }
 
-#header-component[data-sticky-style='solid'][data-sticky-state='active'] .uly-header__underlay--closed,
-#header-component[data-sticky-style='solid'][data-scrolled='true'] .uly-header__underlay--closed {
+#header-component[data-sticky-style='solid'][data-sticky-state='active'] .uly-header__underlay--closed {
   background: var(--color-background) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
@@ -124,16 +131,72 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   4. LOGO — FIX: contained within header height
+   4. HEADER GRID LAYOUT
    ══════════════════════════════════════════════════════════════ */
+
+.uly-header__shell {
+  position: relative;
+}
+
+.uly-header__row {
+  position: relative;
+  border-block: 1px solid rgba(var(--color-foreground-rgb), 0.85);
+  background-color: var(--color-background);
+}
+
+.uly-header__inner {
+  display: grid;
+  grid-template-columns: minmax(100px, auto) minmax(0, 1fr);
+  align-items: center;
+  min-height: var(--header-row-height, 64px);
+  padding: 0.5rem var(--padding-lg, 1.5rem);
+  gap: var(--gap-md, 1rem);
+}
+
+.uly-header__col {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm, 0.5rem);
+}
+
+.uly-header__col--left {
+  justify-content: flex-start;
+}
+
+.uly-header__col--right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  min-width: 0;
+  overflow: visible;
+}
+
+.uly-header__col--right>* {
+  flex-shrink: 0;
+}
+
+.uly-localization-slot--header {
+  order: 3;
+  margin-inline: 0.15rem;
+}
+
+.uly-header-actions-wrapper {
+  order: 4;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5. LOGO
+   ══════════════════════════════════════════════════════════════ */
+
 .uly-logo {
   display: flex;
   align-items: center;
   text-decoration: none;
   color: var(--color-foreground);
+  max-height: calc(var(--header-row-height, 64px) - 12px);
   transition: opacity 0.2s ease;
-  /* Constrain to header height so the logo never overflows */
-  max-height: calc(var(--header-height, 64px) - 12px);
 }
 
 .uly-logo:hover {
@@ -144,9 +207,8 @@
   display: block;
   width: auto;
   height: 100%;
-  /* Hard cap: never wider than the schema setting, never taller than the header */
   max-width: var(--logo-max-width, 120px);
-  max-height: calc(var(--header-height, 64px) - 12px);
+  max-height: calc(var(--header-row-height, 64px) - 12px);
   object-fit: contain;
 }
 
@@ -159,7 +221,6 @@
   white-space: nowrap;
 }
 
-/* Mobile logo size */
 @media screen and (max-width: 749px) {
   .uly-logo__img {
     max-width: 110px;
@@ -168,27 +229,23 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   5. ICON OVERRIDES WITH SECONDARY-ACCENT HOVER
+   6. ICON HOVER — secondary-accent
    ══════════════════════════════════════════════════════════════ */
 
-.uly-header .search-action button svg,
-.uly-header .search-action button .icon-search {
+.uly-header .search-action button svg {
   color: var(--color-foreground);
-  transition: color 0.2s ease;
+  transition: color 0.2s;
 }
 
-.uly-header .search-action button:hover svg,
-.uly-header .search-action button:hover .icon-search {
+.uly-header .search-action button:hover svg {
   color: var(--secondary-accent, #E8612C);
 }
 
-.uly-header .account-button shopify-account svg,
 .uly-header .account-button svg {
   color: var(--color-foreground);
-  transition: color 0.2s ease;
+  transition: color 0.2s;
 }
 
-.uly-header .account-button:hover shopify-account svg,
 .uly-header .account-button:hover svg {
   color: var(--secondary-accent, #E8612C);
 }
@@ -198,17 +255,16 @@
   position: relative;
 }
 
-.uly-header .header-actions__cart-icon svg,
-.uly-header .header-actions__cart-icon .icon-cart {
+.uly-header .header-actions__cart-icon svg {
   color: var(--color-foreground);
-  transition: color 0.2s ease;
+  transition: color 0.2s;
 }
 
-.uly-header .header-actions__action:hover .header-actions__cart-icon svg,
-.uly-header .header-actions__action:hover .header-actions__cart-icon .icon-cart {
+.uly-header .header-actions__action:hover .header-actions__cart-icon svg {
   color: var(--secondary-accent, #E8612C);
 }
 
+/* Cart bubble */
 .cart-bubble__background {
   background-color: var(--secondary-accent, #E8612C) !important;
   width: 18px;
@@ -229,7 +285,6 @@
   line-height: 1;
 }
 
-/* Prevent cart bubble from being clipped by parent overflow */
 .header-actions__action {
   overflow: visible !important;
 }
@@ -242,62 +297,23 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   6. HAMBURGER ICON
-   ══════════════════════════════════════════════════════════════ */
-.header-drawer-icon svg {
-  stroke: var(--color-foreground);
-  transition: stroke 0.2s ease;
-}
-
-.menu-drawer-container .header__icon--summary:hover .header-drawer-icon svg {
-  stroke: var(--secondary-accent, #E8612C);
-}
-
-/* ══════════════════════════════════════════════════════════════
-   7. ACTION WRAPPERS + DRAWER TRIGGER OVERRIDE
+   7. DRAWER TRIGGER OVERRIDE
+   Beats Shopify's compiled CSS: #header-component[data-menu-style=menu] .header__drawer { display:none }
    ══════════════════════════════════════════════════════════════ */
 
-/*
-  CRITICAL: Shopify's server-side compiled styles.css bundle contains:
-    #header-component[data-menu-style=menu] .header__drawer { display:none; min-height:0 }
-  This comes from the Horizon header-drawer {% stylesheet %} block and is injected
-  in the admin editor. We beat it with higher specificity + !important.
-  The JS in utilities.js also prevents data-menu-style ever being set to 'menu'
-  for .uly-header, but this CSS is the guaranteed fallback.
-*/
-#header-component.uly-header .header__drawer,
-#header-component.uly-header[data-menu-style] .header__drawer,
-#header-component.uly-header[data-menu-style='menu'] .header__drawer,
-#header-component.uly-header[data-menu-style='drawer'] .header__drawer {
-  display: flex !important;
+#header-component.uly-header .header__drawer.uly-drawer-host,
+#header-component.uly-header[data-menu-style] .header__drawer.uly-drawer-host,
+#header-component.uly-header[data-menu-style='menu'] .header__drawer.uly-drawer-host,
+#header-component.uly-header[data-menu-style='drawer'] .header__drawer.uly-drawer-host {
+  display: block !important;
   visibility: visible !important;
-  min-height: var(--header-drawer-min-height, 44px) !important;
+  min-height: 0 !important;
 }
 
 .uly-header-actions-wrapper {
   display: flex;
   align-items: center;
   gap: var(--gap-sm, 0.5rem);
-}
-
-.uly-header__col--left {
-  gap: var(--gap-sm, 0.5rem);
-  align-items: center;
-}
-
-.uly-header__col--right {
-  gap: var(--gap-sm, 0.5rem);
-  align-items: center;
-}
-
-.uly-header__col .button-unstyled {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.uly-header__row .header-actions {
-  gap: 8px !important;
 }
 
 .hide-account .account-button {
@@ -315,44 +331,7 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   8. DESKTOP HORIZONTAL MENU — 14px, secondary-accent hover
-   ══════════════════════════════════════════════════════════════ */
-.uly-header__inline-menu {
-  display: flex;
-}
-
-.uly-list-menu {
-  display: flex;
-  gap: var(--gap-lg, 1.5rem);
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.uly-list-menu__item {
-  color: var(--color-foreground);
-  text-decoration: none;
-  font-family: var(--primary-font, 'Geist', sans-serif);
-  font-weight: 500;
-  font-size: 13px;
-  letter-spacing: 0.04em;
-  padding: 4px 2px;
-  display: block;
-  transition: color 0.2s ease;
-}
-
-.uly-list-menu__item:hover,
-.uly-list-menu__item--active {
-  color: var(--secondary-accent, #E8612C);
-  text-decoration: none;
-}
-
-.uly-list-menu__item:after {
-  display: none !important;
-}
-
-/* ══════════════════════════════════════════════════════════════
-   9. LOCALIZATION DROPDOWN — simple, borderless
+   8. LOCALIZATION DROPDOWN
    ══════════════════════════════════════════════════════════════ */
 
 dropdown-localization-component.uly-localization {
@@ -368,23 +347,22 @@ dropdown-localization-component.uly-localization {
   font-family: var(--primary-font, sans-serif);
   font-size: 13px;
   font-weight: 500;
-  letter-spacing: 0.03em;
-  padding: 5px 8px;
+  padding: 4px 6px;
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
   border-radius: 6px;
   cursor: pointer;
   color: var(--color-foreground);
-  transition: background-color 0.2s ease;
   white-space: nowrap;
+  min-height: 40px;
+  transition: background-color 0.2s ease;
 }
 
 .uly-localization .dropdown-localization__button:hover {
   background: rgba(var(--color-foreground-rgb), 0.06) !important;
 }
 
-/* Panel — anchored below button */
 .uly-localization .localization-wrapper {
   position: absolute !important;
   top: calc(100% + 6px) !important;
@@ -420,11 +398,262 @@ dropdown-localization-component.uly-localization {
   transform: rotate(180deg);
 }
 
+/* Localization slot visibility
+   Desktop: show in header row, hide in bar
+   Mobile:  hide in header row, show in bar
+   Admin editor (.shopify-design-mode): always show in header, never in bar */
+.uly-localization-slot {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Default (desktop) */
+.uly-localization-slot--bar {
+  display: none;
+}
+
+.uly-localization-slot--header {
+  display: flex;
+}
+
+@media screen and (max-width: 749px) {
+  .uly-localization-slot--header {
+    display: none !important;
+  }
+
+  .uly-localization-slot--bar {
+    display: flex !important;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .uly-localization-slot--header {
+    display: flex !important;
+  }
+
+  .uly-localization-slot--bar {
+    display: none !important;
+  }
+}
+
 /* ══════════════════════════════════════════════════════════════
-   10. SIDEBAR DRAWER
+   9. SHOP ALL BAR + GRADIENT SIDEBAR DRAWER
    ══════════════════════════════════════════════════════════════ */
 
-/* Base drawer */
+body {
+  --uly-shop-bar-height: 40px;
+}
+
+.uly-header__bar {
+  position: relative;
+  z-index: calc(var(--layer-sticky, 200) + 1);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  min-height: var(--uly-shop-bar-height, 40px);
+  /* Same inline padding as .uly-header__inner so Shop All aligns with logo */
+  padding: 0.35rem var(--padding-lg, 1.5rem);
+  /* Must be auto so the trigger button receives click events */
+  pointer-events: auto;
+}
+
+@media screen and (max-width: 749px) {
+  .uly-header__bar {
+    justify-content: space-between;
+    padding: 0.35rem 1rem;
+  }
+}
+
+.uly-shop-bar__trigger {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--primary-font, sans-serif);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  /* Color: white on transparent header, foreground otherwise */
+  color: rgb(255, 255, 255);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* On non-transparent or scrolled header, use foreground color */
+.uly-header:not(.uly-header--transparent) .uly-shop-bar__trigger,
+.uly-header--transparent[data-scrolled='true'] .uly-shop-bar__trigger {
+  color: var(--color-foreground);
+  text-shadow: none;
+}
+
+.uly-shop-bar__trigger:hover {
+  opacity: 0.8;
+}
+
+.uly-shop-bar__trigger.is-open .uly-shop-bar__arrow {
+  transform: rotate(90deg);
+}
+
+.uly-shop-bar__arrow {
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   9. SHOP ALL BAR + GRADIENT SIDEBAR DRAWER
+   ══════════════════════════════════════════════════════════════ */
+
+body {
+  --uly-shop-bar-height: 40px;
+}
+
+.uly-header__bar {
+  position: relative;
+  z-index: calc(var(--layer-sticky, 200) + 1);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  min-height: var(--uly-shop-bar-height, 40px);
+  padding: 0.35rem var(--padding-lg, 1.5rem);
+  pointer-events: auto;
+}
+
+@media screen and (max-width: 749px) {
+  .uly-header__bar {
+    justify-content: space-between;
+    padding: 0.35rem 1rem;
+  }
+}
+
+.uly-shop-bar__trigger {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--primary-font, sans-serif);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  color: rgb(255, 255, 255);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+}
+
+.uly-header:not(.uly-header--transparent) .uly-shop-bar__trigger,
+.uly-header--transparent[data-scrolled='true'] .uly-shop-bar__trigger {
+  color: var(--color-foreground);
+  text-shadow: none;
+}
+
+.uly-shop-bar__trigger:hover {
+  opacity: 0.8;
+}
+
+.uly-shop-bar__trigger.is-open .uly-shop-bar__arrow {
+  transform: rotate(90deg);
+}
+
+.uly-shop-bar__arrow {
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.uly-localization-slot--bar {
+  pointer-events: auto;
+}
+
+/* Visually hide the native summary trigger — keep accessible but invisible */
+.uly-drawer--hidden-trigger .header__icon--summary {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Drawer open/close animation */
+.menu-drawer-container.menu-open>.menu-drawer {
+  transform: translateX(0) !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: flex !important;
+}
+
+.menu-drawer-container.menu-open>.menu-drawer__backdrop {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* ── GRADIENT SIDEBAR DRAWER ──────────────────────────────────
+   Sits below the header (top = header height).
+   Solid teal left 55%, then smooth fade to transparent.
+   Right edge blends into the page naturally.
+   ─────────────────────────────────────────────────────────── */
+header-drawer.uly-drawer .menu-drawer {
+  position: fixed !important;
+  left: 0 !important;
+  top: var(--header-group-height, 104px) !important;
+  height: calc(100dvh - var(--header-group-height, 104px)) !important;
+  width: min(380px, 58vw) !important;
+  max-width: 380px !important;
+  border-right: none !important;
+  box-shadow: none !important;
+  background: #0E5C66;
+  background: linear-gradient(90deg, rgba(14, 92, 102, 1) 0%, rgba(14, 92, 102, 0.67) 48%, rgba(14, 92, 102, 0.45) 100%) !important;
+  --color-foreground: 255 255 255;
+  --color-foreground-rgb: 255, 255, 255;
+  --menu-top-level-font-color: rgb(255, 255, 255);
+  --menu-parent-font-color: rgba(255, 255, 255, 0.85);
+  --menu-child-font-color: rgba(255, 255, 255, 0.85);
+  color: #fff;
+  overflow: hidden !important;
+  padding-top: 0 !important;
+}
+
+/* All text white inside the drawer */
+header-drawer.uly-drawer .menu-drawer a,
+header-drawer.uly-drawer .menu-drawer button,
+header-drawer.uly-drawer .menu-drawer__menu-item,
+header-drawer.uly-drawer .menu-drawer__menu-item-text,
+header-drawer.uly-drawer .menu-drawer__menu-item--mainlist,
+header-drawer.uly-drawer .menu-drawer__menu-item--parent,
+header-drawer.uly-drawer .menu-drawer__menu-item--child,
+header-drawer.uly-drawer .menu-drawer__back-button,
+header-drawer.uly-drawer .drawer-localization__button {
+  color: #fff !important;
+  --menu-top-level-font-color: #fff;
+  --menu-parent-font-color: rgba(255, 255, 255, 0.85);
+  --menu-child-font-color: rgba(255, 255, 255, 0.85);
+}
+
+header-drawer.uly-drawer .menu-drawer__list-item--divider {
+  border-block-end-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+header-drawer.uly-drawer .menu-drawer__menu {
+  padding-inline: 1.75rem 2.5rem !important;
+}
+
+/* Submenu — same gradient */
+header-drawer.uly-drawer .menu-drawer__submenu {
+  background: #0E5C66;
+  background: linear-gradient(90deg, rgba(14, 92, 102, 1) 0%, rgba(14, 92, 102, 0.67) 48%, rgba(14, 92, 102, 0.45) 100%) !important;
+}
+
 .uly-drawer {
   font-family: var(--primary-font, 'Geist', sans-serif);
   position: fixed !important;
@@ -432,388 +661,235 @@ dropdown-localization-component.uly-localization {
   flex-direction: column !important;
 }
 
-/* ── Close button: dark circle, top-right ── */
+/* Close button: semi-transparent circle, top-right */
 .uly-drawer>.menu-drawer__close-button {
   display: flex !important;
   position: absolute !important;
-  top: 14px !important;
-  right: 14px !important;
+  top: 16px !important;
+  right: 16px !important;
   left: auto !important;
-  width: 38px !important;
-  height: 38px !important;
-  min-width: 38px !important;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
   padding: 0 !important;
   align-items: center !important;
   justify-content: center !important;
-  background: var(--color-foreground) !important;
+  background: rgba(255, 255, 255, 0.18) !important;
   border-radius: 50% !important;
-  border: none !important;
-  color: var(--color-background) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #fff !important;
   cursor: pointer !important;
   z-index: 20 !important;
-  transition: opacity 0.2s ease !important;
+  transition: background 0.2s ease !important;
 }
 
 .uly-drawer>.menu-drawer__close-button:hover {
-  opacity: 0.75 !important;
+  background: rgba(255, 255, 255, 0.3) !important;
 }
 
 .uly-drawer>.menu-drawer__close-button svg {
-  width: 16px !important;
-  height: 16px !important;
-  color: var(--color-background) !important;
-  stroke: var(--color-background) !important;
+  width: 14px !important;
+  height: 14px !important;
+  color: #fff !important;
+  stroke: #fff !important;
 }
 
-/* Navigation takes remaining space */
+/* Navigation area */
 .uly-drawer .menu-drawer__navigation {
   flex-grow: 1;
   overflow-y: auto;
-  padding-top: 8px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  /* Scrollbar invisible */
+  scrollbar-width: none;
 }
 
-/* ── Top-level menu items: uppercase small caps style ── */
+.uly-drawer .menu-drawer__navigation::-webkit-scrollbar {
+  display: none;
+}
+
+/* Top-level menu items */
 .uly-drawer .menu-drawer__menu-item--mainlist {
   font-family: var(--primary-font, sans-serif) !important;
-  font-size: 11px !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.12em !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
   text-transform: uppercase !important;
-  color: var(--color-foreground) !important;
-  min-height: 44px !important;
+  color: #fff !important;
+  min-height: 18px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
   padding: 0 !important;
   text-decoration: none !important;
-  transition: color 0.2s ease !important;
+  transition: opacity 0.15s ease !important;
+  opacity: 0.85;
 }
 
 .uly-drawer .menu-drawer__menu-item--mainlist:hover {
-  color: var(--color-mint, #5FBFB8) !important;
+  opacity: 1 !important;
 }
 
 /* Child / parent items */
 .uly-drawer .menu-drawer__menu-item--child,
 .uly-drawer .menu-drawer__menu-item--parent {
   font-family: var(--primary-font, sans-serif) !important;
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 400 !important;
-  letter-spacing: 0.02em !important;
-  text-transform: none !important;
-  color: var(--color-foreground) !important;
+  color: rgba(255, 255, 255, 0.88) !important;
   text-decoration: none !important;
-  transition: color 0.2s ease !important;
+  min-height: 38px !important;
+  transition: opacity 0.15s ease !important;
 }
 
 .uly-drawer .menu-drawer__menu-item--child:hover,
 .uly-drawer .menu-drawer__menu-item--parent:hover {
-  color: var(--color-mint, #5FBFB8) !important;
+  opacity: 0.65 !important;
 }
 
-/* Caret forward (right arrow on items with children) */
-.uly-drawer .icon-caret--forward svg {
-  width: 10px !important;
-  height: 10px !important;
-  opacity: 0.45;
-}
-
-.uly-drawer .menu-drawer__menu-item:hover .icon-caret--forward svg {
-  opacity: 0.8;
-}
-
-/* ── SUBMENU OVERLAY — full panel slide-in (matches the reference images) ── */
-.uly-drawer .menu-drawer__submenu {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  background-color: var(--color-background) !important;
-  z-index: 10 !important;
-  overflow-y: auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  /* Slide in from right */
-  transform: translateX(100%) !important;
-  opacity: 1 !important;
-  visibility: hidden !important;
-  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-    visibility 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-/* When submenu is open (details[open]) */
-.uly-drawer details[open]>.menu-drawer__submenu {
-  transform: translateX(0) !important;
-  visibility: visible !important;
-}
-
-/* ── Submenu top bar: ← MENU title + ✕ close circle ── */
+/* Submenu nav bar (back + close) */
 .uly-drawer .menu-drawer__nav-buttons {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  padding: 14px 14px 14px 4px !important;
-  border-bottom: 1px solid rgba(var(--color-foreground-rgb), 0.08) !important;
+  padding: 12px 16px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
   flex-shrink: 0 !important;
-  min-height: 56px !important;
+  min-height: 52px !important;
 }
 
-/* Back button: ← MENU */
+/* Back button */
 .uly-drawer .menu-drawer__back-button {
   display: flex !important;
   align-items: center !important;
-  gap: 8px !important;
-  padding: 8px 12px !important;
+  gap: 6px !important;
+  padding: 6px 10px !important;
   font-family: var(--primary-font, sans-serif) !important;
   font-size: 11px !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.12em !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
   text-transform: uppercase !important;
-  color: var(--color-foreground) !important;
+  color: #fff !important;
   background: transparent !important;
   border: none !important;
   cursor: pointer !important;
   white-space: nowrap !important;
-  width: auto !important;
   box-shadow: none !important;
   text-decoration: none !important;
-  transition: color 0.2s ease !important;
+  transition: opacity 0.15s ease !important;
+  opacity: 0.9;
 }
 
 .uly-drawer .menu-drawer__back-button:hover {
-  color: var(--color-mint, #5FBFB8) !important;
+  opacity: 0.65 !important;
 }
 
 .uly-drawer .menu-drawer__back-button>.svg-wrapper {
-  width: 14px !important;
-  height: 14px !important;
-  margin-right: 2px !important;
-  opacity: 0.7;
+  width: 12px !important;
+  height: 12px !important;
+  opacity: 0.8;
 }
 
-/* Submenu close button: dark circle (matches top-level close) */
+/* Submenu close button */
 .uly-drawer .menu-drawer__nav-buttons .menu-drawer__close-button {
   position: static !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 38px !important;
-  height: 38px !important;
-  min-width: 38px !important;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
   padding: 0 !important;
-  background: var(--color-foreground) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
   border-radius: 50% !important;
-  border: none !important;
-  color: var(--color-background) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  color: #fff !important;
   cursor: pointer !important;
   flex-shrink: 0 !important;
-  transition: opacity 0.2s ease !important;
+  transition: background 0.15s ease !important;
 }
 
 .uly-drawer .menu-drawer__nav-buttons .menu-drawer__close-button:hover {
-  opacity: 0.75 !important;
+  background: rgba(255, 255, 255, 0.28) !important;
 }
 
 .uly-drawer .menu-drawer__nav-buttons .menu-drawer__close-button svg {
-  width: 16px !important;
-  height: 16px !important;
-  color: var(--color-background) !important;
-  stroke: var(--color-background) !important;
+  width: 12px !important;
+  height: 12px !important;
+  color: #fff !important;
+  stroke: #fff !important;
 }
 
-/* Submenu content area */
 .uly-drawer .menu-drawer__inner-submenu {
   display: flex !important;
   flex-direction: column !important;
   flex-grow: 1 !important;
   overflow-y: auto !important;
+  scrollbar-width: none;
 }
 
-/* ──────────────────────────────────────────────────────────────
-   11. LOCALIZATION IN DRAWER
-   Mobile: hidden from header, only in drawer.
-   Desktop: visible in both header and drawer.
-   ────────────────────────────────────────────────────────────── */
-
-/* Utility links wrapper (contains localization) */
-.uly-drawer .menu-drawer__utility-links {
-  flex-shrink: 0;
-  margin-top: auto;
-  padding: 0;
-  margin-inline-start: 0 !important;
-  border-top: 1px solid rgba(var(--color-foreground-rgb), 0.08);
-}
-
-/* Always show localization inside the drawer */
-.uly-drawer .menu-drawer__localization {
-  display: block !important;
-}
-
-/* Mobile: hide localization from the header right column — only in drawer */
-@media screen and (max-width: 749px) {
-  .uly-header__col--right .uly-localization {
-    display: none !important;
-  }
-}
-
-/* Desktop: show in both header and drawer */
-@media screen and (min-width: 750px) {
-  .uly-header__col--right .uly-localization {
-    display: flex !important;
-  }
-}
-
-.uly-drawer__locale-row {
-  display: block;
-  border-bottom: 1px solid rgba(var(--color-foreground-rgb), 0.06);
-}
-
-.uly-drawer__locale-row:last-child {
-  border-bottom: none;
-}
-
-.uly-drawer__locale-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 24px;
-  cursor: pointer;
-  list-style: none;
-  text-decoration: none;
-  color: var(--color-foreground);
-  transition: color 0.2s ease;
-}
-
-.uly-drawer__locale-trigger::-webkit-details-marker {
+.uly-drawer .menu-drawer__inner-submenu::-webkit-scrollbar {
   display: none;
 }
 
-.uly-drawer__locale-trigger:hover {
-  color: var(--color-mint, #5FBFB8);
+/* ══════════════════════════════════════════════════════════════
+   11. LOCALIZATION IN DRAWER — MOBILE ONLY
+   Desktop: localization is in the header row — hide from drawer.
+   Mobile:  localization hidden from header — show in drawer.
+   ══════════════════════════════════════════════════════════════ */
+
+/* Hide drawer localization on desktop */
+.uly-drawer .menu-drawer__utility-links {
+  display: none;
 }
 
-.uly-drawer__locale-label {
-  font-family: var(--primary-font, sans-serif);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(var(--color-foreground-rgb), 0.45);
-}
+/* Show on mobile only */
+@media screen and (max-width: 749px) {
+  .uly-drawer .menu-drawer__utility-links {
+    display: flex !important;
+    flex-direction: column;
+    flex-shrink: 0;
+    margin-top: auto;
+    padding: 12px 1.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
 
-.uly-drawer__locale-value {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--primary-font, sans-serif);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--color-foreground);
-  transition: color 0.2s ease;
-}
+  .uly-drawer .menu-drawer__localization {
+    display: block !important;
+  }
 
-.uly-drawer__locale-trigger:hover .uly-drawer__locale-value {
-  color: var(--color-mint, #5FBFB8);
-}
-
-.uly-drawer__locale-value .icon-flag {
-  width: 18px;
-  height: 13px;
-  background-size: cover;
-  background-position: center;
-  border-radius: 2px;
-  flex-shrink: 0;
-}
-
-.uly-drawer__locale-value .icon-caret {
-  width: 9px;
-  height: 9px;
-  opacity: 0.5;
-  rotate: 90deg;
-}
-
-/* Account link in drawer */
-.menu-drawer__account {
-  display: flex;
-  align-items: center;
-  gap: var(--gap-sm, 0.5rem);
-  padding: 1rem 1.5rem;
-  text-decoration: none;
-  color: var(--color-foreground);
-  font-family: var(--primary-font, sans-serif);
-  font-size: 14px !important;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border-top: 1px solid rgba(var(--color-foreground-rgb), 0.08);
-  transition: color 0.2s ease;
-}
-
-.menu-drawer__account:hover {
-  color: var(--secondary-accent, #E8612C) !important;
-}
-
-/* Desktop-links inside drawer: shown on mobile, hidden on desktop */
-.menu-drawer__menu--desktop-links {
-  display: block;
-}
-
-@media screen and (min-width: 750px) {
-  .menu-drawer__menu--desktop-links {
-    display: none !important;
+  /* Localization text white in drawer */
+  .uly-drawer .menu-drawer__utility-links * {
+    color: #fff !important;
+    --color-foreground: 255 255 255;
   }
 }
 
 /* ══════════════════════════════════════════════════════════════
-   12. MOBILE HEADER LAYOUT
+   12. MOBILE LAYOUT
    ══════════════════════════════════════════════════════════════ */
+
 @media screen and (max-width: 749px) {
+  body {
+    --uly-shop-bar-height: 40px;
+  }
 
   .uly-header__inner {
-    display: flex !important;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 1rem;
-    height: var(--header-height);
-    gap: 0;
-    position: relative;
-  }
-
-  .uly-header__col {
-    display: flex;
-    align-items: center;
-  }
-
-  .uly-header__col--left {
-    flex: 0 0 auto;
-    gap: 2px;
-    z-index: 1;
-  }
-
-  /* Hide desktop inline menu on mobile */
-  .uly-header__col--left .uly-header__inline-menu {
-    display: none !important;
-  }
-
-  /* CENTER: logo — absolutely centered */
-  .uly-header__col--center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .uly-header__col--center .uly-logo {
-    pointer-events: all;
+    grid-template-columns: auto 1fr;
+    padding: 0.35rem 1rem;
+    gap: 0.35rem;
   }
 
   .uly-header__col--right {
-    flex: 0 0 auto;
-    gap: 2px;
-    justify-content: flex-end;
-    margin-left: auto;
-    z-index: 1;
+    gap: 0.15rem;
+  }
+
+  .uly-header__bar {
+    padding: 0.35rem 1rem;
+  }
+
+  header-drawer.uly-drawer .menu-drawer {
+    width: min(78vw, 320px) !important;
+    max-width: 320px !important;
   }
 }
