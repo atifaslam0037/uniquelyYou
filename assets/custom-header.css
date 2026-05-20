@@ -24,22 +24,10 @@
   overflow: visible;
 }
 
-/* Drawer host: zero-size fixed container so the drawer can overlay */
 .uly-header .header__drawer.uly-drawer-host {
-  position: fixed;
-  inset: 0 auto auto 0;
-  width: 0;
-  height: 0;
-  overflow: visible;
+  display: none !important;
   min-height: 0 !important;
-  display: block !important;
   pointer-events: none;
-  z-index: var(--layer-menu-drawer);
-}
-
-.uly-header .header__drawer.uly-drawer-host header-drawer,
-.uly-header .header__drawer.uly-drawer-host .menu-drawer-container {
-  pointer-events: auto;
 }
 
 .uly-header-menu-placeholder {
@@ -301,12 +289,8 @@
    Beats Shopify's compiled CSS: #header-component[data-menu-style=menu] .header__drawer { display:none }
    ══════════════════════════════════════════════════════════════ */
 
-#header-component.uly-header .header__drawer.uly-drawer-host,
-#header-component.uly-header[data-menu-style] .header__drawer.uly-drawer-host,
-#header-component.uly-header[data-menu-style='menu'] .header__drawer.uly-drawer-host,
-#header-component.uly-header[data-menu-style='drawer'] .header__drawer.uly-drawer-host {
-  display: block !important;
-  visibility: visible !important;
+#header-component.uly-header .header__drawer.uly-drawer-host {
+  display: none !important;
   min-height: 0 !important;
 }
 
@@ -487,7 +471,7 @@ body {
 /* On non-transparent or scrolled header, use foreground color */
 .uly-header:not(.uly-header--transparent) .uly-shop-bar__trigger,
 .uly-header--transparent[data-scrolled='true'] .uly-shop-bar__trigger {
-  color: var(--color-foreground);
+  color: var(--primary-accent, #0e5c66);
   text-shadow: none;
 }
 
@@ -550,7 +534,7 @@ body {
 
 .uly-header:not(.uly-header--transparent) .uly-shop-bar__trigger,
 .uly-header--transparent[data-scrolled='true'] .uly-shop-bar__trigger {
-  color: var(--color-foreground);
+  color: var(--primary-accent, #0e5c66);
   text-shadow: none;
 }
 

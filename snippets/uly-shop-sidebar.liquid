@@ -1,0 +1,155 @@
+{%- doc -%}
+  Gradient shop sidebar — full height below header, section settings for accordion/dividers.
+
+  @param {object} section - Custom header section
+  @param {object} linklist - Navigation linklist
+  @param {string} shop_label - Shop All heading label
+{%- enddoc -%}
+
+{% liquid
+  assign collections_url = section.settings.shop_all_collections_url
+  if collections_url == blank
+    assign collections_url = routes.collections_url
+  endif
+
+  assign heading = shop_label | default: 'Shop All'
+  assign suffix = section.settings.shop_all_suffix
+  assign use_accordion = section.settings.drawer_accordion
+  assign expand_first = section.settings.drawer_accordion_expand_first
+  assign show_dividers = section.settings.drawer_dividers
+  assign first_accordion_opened = false
+%}
+
+<div
+  id="uly-shop-sidebar"
+  class="uly-shop-sidebar{% if use_accordion %} uly-shop-sidebar--accordion{% endif %}{% if show_dividers %} uly-shop-sidebar--dividers{% endif %}"
+  aria-hidden="true"
+>
+  <div class="uly-shop-sidebar__panel" id="uly-shop-sidebar-panel" role="dialog" aria-modal="false" aria-label="{{ heading | escape }}">
+    <div class="uly-shop-sidebar__head">
+      <a href="{{ collections_url }}" class="uly-shop-sidebar__collections-link">
+        <span class="uly-shop-sidebar__collections-label">{{ heading | escape }}</span>
+        <span class="uly-shop-sidebar__collections-arrow" aria-hidden="true">&rsaquo;</span>
+        {%- if suffix != blank -%}
+          <span class="uly-shop-sidebar__collections-suffix">{{ suffix | escape }}</span>
+        {%- endif -%}
+      </a>
+      <button
+        type="button"
+        class="uly-shop-sidebar__close"
+        id="uly-shop-sidebar-close"
+        aria-label="{{ 'actions.close' | t }}"
+      >
+        <span class="svg-wrapper" aria-hidden="true">
+          {{- 'icon-close.svg' | inline_asset_content -}}
+        </span>
+      </button>
+    </div>
+
+    <nav class="uly-shop-sidebar__nav" aria-label="{{ heading | escape }}">
+      {%- if linklist != blank and linklist.links.size > 0 -%}
+        <ul class="uly-shop-sidebar__menu" role="list">
+          {%- for link in linklist.links -%}
+            {%- liquid
+              assign divider_class = ''
+              if show_dividers and forloop.last == false
+                assign divider_class = ' uly-shop-sidebar__item--divider'
+              endif
+
+              assign open_accordion = false
+              if use_accordion and link.links != blank and expand_first and first_accordion_opened == false
+                assign open_accordion = true
+                assign first_accordion_opened = true
+              endif
+            -%}
+
+            {%- if use_accordion and link.links != blank -%}
+              <li class="uly-shop-sidebar__item uly-shop-sidebar__item--level-1{{ divider_class }}">
+                <details class="uly-shop-sidebar__details" {% if open_accordion %}open{% endif %}>
+                  <summary class="uly-shop-sidebar__summary">
+                    <span class="uly-shop-sidebar__summary-text">
+                      <span class="uly-shop-sidebar__bullet" aria-hidden="true">-</span>
+                      {{ link.title | escape }}
+                    </span>
+                    <span class="uly-shop-sidebar__chevron" aria-hidden="true"></span>
+                  </summary>
+                  <div class="uly-shop-sidebar__submenu">
+                    <a href="{{ link.url }}" class="uly-shop-sidebar__link uly-shop-sidebar__link--view-all">
+                      {{ link.title | escape }}
+                    </a>
+                    <ul class="uly-shop-sidebar__menu uly-shop-sidebar__menu--child" role="list">
+                      {%- for child in link.links -%}
+                        <li class="uly-shop-sidebar__item uly-shop-sidebar__item--level-2">
+                          {%- if child.links != blank -%}
+                            <span class="uly-shop-sidebar__link uly-shop-sidebar__link--child">
+                              <span class="uly-shop-sidebar__bullet" aria-hidden="true">-</span>
+                              {{ child.title | escape }}
+                            </span>
+                            <ul class="uly-shop-sidebar__menu uly-shop-sidebar__menu--grandchild" role="list">
+                              {%- for grandchild in child.links -%}
+                                <li class="uly-shop-sidebar__item uly-shop-sidebar__item--level-3">
+                                  <a href="{{ grandchild.url }}" class="uly-shop-sidebar__link uly-shop-sidebar__link--grandchild">
+                                    <span class="uly-shop-sidebar__bullet" aria-hidden="true">-</span>
+                                    {{ grandchild.title | escape }}
+                                  </a>
+                                </li>
+                              {%- endfor -%}
+                            </ul>
+                          {%- else -%}
+                            <a href="{{ child.url }}" class="uly-shop-sidebar__link uly-shop-sidebar__link--child">
+                              <span class="uly-shop-sidebar__bullet" aria-hidden="true">-</span>
+                              {{ child.title | escape }}
+                            </a>
+                          {%- endif -%}
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  </div>
+                </details>
+              </li>
+            {%- else -%}
+              <li class="uly-shop-sidebar__item uly-shop-sidebar__item--level-1{{ divider_class }}">
+                <a href="{{ link.url }}" class="uly-shop-sidebar__link">
+                  <span class="uly-shop-sidebar__bullet" aria-hidden="true">-</span>
+                  {{ link.title | escape }}
+                </a>
+                {%- if link.links != blank -%}
+                  <ul class="uly-shop-sidebar__menu uly-shop-sidebar__menu--child" role="list">
+                    {%- for child in link.links -%}
+                      <li class="uly-shop-sidebar__item uly-shop-sidebar__item--level-2">
+                        <a href="{{ child.url }}" class="uly-shop-sidebar__link uly-shop-sidebar__link--child">
+                          <span class="uly-shop-sidebar__bullet" aria-hidden="true">-</span>
+                          {{ child.title | escape }}
+                        </a>
+                        {%- if child.links != blank -%}
+                          <ul class="uly-shop-sidebar__menu uly-shop-sidebar__menu--grandchild" role="list">
+                            {%- for grandchild in child.links -%}
+                              <li class="uly-shop-sidebar__item uly-shop-sidebar__item--level-3">
+                                <a href="{{ grandchild.url }}" class="uly-shop-sidebar__link uly-shop-sidebar__link--grandchild">
+                                  <span class="uly-shop-sidebar__bullet" aria-hidden="true">-</span>
+                                  {{ grandchild.title | escape }}
+                                </a>
+                              </li>
+                            {%- endfor -%}
+                          </ul>
+                        {%- endif -%}
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                {%- endif -%}
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- else -%}
+        <p class="uly-shop-sidebar__empty">Add links to your sidebar menu in Online Store → Navigation.</p>
+      {%- endif -%}
+    </nav>
+
+    {% if section.settings.show_social %}
+      <div class="uly-shop-sidebar__footer">
+        {% render 'uly-sidebar-social', section: section %}
+      </div>
+    {% endif %}
+  </div>
+</div>

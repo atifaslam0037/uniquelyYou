@@ -27,6 +27,15 @@
     endif
   endunless
 
+  if request.design_mode
+    if section.settings.show_country
+      assign show_country = true
+    endif
+    if section.settings.show_language
+      assign show_language = true
+    endif
+  endif
+
   assign show_localization = false
   if show_language or show_country
     assign show_localization = true
@@ -151,7 +160,7 @@
         id="uly-shop-drawer-trigger"
         class="uly-shop-bar__trigger"
         aria-expanded="false"
-        aria-controls="Details-menu-drawer-container"
+        aria-controls="uly-shop-sidebar"
       >
         <span class="uly-shop-bar__label">{{ shop_trigger_label | escape }}</span>
         <span class="uly-shop-bar__arrow" aria-hidden="true">&rsaquo;</span>
@@ -174,19 +183,16 @@
           %}
         </div>
       {%- endif -%}
-
     </div>
 
-    {%- comment -%} ── DRAWER HOST ── {%- endcomment -%}
-    <div class="header__drawer uly-drawer-host" ref="headerDrawerContainer" data-skip-node-update="true">
-      {% render 'header-drawer',
-        linklist: section.settings.menu,
-        class: 'uly-drawer uly-drawer--hidden-trigger',
-        section: section,
-        block: section,
-        data_header_drawer_type: 'mobile-drawer'
-      %}
-    </div>
+    {% render 'uly-shop-sidebar',
+      section: section,
+      linklist: sidebar_menu,
+      shop_label: shop_trigger_label
+    %}
+
+    {%- comment -%} Drawer host placeholder {%- endcomment -%}
+    <div class="header__drawer uly-drawer-host" ref="headerDrawerContainer" data-skip-node-update="true" hidden aria-hidden="true"></div>
 
   </div>
 
@@ -229,14 +235,22 @@
 
       // Sync CSS height variables
       function syncHeights() {
+        var headerGroup = document.getElementById('header-group');
         var row = header.querySelector('.uly-header__row');
         var bar = header.querySelector('.uly-header__bar');
         var rowH = row ? row.offsetHeight : 64;
         var barH = bar ? bar.offsetHeight : 40;
-        var total = rowH + barH;
+        var componentH = rowH + barH;
+        var groupH = headerGroup ? headerGroup.offsetHeight : componentH;
         document.body.style.setProperty('--uly-shop-bar-height', barH + 'px');
-        document.body.style.setProperty('--header-height', total + 'px');
-        document.body.style.setProperty('--header-group-height', total + 'px');
+        document.body.style.setProperty('--header-height', componentH + 'px');
+        document.body.style.setProperty('--header-group-height', groupH + 'px');
+
+        var barEl = header.querySelector('.uly-header__bar');
+        if (barEl) {
+          var sidebarTop = Math.round(barEl.getBoundingClientRect().bottom);
+          document.documentElement.style.setProperty('--uly-sidebar-top', sidebarTop + 'px');
+        }
       }
 
       syncHeights();
@@ -274,6 +288,7 @@
 <script src="{{ 'uly-shop-drawer.js' | asset_url }}" type="module"></script>
 <script src="{{ 'header.js' | asset_url }}" type="module"></script>
 {{ 'custom-header.css' | asset_url | stylesheet_tag }}
+{{ 'uly-shop-sidebar.css' | asset_url | stylesheet_tag }}
 
 {% stylesheet %}
   /* ── Admin editor critical overrides ── */
@@ -297,21 +312,9 @@
   }
 
   .uly-header .header__drawer.uly-drawer-host {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
+    display: none !important;
     min-height: 0 !important;
-    display: block !important;
     pointer-events: none;
-    z-index: var(--layer-menu-drawer);
-    border: 0;
-  }
-
-  .uly-header .header__drawer.uly-drawer-host header-drawer,
-  .uly-header .header__drawer.uly-drawer-host .menu-drawer-container {
-    pointer-events: auto;
   }
 
   .uly-header-menu-placeholder { display: none !important; }
@@ -449,118 +452,22 @@
     font-family: var(--primary-font, sans-serif);
     font-size: 0.9375rem;
     font-weight: 600;
-    color: rgb(255,255,255);
-    text-shadow: 0 1px 8px rgba(0,0,0,0.35);
     cursor: pointer;
     transition: opacity 0.2s ease;
   }
 
-  .uly-shop-bar__trigger:hover { opacity: 0.85; }
-
-  .uly-drawer--hidden-trigger .header__icon--summary {
-    position: absolute !important;
-    width: 1px !important;
-    height: 1px !important;
-    padding: 0 !important;
-    margin: -1px !important;
-    overflow: hidden !important;
-    clip: rect(0,0,0,0) !important;
-    white-space: nowrap !important;
-    border: 0 !important;
-  }
-
-  /* Drawer open state */
-  .menu-drawer-container.menu-open > .menu-drawer,
-  .menu-drawer-container[open] > .menu-drawer {
-    transform: translateX(0) !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    display: flex !important;
-  }
-
-  .menu-drawer-container.menu-open > .menu-drawer__backdrop {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-  }
-
-  /* Gradient sidebar drawer */
-  header-drawer.uly-drawer .menu-drawer {
-    position: fixed !important;
-    left: 0 !important;
-    top: var(--header-group-height, 104px) !important;
-    height: calc(100dvh - var(--header-group-height, 104px)) !important;
-    width: min(380px, 58vw) !important;
-    max-width: 380px !important;
-    border-right: none !important;
-    box-shadow: none !important;
-    background: #0E5C66;
-    background: linear-gradient(90deg, rgba(14, 92, 102, 1) 0%, rgba(14, 92, 102, 0.67) 48%, rgba(14, 92, 102, 0.45) 100%) !important;
-    --color-foreground: 255 255 255;
-    --color-foreground-rgb: 255, 255, 255;
-    --menu-top-level-font-color: rgb(255, 255, 255);
-    --menu-parent-font-color: rgba(255, 255, 255, 0.85);
-    --menu-child-font-color: rgba(255, 255, 255, 0.85);
+  .uly-header--transparent:not([data-scrolled='true']) .uly-shop-bar__trigger {
     color: #fff;
-    overflow: hidden !important;
-    padding-top: 0 !important;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
   }
 
-  header-drawer.uly-drawer .menu-drawer__submenu {
-    background: #0E5C66;
-    background: linear-gradient(90deg, rgba(14, 92, 102, 1) 0%, rgba(14, 92, 102, 0.67) 48%, rgba(14, 92, 102, 0.1) 100%) !important;
+  .uly-header:not(.uly-header--transparent) .uly-shop-bar__trigger,
+  .uly-header--transparent[data-scrolled='true'] .uly-shop-bar__trigger {
+    color: var(--primary-accent, #0e5c66);
+    text-shadow: none;
   }
 
-  header-drawer.uly-drawer .menu-drawer a,
-  header-drawer.uly-drawer .menu-drawer button,
-  header-drawer.uly-drawer .menu-drawer__menu-item,
-  header-drawer.uly-drawer .menu-drawer__menu-item-text,
-  header-drawer.uly-drawer .menu-drawer__menu-item--mainlist,
-  header-drawer.uly-drawer .menu-drawer__menu-item--parent,
-  header-drawer.uly-drawer .menu-drawer__menu-item--child,
-  header-drawer.uly-drawer .menu-drawer__back-button,
-  header-drawer.uly-drawer .drawer-localization__button {
-    color: #fff !important;
-    --menu-top-level-font-color: #fff;
-    --menu-parent-font-color: rgba(255, 255, 255, 0.85);
-    --menu-child-font-color: rgba(255, 255, 255, 0.85);
-  }
-
-  header-drawer.uly-drawer .menu-drawer__list-item--divider {
-    border-block-end-color: rgba(255, 255, 255, 0.12) !important;
-  }
-
-  header-drawer.uly-drawer .menu-drawer__menu {
-    padding-inline: 1.75rem 2.5rem !important;
-  }
-
-  /* Localization in drawer: mobile only */
-  .uly-drawer .menu-drawer__utility-links { display: none; }
-
-  @media screen and (max-width: 749px) {
-    .uly-drawer .menu-drawer__utility-links {
-      display: flex !important;
-      flex-direction: column;
-      flex-shrink: 0;
-      margin-top: auto;
-      padding: 12px 1.75rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.12);
-    }
-    .uly-drawer .menu-drawer__localization { display: block !important; }
-    .uly-drawer .menu-drawer__utility-links * {
-      color: #fff !important;
-      --color-foreground: 255 255 255;
-    }
-  }
-
-  header-drawer.uly-drawer .menu-drawer__menu--childlist {
-    list-style: disc;
-    padding-inline-start: 1.35rem;
-  }
-
-  header-drawer.uly-drawer .menu-drawer__menu--childlist .menu-drawer__menu--childlist {
-    list-style: circle;
-    padding-inline-start: 1.1rem;
-  }
+  .uly-shop-bar__trigger:hover { opacity: 0.85; }
 
   /* LOGO */
   .uly-logo {
@@ -703,7 +610,13 @@
       "id": "menu",
       "label": "Sidebar menu",
       "default": "main-menu",
-      "info": "Nested links appear in the gradient sidebar when Shop All is clicked."
+      "info": "Use your Shop All navigation menu (handle: shop-all). Nested links appear in the sidebar."
+    },
+    {
+      "type": "url",
+      "id": "shop_all_collections_url",
+      "label": "Shop All collections link",
+      "info": "Top link in the sidebar (e.g. all collections page). Leave blank for /collections."
     },
     {
       "type": "text",
@@ -717,7 +630,7 @@
       "id": "shop_all_suffix",
       "label": "Shop button suffix",
       "info": "Optional text after the arrow, e.g. Collections:",
-      "default": "test"
+      "default": "Collections:"
     },
     {
       "type": "header",
@@ -826,7 +739,8 @@
       "type": "checkbox",
       "id": "drawer_accordion_expand_first",
       "label": "Auto-expand first item",
-      "default": false
+      "default": false,
+      "visible_if": "{{ section.settings.drawer_accordion }}"
     },
     {
       "type": "checkbox",

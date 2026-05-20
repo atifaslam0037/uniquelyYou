@@ -1,0 +1,302 @@
+/* ULY Shop Sidebar — full height from below Shop All bar to bottom of screen */
+
+.uly-header__shell {
+  position: relative;
+}
+
+.uly-header__row {
+  position: relative;
+  z-index: calc(var(--layer-sticky, 200) + 3);
+}
+
+.uly-header__bar {
+  position: relative;
+  z-index: calc(var(--layer-sticky, 200) + 3);
+  background-color: transparent;
+}
+
+/* Shop All label */
+.uly-header--transparent:not([data-scrolled='true']) .uly-shop-bar__trigger {
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+}
+
+.uly-header:not(.uly-header--transparent) .uly-shop-bar__trigger,
+.uly-header--transparent[data-scrolled='true'] .uly-shop-bar__trigger {
+  color: var(--primary-accent, #0e5c66);
+  text-shadow: none;
+}
+
+/* Panel starts exactly below Shop All bar (set via JS --uly-sidebar-top) */
+.uly-shop-sidebar {
+  position: fixed;
+  left: 0;
+  top: var(--uly-sidebar-top, var(--header-group-height, 120px));
+  z-index: calc(var(--layer-sticky, 200) + 1);
+  width: min(400px, 62vw);
+  max-width: 400px;
+  height: calc(100dvh - var(--uly-sidebar-top, var(--header-group-height, 120px)));
+  max-height: calc(100dvh - var(--uly-sidebar-top, var(--header-group-height, 120px)));
+  pointer-events: none;
+  visibility: hidden;
+  isolation: isolate;
+}
+
+.uly-shop-sidebar--open {
+  visibility: visible;
+}
+
+.uly-shop-sidebar--open .uly-shop-sidebar__panel {
+  pointer-events: auto;
+}
+
+.uly-shop-sidebar__panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: 0.75rem 2rem 1rem 0;
+  box-sizing: border-box;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease;
+  background: linear-gradient(
+    90deg,
+    rgba(14, 92, 102, 0.98) 0%,
+    rgba(14, 92, 102, 0.88) 40%,
+    rgba(14, 92, 102, 0.62) 65%,
+    rgba(14, 92, 102, 0.28) 85%,
+    transparent 100%
+  );
+  font-family: var(--primary-font, sans-serif);
+  color: #fff;
+}
+
+.uly-shop-sidebar--open .uly-shop-sidebar__panel {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.uly-shop-sidebar__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-inline-start: 1.5rem;
+  margin-bottom: 0.5rem;
+  flex-shrink: 0;
+}
+
+.uly-shop-sidebar__collections-link {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.35rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  line-height: 1.35;
+}
+
+.uly-shop-sidebar__collections-link:hover {
+  opacity: 0.85;
+}
+
+.uly-shop-sidebar__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.uly-shop-sidebar__close:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.uly-shop-sidebar__close svg {
+  width: 14px;
+  height: 14px;
+}
+
+.uly-shop-sidebar__nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-inline: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+}
+
+.uly-shop-sidebar__menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.uly-shop-sidebar__menu--child {
+  padding-inline-start: 0.75rem;
+  margin-top: 0.1rem;
+}
+
+.uly-shop-sidebar__menu--grandchild {
+  padding-inline-start: 1rem;
+}
+
+.uly-shop-sidebar--dividers .uly-shop-sidebar__item--divider {
+  border-block-end: 1px solid rgba(255, 255, 255, 0.14);
+  padding-block-end: 0.35rem;
+  margin-block-end: 0.35rem;
+}
+
+.uly-shop-sidebar__link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  padding: 0.3rem 0;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.uly-shop-sidebar__link:hover {
+  opacity: 0.72;
+}
+
+.uly-shop-sidebar__link--child,
+.uly-shop-sidebar__link--grandchild {
+  font-size: 0.8125rem;
+}
+
+.uly-shop-sidebar__details {
+  margin: 0;
+}
+
+.uly-shop-sidebar__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  list-style: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.uly-shop-sidebar__summary::-webkit-details-marker {
+  display: none;
+}
+
+.uly-shop-sidebar__summary-text {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.uly-shop-sidebar__chevron {
+  width: 8px;
+  height: 8px;
+  border-inline-end: 2px solid currentColor;
+  border-block-end: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.uly-shop-sidebar__details[open] .uly-shop-sidebar__chevron {
+  transform: rotate(45deg);
+}
+
+.uly-shop-sidebar__submenu {
+  padding-inline-start: 0.5rem;
+}
+
+/* Footer + social (mobile) */
+.uly-shop-sidebar__footer {
+  flex: 0 0 auto;
+  padding: 0.85rem 1.5rem 1rem;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  display: none;
+}
+
+.uly-sidebar-social {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.uly-sidebar-social__link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: #fff;
+  transition: opacity 0.2s ease;
+}
+
+.uly-sidebar-social__link:hover {
+  opacity: 0.75;
+}
+
+.uly-sidebar-social__link svg {
+  width: 22px;
+  height: 22px;
+}
+
+.uly-sidebar-social__hint {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.uly-shop-bar__trigger.is-open .uly-shop-bar__arrow {
+  transform: rotate(90deg);
+}
+
+.uly-drawer-host[hidden] {
+  display: none !important;
+}
+
+@media screen and (max-width: 749px) {
+  .uly-shop-sidebar {
+    width: min(88vw, 340px);
+    max-width: 340px;
+  }
+
+  /* Hide bar localization while drawer is open (avoids USD overlapping menu) */
+  .uly-header__shell:has(.uly-shop-sidebar--open) .uly-localization-slot--bar {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .uly-shop-sidebar__footer {
+    display: block !important;
+  }
+
+  .uly-shop-sidebar__panel {
+    padding-bottom: 1.25rem;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .uly-shop-sidebar__footer {
+    display: none !important;
+  }
+}

@@ -44,7 +44,7 @@
     "header_section": {
       "type": "custom-header",
       "settings": {
-        "menu": "main-menu",
+        "menu": "shop-all",
         "shop_all_label": "",
         "shop_all_suffix": "",
         "search_placeholder": "Find what makes you unique!",

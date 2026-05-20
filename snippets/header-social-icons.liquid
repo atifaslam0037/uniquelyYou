@@ -2,10 +2,11 @@
   Header social icon links (Facebook, Instagram, TikTok, Pinterest).
 
   @param {object} section - Section with social URL settings
+  @param {boolean} [in_sidebar] - Render inside shop sidebar footer (mobile)
 {%- enddoc -%}
 
 {% unless section.settings.show_social == false %}
-  <div class="uly-header-social">
+  <div class="uly-header-social{% if in_sidebar %} uly-header-social--in-sidebar{% endif %}">
     {% if section.settings.social_facebook != blank %}
       <a
         href="{{ section.settings.social_facebook }}"
@@ -105,7 +106,7 @@
   }
 
   @media screen and (max-width: 749px) {
-    .uly-header-social {
+    .uly-header-social:not(.uly-header-social--in-sidebar) {
       display: none;
     }
   }

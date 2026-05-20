@@ -360,13 +360,12 @@
 {% endstylesheet %}
 <style>
   @media screen and (min-width: 992px) {
-    #shopify-section-template--21149368680502__product_recommendations_qggXJq
     .content-for-layout>.shopify-section:last-child {
       flex: 280px !important;
       flex-shrink: 0 !important;
       flex-grow: 0 !important;
     }
-    #shopify-section-template--21149368680502__main {
+    #MainContent > #shopify-section-{{ section.id }}.shopify-section {
       flex: 1 !important;
     }
       .content-for-layout {

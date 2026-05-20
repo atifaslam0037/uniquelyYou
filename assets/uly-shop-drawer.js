@@ -1,144 +1,147 @@
 /**
- * ULY Shop Drawer v3
- *
- * The ONLY reliable way to trigger Horizon's header-drawer.js is to
- * programmatically click the hidden <summary> element inside the <details>.
- * header-drawer.js listens for summary clicks via its on:click="/toggle"
- * directive — calling hd.open() directly skips internal state setup.
+ * ULY Shop Sidebar — positions below Shop All bar, full height to bottom.
  */
 (function () {
   'use strict';
 
-  /* ─── Selectors ─── */
-  function getTrigger() { return document.getElementById('uly-shop-drawer-trigger'); }
-  function getDetails() { return document.getElementById('Details-menu-drawer-container'); }
-  function getSummary() {
-    var d = getDetails();
-    return d ? d.querySelector('summary.header__icon--summary') : null;
+  var OPEN_CLASS = 'uly-shop-sidebar--open';
+
+  function getHeader() {
+    return document.getElementById('header-component');
   }
 
-  /* ─── State ─── */
+  function getSidebar() {
+    return document.getElementById('uly-shop-sidebar');
+  }
+
+  function getTrigger() {
+    return document.getElementById('uly-shop-drawer-trigger');
+  }
+
+  function getCloseBtn() {
+    return document.getElementById('uly-shop-sidebar-close');
+  }
+
+  function getBar() {
+    var header = getHeader();
+    return header ? header.querySelector('.uly-header__bar') : null;
+  }
+
   function isOpen() {
-    var d = getDetails();
-    return !!d && (d.classList.contains('menu-open') || d.hasAttribute('open'));
+    var sidebar = getSidebar();
+    return !!sidebar && sidebar.classList.contains(OPEN_CLASS);
   }
 
-  /* ─── Scroll lock ─── */
-  function lockScroll(lock) {
-    document.documentElement.toggleAttribute('scroll-lock', lock);
+  /** Pin sidebar top to bottom edge of Shop All bar */
+  function syncSidebarPosition() {
+    var bar = getBar();
+    if (!bar) return;
+    var top = Math.round(bar.getBoundingClientRect().bottom);
+    if (top < 0) top = 0;
+    document.documentElement.style.setProperty('--uly-sidebar-top', top + 'px');
   }
 
-  /* ─── Open / Close via summary click ─── */
-  function openDrawer() {
-    if (isOpen()) return;
-    var s = getSummary();
-    if (s) {
-      s.click();
-    } else {
-      /* Last-resort fallback */
-      var d = getDetails();
-      if (d) {
-        d.classList.add('menu-open');
-        d.setAttribute('open', '');
-      }
-    }
-    lockScroll(true);
-    setTimeout(syncTrigger, 50);
-  }
-
-  function closeDrawer() {
-    if (!isOpen()) return;
-    /* Use header-drawer's own close method if available */
-    var hd = document.querySelector('header-drawer.uly-drawer');
-    if (hd && typeof hd.close === 'function') {
-      hd.close();
-    } else {
-      var s = getSummary();
-      if (s) {
-        s.click();
-      } else {
-        var d = getDetails();
-        if (d) {
-          d.classList.remove('menu-open');
-          d.removeAttribute('open');
-        }
-      }
-    }
-    lockScroll(false);
-    setTimeout(syncTrigger, 50);
-  }
-
-  /* ─── Sync trigger label / arrow ─── */
   function syncTrigger() {
-    var t = getTrigger();
-    if (!t) return;
+    var trigger = getTrigger();
+    if (!trigger) return;
     var open = isOpen();
-    t.setAttribute('aria-expanded', open ? 'true' : 'false');
-    t.classList.toggle('is-open', open);
+    trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    trigger.classList.toggle('is-open', open);
   }
 
-  /* ─── Click handler ─── */
+  function openSidebar() {
+    var sidebar = getSidebar();
+    if (!sidebar || isOpen()) return;
+    syncSidebarPosition();
+    sidebar.classList.add(OPEN_CLASS);
+    sidebar.setAttribute('aria-hidden', 'false');
+    syncTrigger();
+    getCloseBtn()?.focus();
+  }
+
+  function closeSidebar() {
+    var sidebar = getSidebar();
+    if (!sidebar || !isOpen()) return;
+    sidebar.classList.remove(OPEN_CLASS);
+    sidebar.setAttribute('aria-hidden', 'true');
+    syncTrigger();
+    getTrigger()?.focus();
+  }
+
   function onTriggerClick(e) {
     e.preventDefault();
     e.stopPropagation();
     if (isOpen()) {
-      closeDrawer();
+      closeSidebar();
     } else {
-      openDrawer();
+      openSidebar();
     }
   }
 
-  /* ─── Watch details for external close (backdrop click, Escape, etc.) ─── */
-  function watchDetails() {
-    var d = getDetails();
-    if (!d || d._ulyWatched) return;
-    d._ulyWatched = true;
-    var mo = new MutationObserver(function () {
-      syncTrigger();
-      if (!isOpen()) lockScroll(false);
-    });
-    mo.observe(d, { attributes: true, attributeFilter: ['class', 'open'] });
+  function onCloseClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    closeSidebar();
   }
 
-  /* ─── Bind trigger ─── */
-  function bindTrigger() {
-    var t = getTrigger();
-    if (!t || t._ulyBound) return;
-    t._ulyBound = true;
-    t.addEventListener('click', onTriggerClick);
+  function bind() {
+    var trigger = getTrigger();
+    var closeBtn = getCloseBtn();
+
+    if (trigger && !trigger._ulyBound) {
+      trigger._ulyBound = true;
+      trigger.addEventListener('click', onTriggerClick);
+    }
+
+    if (closeBtn && !closeBtn._ulyBound) {
+      closeBtn._ulyBound = true;
+      closeBtn.addEventListener('click', onCloseClick);
+    }
   }
 
-  /* ─── Init ─── */
+  function watchLayout() {
+    syncSidebarPosition();
+    if (isOpen()) syncSidebarPosition();
+  }
+
   function init() {
-    bindTrigger();
-    watchDetails();
+    bind();
+    syncSidebarPosition();
     syncTrigger();
+
+    window.addEventListener('resize', watchLayout);
+    window.addEventListener('scroll', watchLayout, { passive: true });
+
+    var bar = getBar();
+    if (bar && typeof ResizeObserver !== 'undefined') {
+      if (bar._ulyRo) bar._ulyRo.disconnect();
+      bar._ulyRo = new ResizeObserver(watchLayout);
+      bar._ulyRo.observe(bar);
+    }
+
+    var headerGroup = document.getElementById('header-group');
+    if (headerGroup && typeof ResizeObserver !== 'undefined') {
+      if (headerGroup._ulyRo) headerGroup._ulyRo.disconnect();
+      headerGroup._ulyRo = new ResizeObserver(watchLayout);
+      headerGroup._ulyRo.observe(headerGroup);
+    }
   }
 
-  function boot() {
-    /* Try immediately */
-    init();
-    /* Also wait for header-drawer to be fully defined and connected */
-    if (typeof customElements !== 'undefined' && customElements.whenDefined) {
-      customElements.whenDefined('header-drawer').then(function () {
-        requestAnimationFrame(init);
-      }).catch(function () {});
-    }
+  function resetBindings() {
+    var trigger = getTrigger();
+    var closeBtn = getCloseBtn();
+    if (trigger) trigger._ulyBound = false;
+    if (closeBtn) closeBtn._ulyBound = false;
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    boot();
+    init();
   }
 
-  /* Re-init after editor section reloads */
   document.addEventListener('shopify:section:load', function () {
-    var t = getTrigger();
-    if (t) t._ulyBound = false;
-    var d = getDetails();
-    if (d) d._ulyWatched = false;
-    setTimeout(boot, 100);
+    resetBindings();
+    setTimeout(init, 50);
   });
-
 })();

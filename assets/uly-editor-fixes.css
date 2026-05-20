@@ -1,16 +1,5 @@
-/* ================================================================
-   ULY EDITOR FIXES — uly-editor-fixes.css
-   Loaded globally from layout/theme.liquid after content_for_header.
-   Applies identically in both admin editor and live storefront.
-   Keep this file minimal.
-   ================================================================ */
+/* ULY Editor fixes — .shopify-design-mode only (admin theme editor iframe) */
 
-/*
-  EDITOR-ONLY: Transparent header must stay readable.
-  In the admin editor the iframe never scrolls so icons/text would be
-  invisible (white on white). The .shopify-design-mode class is added to
-  <html> only inside the admin editor — zero effect on the live storefront.
-*/
 .shopify-design-mode .uly-header--transparent .uly-header__underlay--closed {
   background: var(--color-background) !important;
   backdrop-filter: none !important;
@@ -20,35 +9,59 @@
 
 .shopify-design-mode .uly-header--transparent .uly-logo__text,
 .shopify-design-mode .uly-header--transparent .uly-logo__img,
-.shopify-design-mode .uly-header--transparent .uly-list-menu__item,
-.shopify-design-mode .uly-header--transparent .header-drawer-icon svg,
+.shopify-design-mode .uly-header--transparent .uly-header-search__trigger,
+.shopify-design-mode .uly-header--transparent .uly-header-search__icon svg,
+.shopify-design-mode .uly-header--transparent .uly-header-social__link,
+.shopify-design-mode .uly-header--transparent .uly-localization .dropdown-localization__button,
 .shopify-design-mode .uly-header--transparent .search-action button svg,
 .shopify-design-mode .uly-header--transparent .header-actions__cart-icon svg,
 .shopify-design-mode .uly-header--transparent .account-button svg,
-.shopify-design-mode .uly-header--transparent .header-actions__action {
-  color: var(--color-foreground) !important;
-  stroke: var(--color-foreground) !important;
+.shopify-design-mode .uly-header--transparent .header-actions__action,
+.shopify-design-mode .uly-header--transparent .uly-shop-bar__trigger {
+  color: var(--primary-accent, #0e5c66) !important;
+  stroke: var(--primary-accent, #0e5c66) !important;
   opacity: 1 !important;
+  text-shadow: none !important;
 }
 
-/*
-  EDITOR-ONLY: Localization always in header row, never in bar.
-  On the live store the media queries in custom-header.css handle this.
-  In the editor iframe, the viewport is always "desktop" width so the
-  mobile media query never fires — localization could end up showing
-  in both slots. This rule ensures only the header slot is visible.
-*/
-.shopify-design-mode .uly-localization-slot--header { display: flex !important; }
-.shopify-design-mode .uly-localization-slot--bar    { display: none !important; }
+/* Match inner-page live store: primary Shop All label in editor */
+.shopify-design-mode .uly-shop-bar__trigger {
+  color: var(--primary-accent, #0e5c66) !important;
+  text-shadow: none !important;
+}
 
-/*
-  QUICK-ADD MODAL: fallback for browsers / iframes without
-  scroll-driven animation support (admin editor, Firefox < 116).
-*/
+/* Localization: always in header row in editor (never duplicate in bar) */
+.shopify-design-mode .uly-localization-slot--header {
+  display: flex !important;
+}
+
+.shopify-design-mode .uly-localization-slot--bar {
+  display: none !important;
+}
+
+.shopify-design-mode .uly-localization .dropdown-localization__button {
+  display: flex !important;
+}
+
+/* Keep right-side icons on one row in narrow editor preview */
+.shopify-design-mode .uly-header__col--right {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  justify-content: flex-end !important;
+  gap: 0.35rem !important;
+  min-width: 0 !important;
+  max-width: 72% !important;
+}
+
+.shopify-design-mode .uly-header__inner {
+  gap: 0.5rem !important;
+}
+
 @supports not (animation-timeline: scroll(self)) {
   .quick-add-modal__content .product-details {
     mask-image: none;
   }
+
   .quick-add-modal__content .product-details :is(.buy-buttons-block)::before,
   .quick-add-modal__content .product-details .buy-buttons-block__bar::before {
     --quick-add-modal-mask-end-progressive-enhanced: 48px;
