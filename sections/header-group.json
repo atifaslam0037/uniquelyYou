@@ -7,7 +7,7 @@
  * made to this file may be overwritten.
  * ------------------------------------------------------------
  */
- {
+{
   "type": "header",
   "name": "Header",
   "sections": {
@@ -31,6 +31,7 @@
       "block_order": [
         "announcement_BxgCk9"
       ],
+      "disabled": true,
       "name": "t:names.announcement_bar",
       "settings": {
         "speed": 5,
@@ -44,24 +45,33 @@
     "header_section": {
       "type": "custom-header",
       "settings": {
+        "logo_max_width": 120,
         "menu": "shop-all",
+        "shop_all_collections_url": "",
         "shop_all_label": "",
         "shop_all_suffix": "",
-        "search_placeholder": "Find what makes you unique!",
-        "show_search_placeholder": false,
-        "show_social": true,
         "show_search": true,
-        "show_account": true,
-        "show_cart": true,
+        "show_search_placeholder": true,
+        "search_placeholder": "Find what makes you unique!",
+        "show_social": true,
+        "social_facebook": "https://www.facebook.com/share/1UhB1r6KRp/",
+        "social_instagram": "https://www.instagram.com/uniquelyyou.vip/",
+        "social_tiktok": "https://www.tiktok.com/@uniquely_youvip?_r=1&_t=ZT-96O69J1GPXx",
+        "social_pinterest": "",
         "show_country": true,
         "country_selector_style": true,
         "show_language": true,
-        "drawer_accordion": false,
+        "show_account": true,
+        "show_cart": true,
+        "drawer_accordion": true,
+        "drawer_accordion_expand_first": true,
         "drawer_dividers": false,
         "menu_style": "text",
+        "image_border_radius": 4,
         "color_scheme": "scheme-1",
-        "enable_transparent_home": true,
+        "enable_transparent_home": false,
         "sticky_style": "glassmorphism",
+        "actions_display_style": "icon",
         "enable_sticky_header": "always"
       }
     }

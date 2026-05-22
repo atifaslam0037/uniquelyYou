@@ -5,6 +5,7 @@
   'use strict';
 
   var OPEN_CLASS = 'uly-shop-sidebar--open';
+  var HEADER_OPEN_CLASS = 'uly-shop-sidebar-is-open';
 
   function getHeader() {
     return document.getElementById('header-component');
@@ -27,18 +28,37 @@
     return header ? header.querySelector('.uly-header__bar') : null;
   }
 
+  function getHeaderRow() {
+    var header = getHeader();
+    return header ? header.querySelector('.uly-header__row') : null;
+  }
+
   function isOpen() {
     var sidebar = getSidebar();
     return !!sidebar && sidebar.classList.contains(OPEN_CLASS);
   }
 
-  /** Pin sidebar top to bottom edge of Shop All bar */
+  /** Pin sidebar below the visible header area. */
   function syncSidebarPosition() {
-    var bar = getBar();
-    if (!bar) return;
-    var top = Math.round(bar.getBoundingClientRect().bottom);
+    var row = getHeaderRow();
+    var anchor = isOpen() ? row : getBar();
+    if (!anchor) return;
+
+    var top = Math.round(anchor.getBoundingClientRect().bottom);
+    if (isOpen() && row) {
+      var rowRect = row.getBoundingClientRect();
+      var minTop = Math.max(0, Math.round(rowRect.top)) + Math.round(rowRect.height);
+      top = Math.max(top, minTop);
+    }
+
     if (top < 0) top = 0;
     document.documentElement.style.setProperty('--uly-sidebar-top', top + 'px');
+  }
+
+  function syncHeaderState() {
+    var header = getHeader();
+    if (!header) return;
+    header.classList.toggle(HEADER_OPEN_CLASS, isOpen());
   }
 
   function syncTrigger() {
@@ -52,9 +72,10 @@
   function openSidebar() {
     var sidebar = getSidebar();
     if (!sidebar || isOpen()) return;
-    syncSidebarPosition();
     sidebar.classList.add(OPEN_CLASS);
     sidebar.setAttribute('aria-hidden', 'false');
+    syncHeaderState();
+    syncSidebarPosition();
     syncTrigger();
     getCloseBtn()?.focus();
   }
@@ -64,6 +85,8 @@
     if (!sidebar || !isOpen()) return;
     sidebar.classList.remove(OPEN_CLASS);
     sidebar.setAttribute('aria-hidden', 'true');
+    syncHeaderState();
+    syncSidebarPosition();
     syncTrigger();
     getTrigger()?.focus();
   }
@@ -106,6 +129,7 @@
 
   function init() {
     bind();
+    syncHeaderState();
     syncSidebarPosition();
     syncTrigger();
 
@@ -117,6 +141,13 @@
       if (bar._ulyRo) bar._ulyRo.disconnect();
       bar._ulyRo = new ResizeObserver(watchLayout);
       bar._ulyRo.observe(bar);
+    }
+
+    var row = getHeaderRow();
+    if (row && typeof ResizeObserver !== 'undefined') {
+      if (row._ulyRo) row._ulyRo.disconnect();
+      row._ulyRo = new ResizeObserver(watchLayout);
+      row._ulyRo.observe(row);
     }
 
     var headerGroup = document.getElementById('header-group');

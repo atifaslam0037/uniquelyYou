@@ -1,42 +1,88 @@
 /* ULY Editor fixes — .shopify-design-mode only (admin theme editor iframe) */
 
-.shopify-design-mode .uly-header--transparent .uly-header__underlay--closed {
-  background: var(--color-background) !important;
+.shopify-design-mode .uly-header--transparent:not([data-scrolled='true']) .uly-header__underlay--closed {
+  background: transparent !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   box-shadow: none !important;
 }
 
-.shopify-design-mode .uly-header--transparent .uly-logo__text,
-.shopify-design-mode .uly-header--transparent .uly-logo__img,
-.shopify-design-mode .uly-header--transparent .uly-header-search__trigger,
-.shopify-design-mode .uly-header--transparent .uly-header-search__icon svg,
-.shopify-design-mode .uly-header--transparent .uly-header-social__link,
-.shopify-design-mode .uly-header--transparent .uly-localization .dropdown-localization__button,
-.shopify-design-mode .uly-header--transparent .search-action button svg,
-.shopify-design-mode .uly-header--transparent .header-actions__cart-icon svg,
-.shopify-design-mode .uly-header--transparent .account-button svg,
-.shopify-design-mode .uly-header--transparent .header-actions__action,
-.shopify-design-mode .uly-header--transparent .uly-shop-bar__trigger {
+.shopify-design-mode .uly-header--transparent:not([data-scrolled='true']) .uly-logo__text,
+.shopify-design-mode .uly-header--transparent:not([data-scrolled='true']) .uly-logo__img,
+.shopify-design-mode .uly-header--transparent:not([data-scrolled='true']) .uly-header-search__trigger,
+.shopify-design-mode .uly-header--transparent:not([data-scrolled='true']) .uly-header-search__icon svg,
+.shopify-design-mode .uly-header--transparent:not([data-scrolled='true']) .uly-header-social__link,
+.shopify-design-mode .uly-header--transparent:not([data-scrolled='true']) .uly-localization .dropdown-localization__button,
+.shopify-design-mode .uly-header--transparent:not([data-scrolled='true']) .search-action button svg,
+.shopify-design-mode .uly-header--transparent:not([data-scrolled='true']) .header-actions__cart-icon svg,
+.shopify-design-mode .uly-header--transparent:not([data-scrolled='true']) .account-button svg,
+.shopify-design-mode .uly-header--transparent:not([data-scrolled='true']) .header-actions__action,
+.shopify-design-mode .uly-header--transparent:not([data-scrolled='true']) .uly-shop-bar__trigger {
+  color: rgb(255, 255, 255) !important;
+  stroke: rgb(255, 255, 255) !important;
+  opacity: 1 !important;
+}
+
+.shopify-design-mode .uly-header:not(.uly-header--transparent) .uly-logo__text,
+.shopify-design-mode .uly-header:not(.uly-header--transparent) .uly-logo__img,
+.shopify-design-mode .uly-header:not(.uly-header--transparent) .uly-header-search__trigger,
+.shopify-design-mode .uly-header:not(.uly-header--transparent) .uly-header-search__icon svg,
+.shopify-design-mode .uly-header:not(.uly-header--transparent) .uly-header-social__link,
+.shopify-design-mode .uly-header:not(.uly-header--transparent) .uly-localization .dropdown-localization__button,
+.shopify-design-mode .uly-header:not(.uly-header--transparent) .search-action button svg,
+.shopify-design-mode .uly-header:not(.uly-header--transparent) .header-actions__cart-icon svg,
+.shopify-design-mode .uly-header:not(.uly-header--transparent) .account-button svg,
+.shopify-design-mode .uly-header:not(.uly-header--transparent) .header-actions__action,
+.shopify-design-mode .uly-header--transparent[data-scrolled='true'] .uly-logo__text,
+.shopify-design-mode .uly-header--transparent[data-scrolled='true'] .uly-logo__img,
+.shopify-design-mode .uly-header--transparent[data-scrolled='true'] .uly-header-search__trigger,
+.shopify-design-mode .uly-header--transparent[data-scrolled='true'] .uly-header-search__icon svg,
+.shopify-design-mode .uly-header--transparent[data-scrolled='true'] .uly-header-social__link,
+.shopify-design-mode .uly-header--transparent[data-scrolled='true'] .uly-localization .dropdown-localization__button,
+.shopify-design-mode .uly-header--transparent[data-scrolled='true'] .search-action button svg,
+.shopify-design-mode .uly-header--transparent[data-scrolled='true'] .header-actions__cart-icon svg,
+.shopify-design-mode .uly-header--transparent[data-scrolled='true'] .account-button svg,
+.shopify-design-mode .uly-header--transparent[data-scrolled='true'] .header-actions__action {
   color: var(--primary-accent, #0e5c66) !important;
   stroke: var(--primary-accent, #0e5c66) !important;
   opacity: 1 !important;
   text-shadow: none !important;
 }
 
-/* Match inner-page live store: primary Shop All label in editor */
-.shopify-design-mode .uly-shop-bar__trigger {
+/* Match live homepage transparent header in the editor preview. */
+.shopify-design-mode .uly-header--transparent:not([data-scrolled='true']) .uly-shop-bar__trigger {
+  color: rgb(255, 255, 255) !important;
+  stroke: rgb(255, 255, 255) !important;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35) !important;
+}
+
+.shopify-design-mode .uly-header:not(.uly-header--transparent) .uly-shop-bar__trigger,
+.shopify-design-mode .uly-header--transparent[data-scrolled='true'] .uly-shop-bar__trigger {
   color: var(--primary-accent, #0e5c66) !important;
+  stroke: var(--primary-accent, #0e5c66) !important;
   text-shadow: none !important;
 }
 
-/* Localization: always in header row in editor (never duplicate in bar) */
-.shopify-design-mode .uly-localization-slot--header {
-  display: flex !important;
+/* Localization: match live responsive placement in the editor.
+   Desktop: top row. Mobile: Shop All bar. */
+@media screen and (min-width: 750px) {
+  .shopify-design-mode .uly-localization-slot--header {
+    display: flex !important;
+  }
+
+  .shopify-design-mode .uly-localization-slot--bar {
+    display: none !important;
+  }
 }
 
-.shopify-design-mode .uly-localization-slot--bar {
-  display: none !important;
+@media screen and (max-width: 749px) {
+  .shopify-design-mode .uly-localization-slot--header {
+    display: none !important;
+  }
+
+  .shopify-design-mode .uly-localization-slot--bar {
+    display: flex !important;
+  }
 }
 
 .shopify-design-mode .uly-localization .dropdown-localization__button {
@@ -50,7 +96,8 @@
   justify-content: flex-end !important;
   gap: 0.35rem !important;
   min-width: 0 !important;
-  max-width: 72% !important;
+  max-width: none !important;
+  overflow: visible !important;
 }
 
 .shopify-design-mode .uly-header__inner {

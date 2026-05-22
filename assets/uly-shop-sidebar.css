@@ -15,6 +15,16 @@
   background-color: transparent;
 }
 
+.uly-header.uly-shop-sidebar-is-open .uly-header__bar {
+  display: none !important;
+}
+
+.uly-header.uly-shop-sidebar-is-open .uly-shop-sidebar {
+  top: max(var(--uly-sidebar-top, var(--header-group-height, 120px)), var(--header-row-height, 64px)) !important;
+  height: calc(100dvh - max(var(--uly-sidebar-top, var(--header-group-height, 120px)), var(--header-row-height, 64px))) !important;
+  max-height: calc(100dvh - max(var(--uly-sidebar-top, var(--header-group-height, 120px)), var(--header-row-height, 64px))) !important;
+}
+
 /* Shop All label */
 .uly-header--transparent:not([data-scrolled='true']) .uly-shop-bar__trigger {
   color: #fff;
@@ -27,7 +37,7 @@
   text-shadow: none;
 }
 
-/* Panel starts exactly below Shop All bar (set via JS --uly-sidebar-top) */
+/* Panel starts below the Shop All bar when closed, and below the top header row when open. */
 .uly-shop-sidebar {
   position: fixed;
   left: 0;

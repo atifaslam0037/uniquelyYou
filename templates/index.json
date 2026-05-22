@@ -275,6 +275,7 @@
         "collection_FRBwUK",
         "collection_RjrMpD"
       ],
+      "disabled": true,
       "settings": {
         "eyebrow_text": "SHOP BY",
         "heading": "One-liner collections",
@@ -316,13 +317,13 @@
       "type": "feature-products",
       "name": "Featured Products",
       "settings": {
-        "heading": "Featured Products",
+        "heading": "Latest Products",
         "collection": "all",
-        "max_products": 4,
+        "max_products": 8,
         "show_vendor": false,
         "show_view_all": true,
         "show_quick_add": true,
-        "layout_type": "grid",
+        "layout_type": "carousel",
         "columns": 4,
         "mobile_columns": "2",
         "carousel_on_mobile": true,
@@ -391,6 +392,7 @@
     },
     "newsletter": {
       "type": "newsletter",
+      "disabled": true,
       "settings": {
         "badge_text": "JOIN THE CLUB",
         "heading": "Get 10% off your first order.",

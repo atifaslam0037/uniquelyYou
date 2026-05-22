@@ -324,6 +324,14 @@ dropdown-localization-component.uly-localization {
   align-items: center;
 }
 
+/* The stock Horizon header stylesheet hides .dropdown-localization until
+   its menu JS chooses desktop menu mode. Our custom header always owns its
+   localization slot, so keep only the ULY dropdown visible. */
+#header-component.uly-header dropdown-localization-component.uly-localization.dropdown-localization,
+#header-component.uly-header .uly-localization-slot .dropdown-localization {
+  display: inline-flex !important;
+}
+
 .uly-localization .dropdown-localization__button {
   display: flex;
   align-items: center;
