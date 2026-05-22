@@ -67,16 +67,13 @@
               <li class="uly-shop-sidebar__item uly-shop-sidebar__item--level-1{{ divider_class }}">
                 <details class="uly-shop-sidebar__details" {% if open_accordion %}open{% endif %}>
                   <summary class="uly-shop-sidebar__summary">
-                    <span class="uly-shop-sidebar__summary-text">
+                    <a href="{{ link.url }}" class="uly-shop-sidebar__summary-link" onclick="event.stopPropagation();">
                       <span class="uly-shop-sidebar__bullet" aria-hidden="true">-</span>
                       {{ link.title | escape }}
-                    </span>
+                    </a>
                     <span class="uly-shop-sidebar__chevron" aria-hidden="true"></span>
                   </summary>
                   <div class="uly-shop-sidebar__submenu">
-                    <a href="{{ link.url }}" class="uly-shop-sidebar__link uly-shop-sidebar__link--view-all">
-                      {{ link.title | escape }}
-                    </a>
                     <ul class="uly-shop-sidebar__menu uly-shop-sidebar__menu--child" role="list">
                       {%- for child in link.links -%}
                         <li class="uly-shop-sidebar__item uly-shop-sidebar__item--level-2">

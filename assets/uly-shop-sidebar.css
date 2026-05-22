@@ -109,10 +109,12 @@
   color: #fff;
   text-decoration: none;
   line-height: 1.35;
+  transition: color 0.15s ease, opacity 0.15s ease;
 }
 
 .uly-shop-sidebar__collections-link:hover {
-  opacity: 0.85;
+  color: var(--secondary-accent, #E8612C);
+  opacity: 1;
 }
 
 .uly-shop-sidebar__close {
@@ -179,11 +181,12 @@
   font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.92);
   text-decoration: none;
-  transition: opacity 0.15s ease;
+  transition: color 0.15s ease, opacity 0.15s ease;
 }
 
 .uly-shop-sidebar__link:hover {
-  opacity: 0.72;
+  color: var(--secondary-accent, #E8612C);
+  opacity: 1;
 }
 
 .uly-shop-sidebar__link--child,
@@ -218,17 +221,32 @@
   gap: 0.35rem;
 }
 
+.uly-shop-sidebar__summary-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.uly-shop-sidebar__summary-link:hover,
+.uly-shop-sidebar__details[open] .uly-shop-sidebar__summary-link {
+  color: var(--secondary-accent, #E8612C);
+}
+
 .uly-shop-sidebar__chevron {
   width: 8px;
   height: 8px;
   border-inline-end: 2px solid currentColor;
   border-block-end: 2px solid currentColor;
   transform: rotate(-45deg);
-  transition: transform 0.2s ease;
+  transition: color 0.15s ease, transform 0.2s ease;
   flex-shrink: 0;
 }
 
 .uly-shop-sidebar__details[open] .uly-shop-sidebar__chevron {
+  color: var(--secondary-accent, #E8612C);
   transform: rotate(45deg);
 }
 

@@ -41,6 +41,7 @@
     assign show_localization = true
   endif
 
+  assign logo_display = section.settings.logo_display | default: 'auto'
   assign is_transparent_home = false
   if section.settings.enable_transparent_home and request.page_type == 'index'
     assign is_transparent_home = true
@@ -98,9 +99,25 @@
 
         {%- comment -%} LEFT: Logo only {%- endcomment -%}
         <div class="uly-header__col uly-header__col--left">
-          <a href="{{ routes.root_url }}" class="uly-logo" aria-label="{{ shop.name }}">
-            {%- assign logo_img = section.settings.logo_image | default: settings.logo -%}
-            {%- if logo_img != blank -%}
+          {%- liquid
+            assign logo_img = section.settings.logo_image | default: settings.logo
+            assign show_logo_image = false
+            assign show_shop_name = false
+
+            if logo_img != blank and logo_display != 'text'
+              assign show_logo_image = true
+            endif
+
+            if logo_display == 'text' or logo_display == 'image_and_text'
+              assign show_shop_name = true
+            endif
+
+            if logo_img == blank
+              assign show_shop_name = true
+            endif
+          -%}
+          <a href="{{ routes.root_url }}" class="uly-logo{% if show_logo_image and show_shop_name %} uly-logo--image-text{% endif %}" aria-label="{{ shop.name }}">
+            {%- if show_logo_image -%}
               {{
                 logo_img
                 | image_url: width: section.settings.logo_max_width
@@ -112,7 +129,8 @@
                   widths: '120, 180, 240, 300',
                   sizes: '(max-width: 749px) 140px, 220px'
               }}
-            {%- else -%}
+            {%- endif -%}
+            {%- if show_shop_name -%}
               <span class="uly-logo__text">{{ shop.name }}</span>
             {%- endif -%}
           </a>
@@ -351,7 +369,12 @@
     position: relative;
     background-color: transparent;
     border-block: 1px solid rgba(var(--color-foreground-rgb), 0.85);
-    background-color: var(--color-background);
+    background-color: var(--color-pale-peach, #FFE8DD);
+  }
+
+  .uly-header.uly-shop-sidebar-is-open .uly-header__row {
+    background-color: var(--color-pale-peach, #FFE8DD) !important;
+    border-block-color: rgba(14, 92, 102, 0.12) !important;
   }
 
   .uly-header__inner {
@@ -407,6 +430,11 @@
   .uly-header--transparent:not([data-scrolled='true']) .uly-header__row {
     background-color: transparent !important;
     border-block-color: rgba(255,255,255,0.35) !important;
+  }
+
+  .uly-header.uly-header--transparent.uly-shop-sidebar-is-open .uly-header__row {
+    background-color: var(--color-pale-peach, #FFE8DD) !important;
+    border-block-color: rgba(14, 92, 102, 0.12) !important;
   }
 
   /* SHOP ALL BAR — padding matches .uly-header__inner so trigger lines up with logo */
@@ -473,6 +501,7 @@
   .uly-logo {
     display: flex;
     align-items: center;
+    gap: 0.65rem;
     text-decoration: none;
     color: var(--color-foreground);
     max-height: calc(var(--header-row-height, 64px) - 12px);
@@ -491,9 +520,13 @@
     font-family: var(--primary-font, sans-serif);
     font-size: 1.35rem;
     font-weight: 700;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
     color: var(--color-foreground);
     white-space: nowrap;
+  }
+
+  .uly-header-search {
+    margin-inline-start: clamp(1rem, 3vw, 3rem);
   }
 
   /* Localization dropdown button */
@@ -560,6 +593,7 @@
       gap: 0.35rem;
     }
     .uly-header__col--right { gap: 0.15rem; }
+    .uly-header-search { margin-inline-start: 0.75rem; }
     .uly-localization-slot--header { display: none !important; }
     .uly-localization-slot--bar { display: flex !important; }
     .uly-header__bar { padding: 0.35rem 1rem; }
@@ -596,6 +630,18 @@
       "id": "logo_image",
       "label": "Logo image",
       "info": "Overrides the global logo setting."
+    },
+    {
+      "type": "select",
+      "id": "logo_display",
+      "label": "Logo display",
+      "options": [
+        { "value": "auto", "label": "Logo if available, otherwise shop name" },
+        { "value": "image", "label": "Logo only" },
+        { "value": "text", "label": "Shop name only" },
+        { "value": "image_and_text", "label": "Logo and shop name" }
+      ],
+      "default": "auto"
     },
     {
       "type": "range",
