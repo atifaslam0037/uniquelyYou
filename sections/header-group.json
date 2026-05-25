@@ -45,6 +45,8 @@
     "header_section": {
       "type": "custom-header",
       "settings": {
+        "logo_image": "shopify://shop_images/uniquely-you.png",
+        "logo_display": "image_and_text",
         "logo_max_width": 120,
         "menu": "shop-all",
         "shop_all_collections_url": "",

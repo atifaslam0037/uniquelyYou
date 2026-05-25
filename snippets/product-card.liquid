@@ -52,6 +52,11 @@
   if product.id == empty or product == blank
     assign onboarding = true
   endif
+
+  assign has_manual_swatches = false
+  if children contains '<product-swatches' or children contains 'swatches-variant-picker-component'
+    assign has_manual_swatches = true
+  endif
 %}
 
 <product-card
@@ -107,6 +112,9 @@
     "
   >
     {{ children }}
+    {% unless onboarding or has_manual_swatches %}
+      {% render 'product-card-color-swatches', product: product %}
+    {% endunless %}
   </div>
 </product-card>
 
