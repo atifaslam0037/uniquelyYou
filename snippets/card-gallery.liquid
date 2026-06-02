@@ -91,8 +91,13 @@
       # Sort media so product.featured_media.preview_image comes first as that is the most relevant image to display
       # product.featured_media updates based on search context and filters applied
 
-      assign other_media = product.media | reject: 'src', product.featured_media
-      assign media_list_to_show = product.featured_media | concat: other_media
+      if product.featured_media
+        assign other_media = product.media | reject: 'id', product.featured_media.id
+        assign featured_media_array = product.media | where: 'id', product.featured_media.id
+        assign media_list_to_show = featured_media_array | concat: other_media
+      else
+        assign media_list_to_show = product.media
+      endif
 
       if product.media.size > 2 and generic_media_size > 0
         assign show_arrows = true

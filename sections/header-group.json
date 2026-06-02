@@ -151,9 +151,9 @@
         "image_border_radius": 4,
         "color_scheme": "scheme-1",
         "header_background_color": "#ffffff",
-        "search_trigger_background_color": "#ffe8dd",
+        "search_trigger_background_color": "#e8612c",
         "enable_transparent_home": false,
-        "sticky_style": "glassmorphism",
+        "sticky_style": "solid",
         "actions_display_style": "icon",
         "enable_sticky_header": "scroll-up"
       }

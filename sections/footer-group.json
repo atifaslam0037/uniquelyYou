@@ -100,9 +100,9 @@
                   "settings": {
                     "image": "shopify://shop_images/uniquely-you.png",
                     "link": "",
-                    "image_ratio": "square",
+                    "image_ratio": "adapt",
                     "width": "custom",
-                    "custom_width": 30,
+                    "custom_width": 40,
                     "width_mobile": "custom",
                     "custom_width_mobile": 40,
                     "height": "fit",

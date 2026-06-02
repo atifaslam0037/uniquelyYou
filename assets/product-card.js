@@ -394,24 +394,25 @@ export class ProductCard extends ProductCardLink {
     slideshow.select({ id }, undefined, { animate: false });
   }
 
-  /**
-   * Previews the next image.
-   * @param {PointerEvent} event - The pointer event.
-   */
   previewImage(event) {
     if (event.pointerType !== 'mouse') return;
 
     const { slideshow } = this.refs;
 
-    if (!slideshow) return;
+    if (!slideshow || !slideshow.refs.slides || slideshow.refs.slides.length < 2) return;
 
     this.resetVariant.cancel();
 
     if (this.#previousSlideIndex != null && this.#previousSlideIndex > 0) {
       slideshow.select(this.#previousSlideIndex, undefined, { animate: false });
     } else {
-      slideshow.next(undefined, { animate: false });
-      setTimeout(() => this.#preloadNextPreviewImage());
+      // Find the second slide's ID (index 1 of the raw DOM slides)
+      const secondSlide = slideshow.refs.slides[1];
+      const secondSlideId = secondSlide.getAttribute('slide-id');
+      if (secondSlideId) {
+        slideshow.select({ id: secondSlideId }, undefined, { animate: false });
+        setTimeout(() => this.#preloadNextPreviewImage());
+      }
     }
   }
 
@@ -426,7 +427,9 @@ export class ProductCard extends ProductCardLink {
 
     if (!this.variantPicker) {
       if (!slideshow) return;
-      slideshow.previous(undefined, { animate: false });
+      // Always reset to slide 0 (the main product image) for consistency
+      // with previewImage which always goes to slide 1.
+      slideshow.select(0, undefined, { animate: false });
     } else {
       this.#resetVariant();
     }

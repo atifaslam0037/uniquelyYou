@@ -136,7 +136,7 @@ export class Slideshow extends Component {
       if (!this.isConnected) return;
     }
 
-    const slideCount = this.slides?.length || 0;
+    const slideCount = this.refs.slides?.length || 0;
     slideCount <= 1 ? this.#setupSlideshowWithoutControls() : this.#setupSlideshow();
   }
 
