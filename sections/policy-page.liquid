@@ -1,0 +1,569 @@
+{%- liquid
+  assign sec_id       = 'pp-' | append: section.id
+  assign bg_color     = section.settings.bg_color
+  assign text_color   = section.settings.text_color
+  assign muted_color  = section.settings.muted_color
+  assign accent       = section.settings.accent_color
+  assign eyebrow_lbl  = section.settings.eyebrow_label
+  assign show_date    = section.settings.show_last_updated
+  assign all_policies = shop.policies
+-%}
+
+<style>
+  #{{ sec_id }},
+  #{{ sec_id }} *,
+  #{{ sec_id }} *::before,
+  #{{ sec_id }} *::after {
+    box-sizing: border-box;
+  }
+
+  #{{ sec_id }} {
+    --pp-bg:      {{ bg_color }};
+    --pp-text:    {{ text_color }};
+    --pp-muted:   {{ muted_color }};
+    --pp-accent:  {{ accent }};
+    --pp-border:  color-mix(in srgb, {{ text_color }} 12%, transparent);
+    --pp-radius:  6px;
+    --pp-font:    var(--font-body-family, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+    --pp-font-hd: var(--font-heading-family, var(--pp-font));
+    background: var(--pp-bg);
+    color: var(--pp-text);
+    font-family: var(--pp-font);
+  }
+
+  #{{ sec_id }} .pp-outer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 50px 25px 50px;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+
+  /* ── Sidebar ── */
+  #{{ sec_id }} .pp-sidebar {
+    position: sticky;
+    top: 96px;
+    align-self: start;
+  }
+
+  #{{ sec_id }} .pp-sidebar-desktop { display: block; }
+
+  #{{ sec_id }} .pp-eyebrow {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--pp-accent);
+    margin: 0 0 14px 0;
+  }
+
+  #{{ sec_id }} .pp-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  #{{ sec_id }} .pp-nav__btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 9px 12px 9px 14px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--pp-muted);
+    border-left: 2px solid transparent;
+    border-radius: 0 var(--pp-radius) var(--pp-radius) 0;
+    transition: color 0.16s, border-color 0.16s, background 0.16s;
+    font-family: var(--pp-font);
+    line-height: 1.45;
+  }
+
+  #{{ sec_id }} .pp-nav__btn:hover {
+    color: var(--pp-text);
+    border-left-color: color-mix(in srgb, var(--pp-accent) 40%, transparent);
+    background: color-mix(in srgb, var(--pp-text) 4%, transparent);
+  }
+
+  #{{ sec_id }} .pp-nav__btn[aria-selected="true"] {
+    color: var(--pp-text);
+    border-left-color: var(--pp-accent);
+    font-weight: 600;
+    background: #FFE8DD;
+  }
+
+  /* ── Mobile toggle ── */
+  #{{ sec_id }} .pp-mobile-toggle {
+    display: none;
+    width: 100%;
+    background: #FFE8DD;
+    border: 2px solid #E8612C;
+    border-radius: var(--pp-radius);
+    padding: 12px 16px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--pp-text);
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--pp-font);
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+    transition: background 0.15s;
+  }
+
+  #{{ sec_id }} .pp-mobile-toggle:hover {
+    {% comment %} background: color-mix(in srgb, var(--pp-text) 10%, transparent); {% endcomment %}
+  }
+
+  #{{ sec_id }} .pp-mobile-toggle svg {
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+
+  #{{ sec_id }} .pp-mobile-toggle[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+  }
+
+  #{{ sec_id }} .pp-mobile-panel {
+    display: none;
+    border: 2px solid #E8612C;
+    border-radius: var(--pp-radius);
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+
+  #{{ sec_id }} .pp-mobile-panel.is-open { display: block; }
+
+  #{{ sec_id }} .pp-mobile-panel .pp-nav__btn {
+    border-left: none;
+    border-radius: 0;
+    border-bottom: 1px solid var(--pp-border);
+    padding: 13px 16px;
+  }
+
+  #{{ sec_id }} .pp-mobile-panel .pp-nav__btn:last-child { border-bottom: none; }
+
+  #{{ sec_id }} .pp-mobile-panel .pp-nav__btn[aria-selected="true"] {
+    border-left: none;
+    background: color-mix(in srgb, var(--pp-accent) 10%, transparent);
+  }
+
+  /* ── Panels ── */
+  #{{ sec_id }} .pp-article {
+    min-width: 0;
+    max-width: 700px;
+    padding: 30px;
+    background: #FFE8DD;
+    border-radius: 16px;
+    border: 2px solid #E8612C; 
+  }
+
+
+  #{{ sec_id }} .pp-panel { display: none; }
+
+  #{{ sec_id }} .pp-panel.is-active {
+    display: block;
+    animation: pp-fade 0.22s ease;
+  }
+
+  @keyframes pp-fade {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  #{{ sec_id }} .pp-article__eyebrow {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--pp-accent);
+    margin: 0 0 12px 0;
+  }
+
+  #{{ sec_id }} .pp-article__title {
+    font-family: var(--pp-font-hd);
+    font-size: clamp(2.5rem,3.5vw, 3.5rem);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--pp-text);
+    margin: 0 0 36px 0;
+  }
+
+  /* ── Prose ── */
+  #{{ sec_id }} .pp-body {
+    color: var(--pp-muted);
+    font-size: 16px;
+    line-height: 1.75;
+  }
+
+  #{{ sec_id }} .pp-body > * + * { margin-top: 1em; }
+
+  #{{ sec_id }} .pp-body h2,
+  #{{ sec_id }} .pp-body h3 {
+    font-family: var(--pp-font-hd);
+    font-weight: 700;
+    color: var(--pp-text);
+    margin-top: 2.25em;
+    margin-bottom: 0.5em;
+    line-height: 1.25;
+  }
+
+  #{{ sec_id }} .pp-body h2 {
+    font-size: 20px;
+    letter-spacing: -0.01em;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--pp-border);
+  }
+
+  #{{ sec_id }} .pp-body h3 { font-size: 1rem; }
+  #{{ sec_id }} .pp-body p { margin: 0; }
+  #{{ sec_id }} .pp-body p + p { margin-top: 0.875em; }
+  #{{ sec_id }} .pp-body ul,
+  #{{ sec_id }} .pp-body ol { padding-left: 1.5em; }
+  #{{ sec_id }} .pp-body li { margin-top: 0.375em; }
+
+  #{{ sec_id }} .pp-body a {
+    color: var(--pp-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+
+  #{{ sec_id }} .pp-body a:hover { text-decoration-thickness: 2px; }
+
+  #{{ sec_id }} .pp-body strong {
+    font-weight: 600;
+    color: var(--pp-text);
+  }
+
+  #{{ sec_id }} .pp-body blockquote {
+    border-left: 3px solid var(--pp-accent);
+    margin-left: 0;
+    padding: 8px 0 8px 20px;
+    font-style: italic;
+  }
+
+  #{{ sec_id }} .pp-body hr {
+    border: none;
+    border-top: 1px solid var(--pp-border);
+    margin: 2em 0;
+  }
+
+  #{{ sec_id }} .pp-body table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  #{{ sec_id }} .pp-body th,
+  #{{ sec_id }} .pp-body td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--pp-border);
+  }
+
+  #{{ sec_id }} .pp-body th {
+    font-weight: 600;
+    color: var(--pp-text);
+    background: color-mix(in srgb, var(--pp-text) 4%, transparent);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 860px) {
+    #{{ sec_id }} .pp-outer {
+      grid-template-columns: 1fr;
+      gap: 0;
+      padding: 30px 20px 30px;
+    }
+
+    #{{ sec_id }} .pp-sidebar { position: static; }
+    #{{ sec_id }} .pp-sidebar-desktop { display: none; }
+    #{{ sec_id }} .pp-mobile-toggle { display: flex; }
+  }
+
+  @media (max-width: 540px) {
+    #{{ sec_id }} .pp-outer { padding: 30px 20px 30px; }
+
+    #{{ sec_id }} .pp-article__title {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+    }
+
+    #{{ sec_id }} .pp-body { font-size: 16px; }
+    #{{ sec_id }} .pp-body h2 { font-size: 20px; }
+  }
+
+
+  @media (max-width: 860px){
+     #{{ sec_id }} .pp-article {
+    max-width: 100%;
+  }
+  }
+</style>
+
+<div id="{{ sec_id }}">
+  <div class="pp-outer">
+
+    <!-- ══ SIDEBAR ══ -->
+    <aside class="pp-sidebar" aria-label="Policy navigation">
+
+      <!-- Desktop -->
+      <div class="pp-sidebar-desktop">
+        <p class="pp-eyebrow">{{ eyebrow_lbl | escape }}</p>
+        <nav>
+          <ul class="pp-nav" role="tablist" aria-orientation="vertical">
+            {%- for p in all_policies %}
+              <li role="presentation">
+                <button
+                  class="pp-nav__btn"
+                  role="tab"
+                  aria-selected="false"
+                  data-index="{{ forloop.index0 }}"
+                  data-hash="{{ p.url | split: '/' | last }}"
+                >{{- p.title -}}</button>
+              </li>
+            {%- endfor %}
+          </ul>
+        </nav>
+      </div>
+
+      <!-- Mobile dropdown -->
+      <button
+        class="pp-mobile-toggle"
+        aria-expanded="false"
+        aria-controls="pp-mobile-panel-{{ sec_id }}"
+      >
+        <span class="pp-mobile-label">{{ all_policies | map: 'title' | first }}</span>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M2 5L7 10L12 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <div id="pp-mobile-panel-{{ sec_id }}" class="pp-mobile-panel">
+        <ul class="pp-nav" role="list">
+          {%- for p in all_policies %}
+            <li>
+              <button
+                class="pp-nav__btn"
+                aria-selected="false"
+                data-index="{{ forloop.index0 }}"
+                data-hash="{{ p.url | split: '/' | last }}"
+                data-mobile="true"
+              >{{- p.title -}}</button>
+            </li>
+          {%- endfor %}
+        </ul>
+      </div>
+
+    </aside>
+
+    <!-- ══ CONTENT PANELS ══ -->
+    <div class="pp-article">
+      {%- for p in all_policies %}
+        <div
+          class="pp-panel"
+          data-index="{{ forloop.index0 }}"
+          data-hash="{{ p.url | split: '/' | last }}"
+          role="tabpanel"
+        >
+          {%- if show_date %}
+            <p class="pp-article__eyebrow">Last updated &middot; {{ 'now' | date: '%B %Y' }}</p>
+          {%- endif %}
+          <h1 class="pp-article__title">{{ p.title | escape }}</h1>
+          <div class="pp-body">{{ p.body }}</div>
+        </div>
+      {%- endfor %}
+
+      {%- if all_policies == empty %}
+        <div class="pp-panel is-active" data-index="0" data-hash="policies">
+          <h1 class="pp-article__title">{{ section.settings.fallback_title | escape }}</h1>
+          <div class="pp-body"><p>{{ section.settings.fallback_body | escape }}</p></div>
+        </div>
+      {%- endif %}
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  var root = document.getElementById('{{ sec_id }}');
+  if (!root) return;
+
+  var allBtns      = Array.from(root.querySelectorAll('.pp-nav__btn'));
+  var panels       = Array.from(root.querySelectorAll('.pp-panel'));
+  var mobileToggle = root.querySelector('.pp-mobile-toggle');
+  var mobilePanel  = root.querySelector('.pp-mobile-panel');
+  var mobileLabel  = root.querySelector('.pp-mobile-label');
+
+  /* ── Core: activate a tab by index ── */
+  function activate(index, updateHash) {
+    allBtns.forEach(function (btn) {
+      btn.setAttribute('aria-selected', parseInt(btn.dataset.index, 10) === index ? 'true' : 'false');
+    });
+
+    panels.forEach(function (panel) {
+      var match = parseInt(panel.dataset.index, 10) === index;
+      panel.classList.toggle('is-active', match);
+    });
+
+    /* Update mobile label */
+    var mobileActiveBtn = allBtns.find(function (b) {
+      return parseInt(b.dataset.index, 10) === index && b.dataset.mobile;
+    });
+    if (mobileLabel && mobileActiveBtn) {
+      mobileLabel.textContent = mobileActiveBtn.textContent.trim();
+    }
+
+    /* Write hash to URL — survives reload, back button, copy/paste */
+    if (updateHash !== false) {
+      var activePanel = panels[index];
+      if (activePanel && activePanel.dataset.hash && window.history && window.history.replaceState) {
+        window.history.replaceState(null, '', '#' + activePanel.dataset.hash);
+      }
+    }
+  }
+
+  /* ── On load: read hash from URL to restore correct tab ── */
+  function activateFromHash() {
+    var hash = window.location.hash.replace('#', '');
+    if (!hash) {
+      activate(0, false);
+      return;
+    }
+    var matched = panels.find(function (p) { return p.dataset.hash === hash; });
+    if (matched) {
+      activate(parseInt(matched.dataset.index, 10), false);
+    } else {
+      activate(0, false);
+    }
+  }
+
+  /* Run on page load */
+  activateFromHash();
+
+  /* Also handle browser back/forward changing the hash */
+  window.addEventListener('hashchange', activateFromHash);
+
+  /* ── Tab clicks ── */
+  allBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      activate(parseInt(btn.dataset.index, 10));
+      if (mobilePanel) {
+        mobilePanel.classList.remove('is-open');
+        if (mobileToggle) mobileToggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+  });
+
+  /* ── Mobile dropdown ── */
+  if (mobileToggle && mobilePanel) {
+    mobileToggle.addEventListener('click', function () {
+      var open = mobilePanel.classList.toggle('is-open');
+      mobileToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+
+  /* ── Keyboard: arrow keys on desktop tabs ── */
+  var desktopBtns = allBtns.filter(function (b) { return !b.dataset.mobile; });
+  desktopBtns.forEach(function (btn, i) {
+    btn.addEventListener('keydown', function (e) {
+      var next = -1;
+      if (e.key === 'ArrowDown') next = (i + 1) % desktopBtns.length;
+      if (e.key === 'ArrowUp')   next = (i - 1 + desktopBtns.length) % desktopBtns.length;
+      if (next >= 0) {
+        desktopBtns[next].focus();
+        activate(parseInt(desktopBtns[next].dataset.index, 10));
+        e.preventDefault();
+      }
+    });
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Policy Page",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Labels"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow_label",
+      "label": "Sidebar Eyebrow Label",
+      "default": "Policies",
+      "info": "Small label shown above the nav links on desktop."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_last_updated",
+      "label": "Show 'Last updated' date",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Fallback Content"
+    },
+    {
+      "type": "text",
+      "id": "fallback_title",
+      "label": "Fallback Title",
+      "default": "Our Policies",
+      "info": "Shown only if no policies exist in the store."
+    },
+    {
+      "type": "textarea",
+      "id": "fallback_body",
+      "label": "Fallback Body",
+      "default": "Please check back soon for our full policy details.",
+      "info": "Shown only as a last resort if no policy content is available."
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Primary Text",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Body / Muted Text",
+      "default": "#555555"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent (active link & headings)",
+      "default": "#0066cc"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Policy Page"
+    }
+  ]
+}
+{% endschema %}

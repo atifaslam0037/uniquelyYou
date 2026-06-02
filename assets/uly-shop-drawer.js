@@ -1,11 +1,12 @@
 /**
- * ULY Shop Sidebar — positions below Shop All bar, full height to bottom.
+ * ULY Shop Sidebar - opens from existing Shop All menu links.
  */
 (function () {
   'use strict';
 
   var OPEN_CLASS = 'uly-shop-sidebar--open';
   var HEADER_OPEN_CLASS = 'uly-shop-sidebar-is-open';
+  var TRIGGER_SELECTOR = '[data-uly-shop-drawer-trigger]';
 
   function getHeader() {
     return document.getElementById('header-component');
@@ -15,22 +16,22 @@
     return document.getElementById('uly-shop-sidebar');
   }
 
-  function getTrigger() {
-    return document.getElementById('uly-shop-drawer-trigger');
+  function getTriggers() {
+    return Array.prototype.slice.call(document.querySelectorAll(TRIGGER_SELECTOR));
   }
 
   function getCloseBtn() {
     return document.getElementById('uly-shop-sidebar-close');
   }
 
-  function getBar() {
-    var header = getHeader();
-    return header ? header.querySelector('.uly-header__bar') : null;
-  }
-
   function getHeaderRow() {
     var header = getHeader();
-    return header ? header.querySelector('.uly-header__row') : null;
+    return header ? header.querySelector('.header__row--top') : null;
+  }
+
+  function getNavigationBar() {
+    var header = getHeader();
+    return header ? header.querySelector('.header__navigation-bar-row') : null;
   }
 
   function isOpen() {
@@ -38,19 +39,22 @@
     return !!sidebar && sidebar.classList.contains(OPEN_CLASS);
   }
 
-  /** Pin sidebar below the visible header area. */
   function syncSidebarPosition() {
+    var header = getHeader();
     var row = getHeaderRow();
-    var anchor = isOpen() ? row : getBar();
-    if (!anchor) return;
+    var nav = getNavigationBar();
+    if (!header) return;
 
-    var top = Math.round(anchor.getBoundingClientRect().bottom);
-    if (isOpen() && row) {
-      var rowRect = row.getBoundingClientRect();
-      var minTop = Math.max(0, Math.round(rowRect.top)) + Math.round(rowRect.height);
-      top = Math.max(top, minTop);
-    }
+    var top = 0;
+    [header, row, nav].forEach(function (element) {
+      if (!element) return;
+      var rect = element.getBoundingClientRect();
+      if (rect.height > 0) top = Math.max(top, Math.round(rect.bottom));
+    });
 
+    var computedHeaderHeight = Number.parseFloat(getComputedStyle(document.body).getPropertyValue('--header-height')) || 0;
+    var computedHeaderGroupHeight = Number.parseFloat(getComputedStyle(document.body).getPropertyValue('--header-group-height')) || 0;
+    top = Math.max(top, Math.round(header.offsetHeight || 0), Math.round(computedHeaderHeight), Math.round(computedHeaderGroupHeight));
     if (top < 0) top = 0;
     document.documentElement.style.setProperty('--uly-sidebar-top', top + 'px');
   }
@@ -61,12 +65,12 @@
     header.classList.toggle(HEADER_OPEN_CLASS, isOpen());
   }
 
-  function syncTrigger() {
-    var trigger = getTrigger();
-    if (!trigger) return;
+  function syncTriggers() {
     var open = isOpen();
-    trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
-    trigger.classList.toggle('is-open', open);
+    getTriggers().forEach(function (trigger) {
+      trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      trigger.classList.toggle('is-open', open);
+    });
   }
 
   function openSidebar() {
@@ -76,7 +80,7 @@
     sidebar.setAttribute('aria-hidden', 'false');
     syncHeaderState();
     syncSidebarPosition();
-    syncTrigger();
+    syncTriggers();
     getCloseBtn()?.focus();
   }
 
@@ -87,13 +91,12 @@
     sidebar.setAttribute('aria-hidden', 'true');
     syncHeaderState();
     syncSidebarPosition();
-    syncTrigger();
-    getTrigger()?.focus();
+    syncTriggers();
   }
 
-  function onTriggerClick(e) {
-    e.preventDefault();
-    e.stopPropagation();
+  function onTriggerClick(event) {
+    event.preventDefault();
+    event.stopPropagation();
     if (isOpen()) {
       closeSidebar();
     } else {
@@ -101,68 +104,125 @@
     }
   }
 
-  function onCloseClick(e) {
-    e.preventDefault();
-    e.stopPropagation();
+  function onCloseClick(event) {
+    event.preventDefault();
+    event.stopPropagation();
     closeSidebar();
   }
 
-  function bind() {
-    var trigger = getTrigger();
-    var closeBtn = getCloseBtn();
+  function syncAccordionToggle(details) {
+    var toggle = details ? details.querySelector('.uly-shop-sidebar__chevron') : null;
+    if (!toggle) return;
+    toggle.setAttribute('aria-expanded', details.open ? 'true' : 'false');
+  }
 
-    if (trigger && !trigger._ulyBound) {
+  function onAccordionSummaryClick(event) {
+    if (!(event.target instanceof Element)) return;
+    if (event.target.closest('.uly-shop-sidebar__summary-link')) return;
+
+    event.preventDefault();
+  }
+
+  function onAccordionSummaryKeydown(event) {
+    if (!(event.target instanceof Element)) return;
+    if (event.target.closest('.uly-shop-sidebar__chevron')) return;
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+
+    event.preventDefault();
+  }
+
+  function toggleAccordion(event) {
+    if (!(event.target instanceof Element)) return;
+
+    var details = event.target.closest('.uly-shop-sidebar__details');
+    if (!details) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    details.open = !details.open;
+    syncAccordionToggle(details);
+  }
+
+  function onAccordionToggleKeydown(event) {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    toggleAccordion(event);
+  }
+
+  function bind() {
+    getTriggers().forEach(function (trigger) {
+      if (trigger._ulyBound) return;
       trigger._ulyBound = true;
       trigger.addEventListener('click', onTriggerClick);
-    }
+    });
 
+    var closeBtn = getCloseBtn();
     if (closeBtn && !closeBtn._ulyBound) {
       closeBtn._ulyBound = true;
       closeBtn.addEventListener('click', onCloseClick);
     }
+
+    var sidebar = getSidebar();
+    if (!sidebar) return;
+
+    sidebar.querySelectorAll('.uly-shop-sidebar__summary').forEach(function (summary) {
+      if (summary._ulyBound) return;
+      summary._ulyBound = true;
+      summary.addEventListener('click', onAccordionSummaryClick);
+      summary.addEventListener('keydown', onAccordionSummaryKeydown);
+    });
+
+    sidebar.querySelectorAll('.uly-shop-sidebar__chevron').forEach(function (toggle) {
+      if (toggle._ulyBound) return;
+      toggle._ulyBound = true;
+      toggle.addEventListener('click', toggleAccordion);
+      toggle.addEventListener('keydown', onAccordionToggleKeydown);
+    });
+
+    sidebar.querySelectorAll('.uly-shop-sidebar__details').forEach(function (details) {
+      if (details._ulyBound) return;
+      details._ulyBound = true;
+      syncAccordionToggle(details);
+      details.addEventListener('toggle', function () {
+        syncAccordionToggle(details);
+      });
+    });
   }
 
   function watchLayout() {
     syncSidebarPosition();
-    if (isOpen()) syncSidebarPosition();
   }
 
   function init() {
     bind();
     syncHeaderState();
     syncSidebarPosition();
-    syncTrigger();
+    syncTriggers();
 
     window.addEventListener('resize', watchLayout);
     window.addEventListener('scroll', watchLayout, { passive: true });
 
-    var bar = getBar();
-    if (bar && typeof ResizeObserver !== 'undefined') {
-      if (bar._ulyRo) bar._ulyRo.disconnect();
-      bar._ulyRo = new ResizeObserver(watchLayout);
-      bar._ulyRo.observe(bar);
-    }
-
-    var row = getHeaderRow();
-    if (row && typeof ResizeObserver !== 'undefined') {
-      if (row._ulyRo) row._ulyRo.disconnect();
-      row._ulyRo = new ResizeObserver(watchLayout);
-      row._ulyRo.observe(row);
-    }
-
-    var headerGroup = document.getElementById('header-group');
-    if (headerGroup && typeof ResizeObserver !== 'undefined') {
-      if (headerGroup._ulyRo) headerGroup._ulyRo.disconnect();
-      headerGroup._ulyRo = new ResizeObserver(watchLayout);
-      headerGroup._ulyRo.observe(headerGroup);
-    }
+    [getHeader(), getHeaderRow(), getNavigationBar()].forEach(function (element) {
+      if (!element || typeof ResizeObserver === 'undefined') return;
+      if (element._ulyRo) element._ulyRo.disconnect();
+      element._ulyRo = new ResizeObserver(watchLayout);
+      element._ulyRo.observe(element);
+    });
   }
 
   function resetBindings() {
-    var trigger = getTrigger();
+    getTriggers().forEach(function (trigger) {
+      trigger._ulyBound = false;
+    });
+
     var closeBtn = getCloseBtn();
-    if (trigger) trigger._ulyBound = false;
     if (closeBtn) closeBtn._ulyBound = false;
+
+    var sidebar = getSidebar();
+    if (!sidebar) return;
+
+    sidebar.querySelectorAll('.uly-shop-sidebar__summary, .uly-shop-sidebar__chevron, .uly-shop-sidebar__details').forEach(function (element) {
+      element._ulyBound = false;
+    });
   }
 
   if (document.readyState === 'loading') {

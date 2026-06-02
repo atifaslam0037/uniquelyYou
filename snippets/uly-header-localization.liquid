@@ -1,68 +1,51 @@
 {%- doc -%}
-  Header localization dropdown for the custom header.
+  Renders localization controls for the custom header.
 
-  @param {object} section - Header section
-  @param {boolean} show_country - Show country selector
-  @param {boolean} show_language - Show language selector
-  @param {string} [id_suffix] - Unique suffix for duplicate instances (e.g. '-mobile')
+  @param {object} section - The section object.
+  @param {boolean} show_country - Whether to show the country selector.
+  @param {boolean} show_language - Whether to show the language selector.
+  @param {string} id_suffix - Suffix used to keep IDs unique.
 {%- enddoc -%}
 
-{% liquid
-  assign id_suffix = id_suffix | default: ''
-  assign controls_id = 'uly-localization-results' | append: id_suffix
-  assign form_id = section.id | append: id_suffix
-  assign localization_font = '--menu-localization-font: var(--primary-font); '
-  assign localization_font_size = '--menu-localization-font-size: 0.875rem; '
+{%- liquid
+  assign localization_form_id = section.id
+  if id_suffix != blank
+    assign localization_form_id = section.id | append: '-' | append: id_suffix
+  endif
   assign color_shadow = '--color-shadow: rgb(var(--color-foreground-rgb) / var(--opacity-10-25));'
-  assign form_style = localization_font | append: localization_font_size | append: color_shadow
-%}
+  assign form_style = '--menu-localization-font: var(--font-body--family); --menu-localization-font-size: 0.875rem; ' | append: color_shadow
+-%}
 
-{% if show_language and show_country == false %}
-  <div class="uly-localization">
+{%- if show_language and show_country == false -%}
+  <div class="dropdown-localization uly-localization">
     {% render 'localization-form',
       show_country: show_country,
       show_language: show_language,
       localization_style: 'dropdown',
       form_style: form_style,
-      form_id: form_id
+      form_id: localization_form_id
     %}
   </div>
-{% elsif show_country %}
-  <dropdown-localization-component class="uly-localization dropdown-localization">
+{%- elsif show_country -%}
+  <dropdown-localization-component class="dropdown-localization uly-localization">
     <button
       type="button"
-      class="button uly-localization__btn dropdown-localization__button localization-selector header-actions__action"
+      class="button dropdown-localization__button localization-selector header-actions__action"
       aria-expanded="false"
-      aria-controls="{{ controls_id }}"
+      aria-controls="dropdown-localization-results-{{ localization_form_id }}"
       ref="button"
       on:click="/toggleSelector"
-      style="{{ form_style }}"
     >
-      {%- if show_country -%}
-        {%- if section.settings.country_selector_style -%}
-          {% liquid
-            assign bg_brightness = section.settings.color_scheme.settings.background | color_brightness
-            if bg_brightness < 64
-              assign shadow_size = 4
-            else
-              assign shadow_size = 2
-            endif
-          %}
-          <span
-            class="icon-flag"
-            style="
-              background-image: url({{ localization.country | image_url: width: 32 }});
-              --size-shadow: {{ shadow_size }}px;
-              --color-shadow: rgb(var(--color-foreground-rgb) / var(--opacity-30-60));
-            "
-          ></span>
-        {%- endif -%}
-        <span class="currency-code" data-testid="localization-currency-code">
-          {{- localization.country.currency.iso_code -}}
-        </span>
-      {%- endif -%}
+      <span
+        class="icon-flag"
+        style="background-image: url({{- localization.country | image_url: width: 32 }});"
+      ></span>
 
-      <span class="visually-hidden">
+      <span class="currency-code" data-testid="localization-currency-code">
+        {{- localization.country.currency.iso_code -}}
+      </span>
+
+      <span class="visually-hidden" data-testid="localization-visually-hidden">
         {{- 'accessibility.localization_region_and_language' | t -}}
       </span>
 
@@ -80,7 +63,7 @@
     </button>
 
     <div
-      id="{{ controls_id }}"
+      id="dropdown-localization-results-{{ localization_form_id }}"
       class="localization-wrapper right-bound color-{{ settings.popover_color_scheme }}"
       hidden
       ref="panel"
@@ -90,8 +73,8 @@
         show_language: show_language,
         localization_style: 'dropdown',
         form_style: form_style,
-        form_id: form_id
+        form_id: localization_form_id
       %}
     </div>
   </dropdown-localization-component>
-{% endif %}
+{%- endif -%}

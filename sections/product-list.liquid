@@ -1,5 +1,3 @@
-
-
 {% liquid
   assign max_items = section.settings.max_products
 %}
@@ -881,4 +879,836 @@
     }
   ]
 }
-{% endschema %}
+{% endschema %} 
+
+
+{% comment %} {% liquid
+  assign max_items = section.settings.max_products
+%}
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<div
+  data-testid="product-list"
+  class="
+    section
+    section--{{ section.settings.section_width }}
+    color-{{ section.settings.color_scheme }}
+    section-resource-list
+    spacing-style
+    gap-style
+  "
+  style="
+    {% render 'spacing-style', settings: section.settings %}
+    {% render 'gap-style', value: section.settings.gap %}
+  "
+>
+  <div class="section-resource-list__header">
+    {%- content_for 'block', type: '_product-list-content', id: 'static-header' -%}
+  </div>
+
+  {% capture list_items %}
+    {% if section.settings.collection != blank and shop.products_count != 0 %}
+      {% paginate section.settings.collection.products by max_items %}
+        {% for product in section.settings.collection.products limit: max_items %}
+
+          {%- comment -%}
+            Detect color option index once per product so the swatch
+            block below knows which option position holds the color value.
+          {%- endcomment -%}
+          {%- assign pcs_color_index = nil -%}
+          {%- for option in product.options -%}
+            {%- assign _opt = option | downcase | strip -%}
+            {%- if _opt == 'color' or _opt == 'colour' -%}
+              {%- assign pcs_color_index = forloop.index0 -%}
+              {%- break -%}
+            {%- endif -%}
+          {%- endfor -%}
+
+          {%- comment -%}
+            .pcs-card-shell wraps BOTH the _product-card block AND the swatch
+            row. This is the critical fix: the swatches are a child of the
+            same container as the card, so visibility/display on the shell
+            affects both together. The shell itself takes the slot that
+            .resource-list__item previously occupied.
+          {%- endcomment -%}
+          <div class="resource-list__item pcs-card-shell">
+
+            {%- comment -%} ── Inner wrapper the card block renders into ── {%- endcomment -%}
+            <div class="pcs-card-inner">
+              {% # theme-check-disable UniqueStaticBlockId %}
+                {% content_for 'block', type: '_product-card', id: 'static-product-card', closest.product: product %}
+              {% # theme-check-enable UniqueStaticBlockId %}
+            </div>
+
+            {%- comment -%}── COLOR SWATCHES ─────────────────────────────────────────────{%- endcomment -%}
+            {%- if pcs_color_index != nil -%}
+              {%- assign pcs_seen = '|' -%}
+              {%- assign pcs_swatch_count = 0 -%}
+              {%- for variant in product.variants -%}
+                {%- assign _cv  = variant.options[pcs_color_index] -%}
+                {%- assign _key = _cv | downcase | strip | replace: ' ', '-' | replace: '/', '-' | replace: "'", '' -%}
+                {%- assign _del = '|' | append: _key | append: '|' -%}
+                {%- unless pcs_seen contains _del -%}
+                  {%- assign pcs_swatch_count = pcs_swatch_count | plus: 1 -%}
+                  {%- assign pcs_seen = pcs_seen | append: _key | append: '|' -%}
+                {%- endunless -%}
+              {%- endfor -%}
+
+              {%- if pcs_swatch_count > 1 -%}
+                {%- comment -%}
+                  Only render the swatch row when there are 2+ distinct colors.
+                  A single-color product needs no selector.
+                {%- endcomment -%}
+                {%- assign pcs_seen = '|' -%}
+                <div
+                  class="pcs-swatches"
+                  data-product-id="{{ product.id }}"
+                  aria-label="Color options for {{ product.title | escape }}"
+                  role="group"
+                >
+                  {%- for variant in product.variants -%}
+                    {%- assign _cv    = variant.options[pcs_color_index] -%}
+                    {%- assign _key   = _cv | downcase | strip | replace: ' ', '-' | replace: '/', '-' | replace: "'", '' -%}
+                    {%- assign _del   = '|' | append: _key | append: '|' -%}
+                    {%- unless pcs_seen contains _del -%}
+                      {%- assign pcs_seen = pcs_seen | append: _key | append: '|' -%}
+
+                      {%- comment -%}
+                        Prefer the variant's own featured image; fall back to
+                        product featured image. Always generate a width-800 URL
+                        so the swap never loads a gigantic original.
+                      {%- endcomment -%}
+                      {%- if variant.featured_image -%}
+                        {%- assign _img = variant.featured_image | image_url: width: 800 -%}
+                      {%- else -%}
+                        {%- assign _img = product.featured_image | image_url: width: 800 -%}
+                      {%- endif -%}
+
+                      <button
+                        class="pcs-swatch{% if forloop.first %} pcs-swatch--active{% endif %}"
+                        data-variant-id="{{ variant.id }}"
+                        data-image-src="{{ _img }}"
+                        data-color="{{ _cv | escape }}"
+                        data-color-key="{{ _key }}"
+                        title="{{ _cv | escape }}"
+                        aria-label="{{ _cv | escape }}"
+                        aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+                        type="button"
+                      ></button>
+                    {%- endunless -%}
+                  {%- endfor -%}
+                </div>
+              {%- endif -%}
+            {%- endif -%}
+            {%- comment -%}── END COLOR SWATCHES ────────────────────────────────────────────{%- endcomment -%}
+
+          </div><!-- /.pcs-card-shell -->
+
+          {% unless forloop.last %}
+            <!--@list/split-->
+          {% endunless %}
+        {% endfor %}
+      {% endpaginate %}
+
+    {% else %}
+      {% for i in (1..max_items) %}
+        <div class="resource-list__item pcs-card-shell">
+          <div class="pcs-card-inner">
+            {% # theme-check-disable UniqueStaticBlockId %}
+              {% content_for 'block', type: '_product-card', id: 'static-product-card', closest.product: null %}
+            {% # theme-check-enable UniqueStaticBlockId %}
+          </div>
+        </div>
+        {% unless forloop.last %}<!--@list/split-->{% endunless %}
+      {% endfor %}
+    {% endif %}
+  {% endcapture %}
+
+  {% liquid
+    assign list_items_array = list_items | strip | split: '<!--@list/split-->'
+  %}
+
+  {% render 'resource-list',
+    list_items: list_items,
+    list_items_array: list_items_array,
+    settings: section.settings,
+    slide_count: max_items,
+    content_type: 'products',
+    test_id: 'resource-list-grid'
+  %}
+
+  <div
+    class="section-resource-list__content"
+    style="--horizontal-alignment: {{ section.settings.horizontal_alignment }};"
+  >
+    {%- content_for 'blocks' -%}
+  </div>
+</div>
+
+<style>
+  /* ── Shell: the true card unit ───────────────────────────────────────────── */
+  .pcs-card-shell {
+    display: flex;
+    flex-direction: column;
+    /* Inherit whatever height the grid/carousel assigns to .resource-list__item */
+    height: 100%;
+  }
+
+  /*
+   * Inner card wrapper grows to fill all available space so the product
+   * image + info take the expected proportion regardless of swatch row height.
+   */
+  .pcs-card-inner {
+    flex: 1 1 auto;
+    min-height: 0; /* prevent overflow in strict height contexts */
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Swatch row ─────────────────────────────────────────────────────────── */
+  .pcs-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    /* Sits naturally below the card content */
+    padding: 8px 5px 4px !important;
+    flex-shrink: 0;
+    overflow: visible;
+  }
+
+  /* ── Individual swatch circle ───────────────────────────────────────────── */
+  .pcs-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    /* Subtle border so light-colored swatches are visible on white bg */
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    outline: none;
+    background-image: none !important; /* color always set via JS */
+    vertical-align: middle;
+  }
+
+  .pcs-swatch:hover {
+    transform: scale(1.18);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.28);
+  }
+
+  .pcs-swatch:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  /* Selected state: white gap + dark outer ring */
+  .pcs-swatch--active {
+    transform: none;
+    box-shadow:
+      0 0 0 2px #ffffff,
+      0 0 0 3.5px rgba(0, 0, 0, 0.65),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+  }
+
+  /* CSS tooltip (progressive enhancement) */
+  .pcs-swatch::after {
+    content: attr(title);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.78);
+    color: #fff;
+    font-size: 11px;
+    line-height: 1.3;
+    white-space: nowrap;
+    padding: 3px 7px;
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 30;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+  }
+
+  .pcs-swatch:hover::after {
+    opacity: 1;
+  }
+</style>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── Curated color name → CSS hex ─────────────────────────────────────────
+     Keys match the data-color-key slug (lowercase, spaces/slashes → hyphens).
+     JS only needs this as a fallback; the real source of truth is Shopify's
+     variant data rendered by Liquid above.                                    */
+  var COLOR_MAP = {
+    'black':'#111111','white':'#FFFFFF','off-white':'#F8F5F0','off-white-2':'#F8F5F0',
+    'ivory':'#FFFFF0','cream':'#FFFDD0','eggshell':'#F0EAD6','beige':'#F5F5DC',
+    'sand':'#C2B280','oatmeal':'#E4D5C0','linen':'#FAF0E6','ecru':'#C2B280',
+    'grey':'#9E9E9E','gray':'#9E9E9E','light-grey':'#D3D3D3','light-gray':'#D3D3D3',
+    'silver':'#C0C0C0','charcoal':'#36454F','dark-grey':'#555555','dark-gray':'#555555',
+    'slate':'#708090','stone':'#928E85','pebble':'#A8A39D','heather':'#A9A9A9',
+    'brown':'#8B4513','chocolate':'#7B3F00','cognac':'#9A4731','camel':'#C19A6B',
+    'tan':'#D2B48C','taupe':'#483C32','mocha':'#6B3A2A','espresso':'#5B2C1E','khaki':'#BDB76B',
+    'red':'#CC2222','crimson':'#DC143C','scarlet':'#FF2400','burgundy':'#800020',
+    'wine':'#722F37','oxblood':'#800000','blush':'#FFB6C1','rose':'#FF007F',
+    'dusty-rose':'#DCAE96','pink':'#FF69B4','hot-pink':'#FF1493','light-pink':'#FFB6C1',
+    'ballet-pink':'#F0AABF','mauve':'#C07A8E',
+    'orange':'#FF8C00','rust':'#B7410E','terracotta':'#E2725B','coral':'#FF7F50',
+    'peach':'#FFCBA4','apricot':'#FBCEB1','burnt-orange':'#CC5500','pumpkin':'#FF7518',
+    'yellow':'#FFD700','lemon':'#FFF44F','mustard':'#FFDB58','gold':'#FFD700',
+    'champagne':'#F7E7CE','butter':'#FFFACD',
+    'green':'#2E8B57','olive':'#808000','sage':'#87A878','mint':'#98FF98',
+    'emerald':'#50C878','forest':'#228B22','forest-green':'#228B22',
+    'hunter-green':'#355E3B','army-green':'#4B5320','moss':'#8A9A5B',
+    'lime':'#32CD32','grass':'#7CFC00',
+    'blue':'#1A56DB','sky-blue':'#87CEEB','powder-blue':'#B0D4E8','baby-blue':'#89CFF0',
+    'cornflower':'#6495ED','cornflower-blue':'#6495ED','denim':'#1560BD',
+    'royal':'#4169E1','royal-blue':'#4169E1','cobalt':'#0047AB','cobalt-blue':'#0047AB',
+    'navy':'#001F5B','navy-blue':'#001F5B','midnight':'#191970','midnight-blue':'#191970',
+    'teal':'#008080','turquoise':'#40E0D0','aqua':'#00FFFF','indigo':'#4B0082',
+    'steel-blue':'#4682B4','ice-blue':'#D6EAF8',
+    'purple':'#7B2D8B','violet':'#EE82EE','lavender':'#E6E6FA','lilac':'#C8A2C8',
+    'plum':'#8E4585','berry':'#8B0050','grape':'#6F2DA8','orchid':'#DA70D6',
+    'rose-gold':'#B76E79','bronze':'#CD7F32','copper':'#B87333'
+  };
+
+  /* Resolve a color name to a CSS value using map → CSS probe → HSL hash */
+  function resolveColor(name, key) {
+    if (COLOR_MAP[key])  return COLOR_MAP[key];
+    var n = (name || '').toLowerCase().trim();
+    if (COLOR_MAP[n])    return COLOR_MAP[n];
+    /* CSS named-color probe */
+    var el = document.createElement('span');
+    el.style.backgroundColor = n;
+    if (el.style.backgroundColor) return n;
+    /* HSL hash fallback — always produces a unique, pleasant swatch */
+    var h = 0;
+    for (var i = 0; i < name.length; i++) h = (name.charCodeAt(i) + ((h << 5) - h)) | 0;
+    return 'hsl(' + (Math.abs(h) % 360) + ',42%,55%)';
+  }
+
+  /*
+   * ── swapImage ─────────────────────────────────────────────────────────────
+   * Cross-fades the hero product image inside a card shell to newSrc.
+   *
+   * Shopify themes render images in several ways:
+   *   1. Plain <img src="…">
+   *   2. <picture><source srcset="…"><img></picture>
+   *   3. Lazy-loaded: <img data-src="…" data-srcset="…" src="placeholder">
+   *
+   * We handle all three and clear lazy-loader attributes so the observer
+   * cannot revert our swap when it fires.
+   */
+  function swapImage(shell, newSrc) {
+    if (!newSrc || newSrc === 'null' || newSrc === '') return;
+
+    /* Search inside the card-inner wrapper only — never bleed into swatches */
+    var inner = shell.querySelector('.pcs-card-inner') || shell;
+
+    var img = inner.querySelector(
+      '[data-product-image], ' +
+      '.product-card__image img, ' +
+      '.card__media img, ' +
+      '.product__media img, ' +
+      'figure img, ' +
+      '.media img, ' +
+      'a img, ' +
+      'img'
+    );
+    if (!img) return;
+
+    /* Fade out */
+    img.style.transition = 'opacity 0.2s ease';
+    img.style.opacity    = '0';
+
+    setTimeout(function () {
+      /* ① <picture><source> */
+      var picture = img.closest('picture');
+      if (picture) {
+        picture.querySelectorAll('source').forEach(function (s) {
+          s.srcset = newSrc;
+          s.removeAttribute('data-srcset');
+        });
+      }
+
+      /* ② <img> src + srcset */
+      img.src    = newSrc;
+      img.srcset = newSrc;
+
+      /* ③ Disable Shopify / lazysizes lazy-loader so it can't revert us */
+      if (img.dataset) {
+        img.dataset.src    = newSrc;
+        img.dataset.srcset = newSrc;
+      }
+      img.removeAttribute('loading'); /* remove native lazy if present */
+
+      /* Fade back in */
+      img.style.opacity = '1';
+    }, 100);
+  }
+
+  /*
+   * ── updateVariantLink ─────────────────────────────────────────────────────
+   * Rewrites ?variant= on the product anchor so the PDP opens pre-selected.
+   */
+  function updateVariantLink(shell, variantId) {
+    if (!variantId) return;
+    var inner = shell.querySelector('.pcs-card-inner') || shell;
+    var link  = inner.querySelector('a[href*="/products/"]');
+    if (!link) return;
+    try {
+      var url = new URL(link.href, window.location.origin);
+      url.searchParams.set('variant', variantId);
+      link.href = url.toString();
+    } catch (_) {}
+  }
+
+  /*
+   * ── initSwatches ──────────────────────────────────────────────────────────
+   * Paints swatch backgrounds and wires click handlers.
+   * data-pcs-init guard makes repeated calls safe.
+   */
+  function initSwatches(root) {
+    root = root || document;
+
+    root.querySelectorAll('.pcs-swatches:not([data-pcs-init])').forEach(function (container) {
+      container.setAttribute('data-pcs-init', '1');
+
+      /* Paint each swatch its resolved color */
+      container.querySelectorAll('.pcs-swatch').forEach(function (swatch) {
+        swatch.style.backgroundImage = 'none';
+        swatch.style.backgroundColor = resolveColor(
+          swatch.getAttribute('data-color')     || '',
+          swatch.getAttribute('data-color-key') || ''
+        );
+      });
+
+      /* Delegated click on the whole row */
+      container.addEventListener('click', function (e) {
+        var swatch = e.target.closest('.pcs-swatch');
+        if (!swatch) return;
+
+        /* Move active ring */
+        container.querySelectorAll('.pcs-swatch').forEach(function (s) {
+          s.classList.remove('pcs-swatch--active');
+          s.setAttribute('aria-pressed', 'false');
+        });
+        swatch.classList.add('pcs-swatch--active');
+        swatch.setAttribute('aria-pressed', 'true');
+
+        /* Walk up to the shell (not just .resource-list__item) */
+        var shell = container.closest('.pcs-card-shell');
+        if (shell) {
+          swapImage(shell, swatch.getAttribute('data-image-src'));
+          updateVariantLink(shell, swatch.getAttribute('data-variant-id'));
+        }
+      });
+    });
+  }
+
+  /* ── Bootstrap ──────────────────────────────────────────────────────────── */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { initSwatches(); });
+  } else {
+    initSwatches();
+  }
+
+  /* Shopify theme editor live-reload hooks */
+  document.addEventListener('shopify:section:load',  function (e) { initSwatches(e.target); });
+  document.addEventListener('shopify:block:select',  function (e) {
+    initSwatches(e.target.closest('[data-testid="product-list"]') || document);
+  });
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "t:names.product_list",
+  "class": "ui-test-product-list",
+  "blocks": [
+    { "type": "@theme" },
+    { "type": "@app" },
+    { "type": "_divider" }
+  ],
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "collection", "id": "collection", "label": "t:settings.collection" },
+    {
+      "type": "select", "id": "layout_type", "label": "t:settings.layout_type",
+      "options": [
+        { "value": "grid",      "label": "t:options.grid" },
+        { "value": "carousel",  "label": "t:options.carousel" },
+        { "value": "editorial", "label": "t:options.editorial" }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "checkbox", "id": "carousel_on_mobile",
+      "label": "t:settings.carousel_on_mobile", "default": false,
+      "visible_if": "{{ section.settings.layout_type != 'carousel' }}"
+    },
+    { "type": "range", "id": "max_products", "label": "t:settings.product_count", "min": 1, "max": 16, "step": 1, "default": 4 },
+    {
+      "type": "range", "id": "columns", "label": "t:settings.columns",
+      "min": 1, "max": 8, "step": 1, "default": 4,
+      "visible_if": "{{ section.settings.layout_type != 'editorial' }}"
+    },
+    {
+      "type": "select", "id": "mobile_columns", "label": "t:settings.mobile_columns",
+      "options": [
+        { "value": "1", "label": "t:options.one_number" },
+        { "value": "2", "label": "t:options.two_number" }
+      ],
+      "default": "2",
+      "visible_if": "{{ section.settings.layout_type == 'grid' and section.settings.carousel_on_mobile == false }}"
+    },
+    {
+      "type": "select", "id": "mobile_card_size", "label": "t:settings.mobile_columns",
+      "options": [
+        { "value": "60cqw", "label": "t:options.one_number" },
+        { "value": "44cqw", "label": "t:options.two_number" }
+      ],
+      "default": "60cqw",
+      "visible_if": "{{ section.settings.layout_type == 'carousel' or section.settings.carousel_on_mobile == true }}"
+    },
+    {
+      "type": "range", "id": "columns_gap", "label": "t:settings.horizontal_gap",
+      "min": 0, "max": 100, "step": 1, "unit": "px", "default": 8,
+      "visible_if": "{{ section.settings.layout_type == 'grid' or section.settings.layout_type == 'carousel' }}"
+    },
+    {
+      "type": "range", "id": "rows_gap", "label": "t:settings.vertical_gap",
+      "min": 0, "max": 100, "step": 1, "unit": "px", "default": 8,
+      "visible_if": "{{ section.settings.layout_type == 'grid' }}"
+    },
+    {
+      "type": "header", "content": "t:content.carousel_navigation",
+      "visible_if": "{{ section.settings.layout_type == 'carousel' or section.settings.carousel_on_mobile == true }}"
+    },
+    {
+      "type": "select", "id": "icons_style", "label": "t:settings.icon",
+      "options": [
+        { "value": "arrow",         "label": "t:options.arrows" },
+        { "value": "chevron",       "label": "t:options.chevrons" },
+        { "value": "arrows_large",  "label": "t:options.arrows_large" },
+        { "value": "chevron_large", "label": "t:options.chevron_large" },
+        { "value": "none",          "label": "t:options.none" }
+      ],
+      "default": "arrow",
+      "visible_if": "{{ section.settings.layout_type == 'carousel' or section.settings.carousel_on_mobile == true }}"
+    },
+    {
+      "type": "select", "id": "icons_shape", "label": "t:settings.icon_background",
+      "options": [
+        { "value": "none",   "label": "t:options.none" },
+        { "value": "circle", "label": "t:options.circle" },
+        { "value": "square", "label": "t:options.square" }
+      ],
+      "default": "none",
+      "visible_if": "{{ section.settings.icons_style != 'none' and section.settings.layout_type == 'carousel' or section.settings.carousel_on_mobile == true }}"
+    },
+    { "type": "header", "content": "t:content.section_layout" },
+    {
+      "type": "select", "id": "section_width", "label": "t:settings.width",
+      "options": [
+        { "value": "page-width", "label": "t:options.page" },
+        { "value": "full-width", "label": "t:options.full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "select", "id": "horizontal_alignment", "label": "t:settings.alignment",
+      "options": [
+        { "value": "flex-start", "label": "t:options.left" },
+        { "value": "center",     "label": "t:options.center" },
+        { "value": "flex-end",   "label": "t:options.right" }
+      ],
+      "default": "flex-start"
+    },
+    { "type": "range", "id": "gap", "label": "t:settings.gap", "min": 0, "max": 100, "step": 1, "unit": "px", "default": 12 },
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:settings.color_scheme", "default": "scheme-1" },
+    { "type": "header", "content": "t:content.padding" },
+    { "type": "range", "id": "padding-block-start", "label": "t:settings.top",    "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "padding-block-end",   "label": "t:settings.bottom", "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0 }
+  ],
+  "presets": [
+    {
+      "name": "t:names.products_grid",
+      "category": "t:categories.products",
+      "settings": {
+        "collection": "", "max_products": 8, "layout_type": "grid",
+        "carousel_on_mobile": false, "columns": 4, "mobile_columns": "2",
+        "columns_gap": 8, "rows_gap": 24, "icons_style": "arrow",
+        "icons_shape": "none", "section_width": "page-width", "gap": 28,
+        "color_scheme": "scheme-1", "padding-block-start": 48, "padding-block-end": 48
+      },
+      "blocks": {
+        "static-header": {
+          "type": "_product-list-content", "name": "t:names.header", "static": true,
+          "settings": {
+            "content_direction": "row", "vertical_on_mobile": false,
+            "horizontal_alignment": "space-between", "vertical_alignment": "flex-end",
+            "align_baseline": true, "horizontal_alignment_flex_direction_column": "flex-start",
+            "vertical_alignment_flex_direction_column": "center", "gap": 12,
+            "width": "fill", "custom_width": 100, "width_mobile": "fill", "custom_width_mobile": 100,
+            "height": "fit", "custom_height": 100, "inherit_color_scheme": true, "color_scheme": "",
+            "background_media": "none", "video_position": "cover", "background_image_position": "cover",
+            "border": "none", "border_width": 1, "border_opacity": 100, "border_radius": 0,
+            "padding-block-start": 0, "padding-block-end": 0, "padding-inline-start": 0, "padding-inline-end": 0
+          },
+          "blocks": {
+            "product_list_text": {
+              "type": "_product-list-text", "name": "t:names.collection_title",
+              "settings": {
+                "text": "<h3>{{ closest.collection.title }}</h3>", "type_preset": "rte",
+                "font": "var(--font-body--family)", "font_size": "", "line_height": "normal",
+                "letter_spacing": "normal", "case": "none", "wrap": "pretty",
+                "width": "fit-content", "max_width": "normal", "alignment": "left",
+                "padding-block-start": 0, "padding-block-end": 0, "padding-inline-start": 0, "padding-inline-end": 0
+              }
+            },
+            "product_list_button": {
+              "type": "_product-list-button", "name": "t:names.product_list_button",
+              "settings": {
+                "label": "t:text_defaults.view_all_button_label", "open_in_new_tab": false,
+                "style_class": "link", "width": "fit-content", "custom_width": 100,
+                "width_mobile": "fit-content", "custom_width_mobile": 100
+              }
+            }
+          },
+          "block_order": ["product_list_text", "product_list_button"]
+        },
+        "static-product-card": {
+          "type": "_product-card", "name": "t:names.product_card", "static": true,
+          "settings": {
+            "product_card_gap": 4, "inherit_color_scheme": true, "color_scheme": "",
+            "border": "none", "border_width": 1, "border_opacity": 100, "border_radius": 0,
+            "padding-block-start": 0, "padding-block-end": 0, "padding-inline-start": 0, "padding-inline-end": 0
+          },
+          "blocks": {
+            "product-card-gallery": {
+              "type": "_product-card-gallery", "name": "t:names.product_card_media",
+              "settings": {
+                "image_ratio": "adapt", "border": "none", "border_width": 1,
+                "border_opacity": 100, "border_radius": 0,
+                "padding-block-start": 0, "padding-block-end": 0, "padding-inline-start": 0, "padding-inline-end": 0
+              }
+            },
+            "product_title": {
+              "type": "product-title", "name": "t:names.product_title",
+              "settings": {
+                "width": "fit-content", "max_width": "normal", "alignment": "left",
+                "type_preset": "paragraph", "font": "var(--font-body--family)",
+                "font_size": "1rem", "line_height": "normal", "letter_spacing": "normal",
+                "case": "none", "wrap": "pretty", "color": "var(--color-foreground)",
+                "background": false, "background_color": "#00000026", "corner_radius": 0,
+                "padding-block-start": 4, "padding-block-end": 0, "padding-inline-start": 0, "padding-inline-end": 0
+              }
+            },
+            "price": {
+              "type": "price", "name": "t:names.product_price",
+              "settings": {
+                "show_sale_price_first": true, "show_installments": false, "show_tax_info": false,
+                "type_preset": "h6", "width": "100%", "alignment": "left",
+                "font": "var(--font-body--family)", "font_size": "1rem", "line_height": "normal",
+                "letter_spacing": "normal", "case": "none", "color": "var(--color-foreground)",
+                "padding-block-start": 0, "padding-block-end": 0, "padding-inline-start": 0, "padding-inline-end": 0
+              }
+            }
+          },
+          "block_order": ["product-card-gallery", "product_title", "price"]
+        }
+      },
+      "block_order": []
+    },
+    {
+      "name": "t:names.products_carousel",
+      "category": "t:categories.products",
+      "settings": {
+        "collection": "", "max_products": 6, "layout_type": "carousel",
+        "carousel_on_mobile": false, "columns": 4, "mobile_columns": "2",
+        "columns_gap": 8, "rows_gap": 24, "icons_style": "arrow",
+        "icons_shape": "circle", "section_width": "page-width", "gap": 28,
+        "color_scheme": "scheme-1", "padding-block-start": 48, "padding-block-end": 48
+      },
+      "blocks": {
+        "static-header": {
+          "type": "_product-list-content", "name": "t:names.header", "static": true,
+          "settings": {
+            "content_direction": "row", "vertical_on_mobile": false,
+            "horizontal_alignment": "space-between", "vertical_alignment": "flex-end",
+            "align_baseline": true, "horizontal_alignment_flex_direction_column": "flex-start",
+            "vertical_alignment_flex_direction_column": "center", "gap": 12,
+            "width": "fill", "custom_width": 100, "width_mobile": "fill", "custom_width_mobile": 100,
+            "height": "fit", "custom_height": 100, "inherit_color_scheme": true, "color_scheme": "",
+            "background_media": "none", "video_position": "cover", "background_image_position": "cover",
+            "border": "none", "border_width": 1, "border_opacity": 100, "border_radius": 0,
+            "padding-block-start": 0, "padding-block-end": 0, "padding-inline-start": 0, "padding-inline-end": 0
+          },
+          "blocks": {
+            "product_list_text": {
+              "type": "_product-list-text", "name": "t:names.collection_title",
+              "settings": {
+                "text": "<h2>{{ closest.collection.title }}</h2>", "type_preset": "h3",
+                "font": "var(--font-body--family)", "font_size": "", "line_height": "normal",
+                "letter_spacing": "normal", "case": "none", "wrap": "pretty",
+                "width": "fit-content", "max_width": "normal", "alignment": "left",
+                "padding-block-start": 0, "padding-block-end": 0, "padding-inline-start": 0, "padding-inline-end": 0
+              }
+            },
+            "product_list_button": {
+              "type": "_product-list-button", "name": "t:names.product_list_button",
+              "settings": {
+                "label": "t:text_defaults.view_all_button_label", "open_in_new_tab": false,
+                "style_class": "link", "width": "fit-content", "custom_width": 100,
+                "width_mobile": "fit-content", "custom_width_mobile": 100
+              }
+            }
+          },
+          "block_order": ["product_list_text", "product_list_button"]
+        },
+        "static-product-card": {
+          "type": "_product-card", "name": "t:names.product_card", "static": true,
+          "settings": {
+            "product_card_gap": 4, "inherit_color_scheme": true, "color_scheme": "",
+            "border": "none", "border_width": 1, "border_opacity": 100, "border_radius": 0,
+            "padding-block-start": 0, "padding-block-end": 0, "padding-inline-start": 0, "padding-inline-end": 0
+          },
+          "blocks": {
+            "product-card-gallery": {
+              "type": "_product-card-gallery", "name": "t:names.product_card_media",
+              "settings": {
+                "image_ratio": "adapt", "border": "none", "border_width": 1,
+                "border_opacity": 100, "border_radius": 0,
+                "padding-block-start": 0, "padding-block-end": 0, "padding-inline-start": 0, "padding-inline-end": 0
+              }
+            },
+            "product_title": {
+              "type": "product-title", "name": "t:names.product_title",
+              "settings": {
+                "width": "fit-content", "max_width": "normal", "alignment": "left",
+                "type_preset": "paragraph", "font": "var(--font-body--family)",
+                "font_size": "1rem", "line_height": "normal", "letter_spacing": "normal",
+                "case": "none", "wrap": "pretty", "color": "var(--color-foreground)",
+                "background": false, "background_color": "#00000026", "corner_radius": 0,
+                "padding-block-start": 4, "padding-block-end": 0, "padding-inline-start": 0, "padding-inline-end": 0
+              }
+            },
+            "price": {
+              "type": "price", "name": "t:names.product_price",
+              "settings": {
+                "show_sale_price_first": true, "show_installments": false, "show_tax_info": false,
+                "type_preset": "h6", "width": "100%", "alignment": "left",
+                "font": "var(--font-body--family)", "font_size": "1rem", "line_height": "normal",
+                "letter_spacing": "normal", "case": "none", "color": "var(--color-foreground)",
+                "padding-block-start": 0, "padding-block-end": 0, "padding-inline-start": 0, "padding-inline-end": 0
+              }
+            }
+          },
+          "block_order": ["product-card-gallery", "product_title", "price"]
+        }
+      },
+      "block_order": []
+    },
+    {
+      "name": "t:names.products_editorial",
+      "category": "t:categories.products",
+      "settings": {
+        "collection": "", "layout_type": "editorial", "carousel_on_mobile": false,
+        "max_products": 4, "columns": 4, "mobile_columns": "2",
+        "columns_gap": 8, "rows_gap": 24, "icons_style": "arrow", "icons_shape": "none",
+        "section_width": "page-width", "horizontal_alignment": "flex-start",
+        "gap": 64, "color_scheme": "scheme-1", "padding-block-start": 48, "padding-block-end": 48
+      },
+      "blocks": {
+        "static-header": {
+          "type": "_product-list-content", "name": "t:names.header", "static": true,
+          "settings": {
+            "content_direction": "row", "vertical_on_mobile": false,
+            "horizontal_alignment": "space-between", "vertical_alignment": "flex-end",
+            "align_baseline": true, "horizontal_alignment_flex_direction_column": "flex-start",
+            "vertical_alignment_flex_direction_column": "center", "gap": 12,
+            "width": "fill", "custom_width": 100, "width_mobile": "fill", "custom_width_mobile": 100,
+            "height": "fit", "custom_height": 100, "inherit_color_scheme": true, "color_scheme": "",
+            "background_media": "none", "video_position": "cover", "background_image_position": "cover",
+            "border": "none", "border_width": 1, "border_opacity": 100, "border_radius": 0,
+            "padding-block-start": 0, "padding-block-end": 0, "padding-inline-start": 0, "padding-inline-end": 0
+          },
+          "blocks": {
+            "product_list_text": {
+              "type": "_product-list-text", "name": "t:names.collection_title",
+              "settings": {
+                "text": "<h3>{{ closest.collection.title }}</h3>",
+                "width": "fit-content", "max_width": "normal", "alignment": "left",
+                "type_preset": "rte", "font": "var(--font-body--family)", "font_size": "",
+                "line_height": "normal", "letter_spacing": "normal", "case": "none", "wrap": "pretty",
+                "color": "var(--color-foreground)", "background": false, "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 0, "padding-block-end": 0, "padding-inline-start": 0, "padding-inline-end": 0
+              }
+            },
+            "product_list_button": {
+              "type": "_product-list-button", "name": "t:names.product_list_button",
+              "settings": {
+                "label": "t:text_defaults.view_all_button_label", "open_in_new_tab": false,
+                "style_class": "link", "width": "fit-content", "custom_width": 100,
+                "width_mobile": "fit-content", "custom_width_mobile": 100
+              }
+            }
+          },
+          "block_order": ["product_list_text", "product_list_button"]
+        },
+        "static-product-card": {
+          "type": "_product-card", "name": "t:names.product_card", "static": true,
+          "settings": {
+            "product_card_gap": 4, "inherit_color_scheme": true, "color_scheme": "",
+            "border": "none", "border_width": 1, "border_opacity": 100, "border_radius": 0,
+            "padding-block-start": 0, "padding-block-end": 0, "padding-inline-start": 0, "padding-inline-end": 0
+          },
+          "blocks": {
+            "product-card-gallery": {
+              "type": "_product-card-gallery", "name": "t:names.product_card_media",
+              "settings": {
+                "image_ratio": "adapt", "border": "none", "border_width": 1,
+                "border_opacity": 100, "border_radius": 0,
+                "padding-block-start": 0, "padding-block-end": 0, "padding-inline-start": 0, "padding-inline-end": 0
+              }
+            },
+            "product_title": {
+              "type": "product-title", "name": "t:names.product_title",
+              "settings": {
+                "width": "fit-content", "max_width": "normal", "alignment": "left",
+                "type_preset": "paragraph", "font": "var(--font-body--family)",
+                "font_size": "1rem", "line_height": "normal", "letter_spacing": "normal",
+                "case": "none", "wrap": "pretty", "color": "var(--color-foreground)",
+                "background": false, "background_color": "#00000026", "corner_radius": 0,
+                "padding-block-start": 4, "padding-block-end": 0, "padding-inline-start": 0, "padding-inline-end": 0
+              }
+            },
+            "price": {
+              "type": "price", "name": "t:names.product_price",
+              "settings": {
+                "show_sale_price_first": true, "show_installments": false, "show_tax_info": false,
+                "type_preset": "h6", "width": "100%", "alignment": "left",
+                "font": "var(--font-body--family)", "font_size": "1rem", "line_height": "normal",
+                "letter_spacing": "normal", "case": "none", "color": "var(--color-foreground)",
+                "padding-block-start": 0, "padding-block-end": 0, "padding-inline-start": 0, "padding-inline-end": 0
+              }
+            }
+          },
+          "block_order": ["product-card-gallery", "product_title", "price"]
+        }
+      },
+      "block_order": []
+    }
+  ]
+}
+{% endschema %} {% endcomment %}

@@ -85,37 +85,31 @@
     <div
       class="account-button header-actions__action{% if display_style == 'text' %} account-button--text{% endif %} color-{{ settings.popover_color_scheme }}"
     >
-      <a
-        href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}"
-        class="header-actions__action-link"
+      <shopify-account
+        menu="{{ customer_account_menu }}"
         {% if account_actions_style != blank %}
           style="{{ account_actions_style }}"
         {% endif %}
       >
         {% if customer %}
-          <div class="account-button__fallback">
-            <span class="{% if display_style != 'icon' %}desktop:hidden{% endif %}" aria-hidden="true">
-              {{ account_icon }}
-            </span>
-            <span class="account-button__text header-actions__text-style {% if display_style == 'icon' %}hidden{% else %}mobile:hidden{% endif %}">
-              {{ 'content.account_title' | t }}
-            </span>
-          </div>
+          <div class="account-button__fallback"></div>
         {% else %}
           <span
+            slot="signed-out-avatar"
             class="account-button__text header-actions__text-style {% if display_style == 'icon' %}hidden{% else %}mobile:hidden{% endif %}"
           >
             {{ 'content.account_title' | t }}
           </span>
 
           <span
+            slot="signed-out-avatar"
             class="{% if display_style != 'icon' %}desktop:hidden{% endif %}"
             aria-hidden="true"
           >
             {{ account_icon }}
           </span>
         {% endif %}
-      </a>
+      </shopify-account>
     </div>
   {% endif %}
 
@@ -292,6 +286,32 @@
     color: var(--color-account-icon);
     transition: color var(--header-content-transition-timing);
     -webkit-font-smoothing: antialiased;
+  }
+
+  shopify-account {
+    --shopify-account-font-heading: var(--font-heading--family);
+    --shopify-account-font-heading-weight: var(--font-heading--weight);
+    --shopify-account-font-body: var(--font-body--family);
+    --shopify-account-font-body-weight: var(--font-body--weight);
+    --shopify-account-radius-base: var(--style-border-radius-popover);
+    --shopify-account-radius-button: var(--style-border-radius-buttons-primary);
+    --shopify-account-radius-button-small: var(--style-border-radius-buttons-primary);
+    --shopify-account-radius-input: var(--style-border-radius-buttons-primary);
+    --shopify-account-color-background: var(--color-background);
+    --shopify-account-color-text: var(--color-foreground);
+    --shopify-account-color-accent: var(--color-primary-button-background);
+    --shopify-account-color-accent-text: var(--color-primary-button-text);
+    --shopify-account-dialog-position-top: var(--account-offset-top);
+
+    &:not(:defined) {
+      min-width: 44px;
+      height: 44px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* Match the line height of the other buttons */
+      line-height: normal;
+    }
   }
 
   .account-button__fallback {
@@ -518,8 +538,7 @@
 
   header-actions {
     display: flex;
-    gap: .5rem;
-    align-items: center;
+
     @media screen and (max-width: 749px) {
       justify-self: flex-end;
     }
@@ -552,9 +571,6 @@
     --cart-bubble-right: 2.5px;
 
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   .header-actions__cart-icon .cart-bubble {
@@ -576,8 +592,6 @@
     border-radius: var(--style-border-radius-buttons-primary);
     aspect-ratio: auto;
     padding: var(--cart-padding);
-    position: relative !important;
-    inset: 0 !important;
   }
 
   .cart-drawer__heading .cart-bubble[data-maintain-ratio] {

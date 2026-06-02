@@ -43,9 +43,86 @@
       }
     },
     "header_section": {
-      "type": "custom-header",
+      "type": "header",
+      "blocks": {
+        "header-logo": {
+          "type": "_header-logo",
+          "disabled": true,
+          "static": true,
+          "settings": {
+            "hide_logo_on_home_page": false,
+            "padding-block-start": 0,
+            "padding-block-end": 0
+          },
+          "blocks": {}
+        },
+        "header-menu": {
+          "type": "_header-menu",
+          "disabled": true,
+          "static": true,
+          "settings": {
+            "menu": "shop-all",
+            "color_scheme": "",
+            "type_font_primary_size": "0.875rem",
+            "menu_font_style": "inverse",
+            "type_font_primary_link": "body",
+            "type_case_primary_link": "none",
+            "menu_style": "featured_products",
+            "featured_products_aspect_ratio": "4 / 5",
+            "featured_collections_aspect_ratio": "16 / 9",
+            "image_border_radius": 0,
+            "sidebar_accordion": true,
+            "sidebar_accordion_expand_first": true,
+            "sidebar_dividers": false,
+            "navigation_bar": false,
+            "color_scheme_navigation_bar": "",
+            "drawer_accordion": true,
+            "drawer_accordion_expand_first": false,
+            "drawer_dividers": false
+          },
+          "blocks": {}
+        }
+      },
+      "disabled": true,
       "settings": {
-        "logo_image": "shopify://shop_images/uniquely-you.png",
+        "logo_position": "center",
+        "menu_position": "left",
+        "menu_row": "top",
+        "customer_account_menu": "customer-account-main-menu",
+        "show_search": true,
+        "search_position": "left",
+        "search_row": "top",
+        "show_country": true,
+        "country_selector_style": true,
+        "show_language": true,
+        "localization_font": "heading",
+        "localization_font_size": "0.875rem",
+        "localization_position": "right",
+        "localization_row": "top",
+        "section_width": "page-width",
+        "section_height": "standard",
+        "enable_sticky_header": "always",
+        "divider_width": 0,
+        "divider_size": "page-width",
+        "border_width": 0,
+        "actions_display_style": "icon",
+        "actions_font_size": "0.875rem",
+        "actions_font": "body",
+        "actions_text_case": "none",
+        "color_scheme_top": "scheme-b64f2591-8caf-4505-a026-a057b9b7a25b",
+        "color_scheme_bottom": "",
+        "color_scheme_transparent": "scheme-6",
+        "enable_transparent_header_home": true,
+        "home_color_scheme": "inverse",
+        "enable_transparent_header_product": false,
+        "product_color_scheme": "default",
+        "enable_transparent_header_collection": false,
+        "collection_color_scheme": "default"
+      }
+    },
+    "custom_header": {
+      "type": "custom_header",
+      "settings": {
         "logo_display": "image_and_text",
         "logo_max_width": 120,
         "menu": "shop-all",
@@ -59,7 +136,9 @@
         "social_facebook": "https://www.facebook.com/share/1UhB1r6KRp/",
         "social_instagram": "https://www.instagram.com/uniquelyyou.vip/",
         "social_tiktok": "https://www.tiktok.com/@uniquely_youvip?_r=1&_t=ZT-96O69J1GPXx",
-        "social_pinterest": "",
+        "social_pinterest": "https://www.tiktok.com/@uniquely_youvip?_r=1&_t=ZT-96O69J1GPXx",
+        "social_youtube": "shopify://products/annoyingly-happy-labrador-puppy",
+        "social_twitter": "shopify://products/annoyingly-happy-golden-retriever-1",
         "show_country": true,
         "country_selector_style": true,
         "show_language": true,
@@ -71,15 +150,18 @@
         "menu_style": "text",
         "image_border_radius": 4,
         "color_scheme": "scheme-1",
+        "header_background_color": "#ffffff",
+        "search_trigger_background_color": "#ffe8dd",
         "enable_transparent_home": false,
         "sticky_style": "glassmorphism",
         "actions_display_style": "icon",
-        "enable_sticky_header": "always"
+        "enable_sticky_header": "scroll-up"
       }
     }
   },
   "order": [
     "header_announcements_9jGBFp",
-    "header_section"
+    "header_section",
+    "custom_header"
   ]
 }

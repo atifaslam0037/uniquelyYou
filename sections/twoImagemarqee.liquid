@@ -1,0 +1,736 @@
+{% comment %}
+  Section: Dual Marquee Panels
+  - Two panels side by side, each with a full background image
+  - Each panel has its own independent infinite-loop marquee of logo badges
+  - No text or buttons below the cards
+{% endcomment %}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --panel-gap: {{ section.settings.panel_gap }}px;
+    --section-bg: {{ section.settings.section_bg_color }};
+    --section-pt: {{ section.settings.section_padding_top }}px;
+    --section-pb: {{ section.settings.section_padding_bottom }}px;
+    --section-px: {{ section.settings.section_horizontal_padding }}px;
+    --card-height: {{ section.settings.card_height }}px;
+    --card-height-mobile: {{ section.settings.card_height_mobile }}px;
+    --card-shadow: {{ section.settings.card_shadow }};
+    --badge-size: {{ section.settings.badge_size }}px;
+    --badge-size-mobile: {{ section.settings.badge_size_mobile }}px;
+    --badge-gap: {{ section.settings.badge_gap }}px;
+    --marquee-speed-left: {{ section.settings.marquee_speed_left }}s;
+    --marquee-speed-right: {{ section.settings.marquee_speed_right }}s;
+    --marquee-vpad: {{ section.settings.marquee_vertical_padding }}px;
+  }
+
+  /* ── Section wrapper ── */
+  .dmp-section-{{ section.id }} {
+    background-color: var(--section-bg);
+    padding: var(--section-pt) var(--section-px) var(--section-pb);
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  /* ── Two-column panel grid ── */
+  .dmp-grid-{{ section.id }} {
+    display: flex;
+    flex-direction: row;
+    gap: var(--panel-gap);
+    align-items: stretch;
+    width: 100%;
+  }
+
+  /* ── Individual card ── */
+  .dmp-card-{{ section.id }} {
+    flex: 1 1 0;
+    min-width: 0;
+    position: relative;
+    overflow: hidden;
+    height: var(--card-height);
+    box-shadow: var(--card-shadow);
+  }
+
+  /* ── Background image fills card fully ── */
+  .dmp-card-{{ section.id }} .dmp-card__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+    z-index: 0;
+  }
+
+  /* placeholder SVG when no image set */
+  .dmp-card-{{ section.id }} .dmp-card__bg-placeholder {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  .dmp-card-{{ section.id }} .dmp-card__bg-placeholder svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* optional dark overlay on top of bg image */
+  .dmp-card-{{ section.id }} .dmp-card__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* ── Marquee container sits over the image ── */
+  .dmp-marquee-wrap-{{ section.id }} {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    padding: var(--marquee-vpad) 0;
+    pointer-events: none;
+    width: 100%;
+  }
+
+  .dmp-marquee-wrap-{{ section.id }}.dmp-pos-top    {
+    top: {{ section.settings.marquee_offset_top }}px;
+  }
+  .dmp-marquee-wrap-{{ section.id }}.dmp-pos-center {
+    top: 40%;
+    transform: translateY(-50%);
+    width: 30%; 
+    margin: 0 auto;
+  }
+  .dmp-marquee-wrap-{{ section.id }}.dmp-pos-bottom {
+    bottom: {{ section.settings.marquee_offset_bottom }}px;
+  }
+
+  /* edge fade */
+  {% if section.settings.edge_fade %}
+  .dmp-marquee-wrap-{{ section.id }}::before,
+  .dmp-marquee-wrap-{{ section.id }}::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 60px;
+    z-index: 3;
+    pointer-events: none;
+  }
+  .dmp-marquee-wrap-{{ section.id }}::before {
+    left: 0;
+    background: linear-gradient(to right, {{ section.settings.fade_color }}ee, transparent);
+  }
+  .dmp-marquee-wrap-{{ section.id }}::after {
+    right: 0;
+    background: linear-gradient(to left, {{ section.settings.fade_color }}ee, transparent);
+  }
+  {% endif %}
+
+  /* ── Scrolling track ── */
+  .dmp-marquee-track-{{ section.id }} {
+    display: flex;
+    align-items: center;
+    gap: var(--badge-gap);
+    flex-shrink: 0;
+    will-change: transform;
+    min-width: max-content;
+  }
+
+  /* ── Keyframes ── */
+  @keyframes dmpScrollLeft{{ section.id }} {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @keyframes dmpScrollRight{{ section.id }} {
+    0%   { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+  }
+
+  .dmp-track-left-{{ section.id }} {
+    animation: dmpScrollLeft{{ section.id }} var(--marquee-speed-left) linear infinite;
+    {% if section.settings.marquee_dir_left == 'ltr' %}animation-direction: reverse;{% endif %}
+  }
+
+  .dmp-track-right-{{ section.id }} {
+    animation: dmpScrollRight{{ section.id }} var(--marquee-speed-right) linear infinite;
+    {% if section.settings.marquee_dir_right == 'rtl' %}animation-direction: reverse;{% endif %}
+  }
+
+  {% if section.settings.pause_on_hover %}
+  .dmp-card-{{ section.id }}:hover .dmp-marquee-track-{{ section.id }} {
+    animation-play-state: paused;
+  }
+  {% endif %}
+
+  /* ── Badge / Logo item ── */
+  .dmp-badge-{{ section.id }} {
+    width: var(--badge-size);
+    height: var(--badge-size);
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dmp-badge-{{ section.id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .dmp-badge-{{ section.id }}.dmp-badge--fallback {
+    background: {{ section.settings.fallback_badge_bg }};
+    border: 2px solid {{ section.settings.fallback_badge_border }};
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .dmp-badge-{{ section.id }} .dmp-badge__title {
+    font-size: calc(var(--badge-size) * 0.17);
+    font-weight: 700;
+    color: {{ section.settings.fallback_badge_text }};
+    line-height: 1.1;
+    display: block;
+  }
+
+  .dmp-badge-{{ section.id }} .dmp-badge__sub {
+    font-size: calc(var(--badge-size) * 0.14);
+    color: {{ section.settings.fallback_badge_accent }};
+    font-weight: 600;
+    display: block;
+  }
+
+  /* ═══════════════════════════════════════
+     MOBILE — full responsive overrides
+  ═══════════════════════════════════════ */
+  @media screen and (max-width: 767px) {
+
+    /* remove side padding on very small screens so cards fill edge-to-edge */
+    .dmp-section-{{ section.id }} {
+      padding-left: {{ section.settings.section_horizontal_padding | divided_by: 2 }}px;
+      padding-right: {{ section.settings.section_horizontal_padding | divided_by: 2 }}px;
+    }
+
+    /* stack cards vertically */
+    .dmp-grid-{{ section.id }} {
+      flex-direction: column;
+      gap: {{ section.settings.panel_gap | divided_by: 2 }}px;
+    }
+
+    /* full width, mobile height */
+    .dmp-card-{{ section.id }} {
+      flex: none;
+      width: 100%;
+      height: var(--card-height-mobile);
+    }
+
+    /* shrink badges */
+    .dmp-badge-{{ section.id }} {
+      width: var(--badge-size-mobile);
+      height: var(--badge-size-mobile);
+    }
+
+    /* scale badge text with mobile size */
+    .dmp-badge-{{ section.id }} .dmp-badge__title {
+      font-size: calc(var(--badge-size-mobile) * 0.17);
+    }
+    .dmp-badge-{{ section.id }} .dmp-badge__sub {
+      font-size: calc(var(--badge-size-mobile) * 0.14);
+    }
+
+    /* tighten badge gap on mobile */
+    .dmp-marquee-track-{{ section.id }} {
+      gap: calc(var(--badge-gap) * 0.65);
+    }
+
+    /* reduce edge fade width so it doesn't swallow small badges */
+    {% if section.settings.edge_fade %}
+    .dmp-marquee-wrap-{{ section.id }}::before,
+    .dmp-marquee-wrap-{{ section.id }}::after {
+      width: 36px;
+    }
+    {% endif %}
+  }
+</style>
+
+<div class="dmp-section-{{ section.id }}">
+  <div class="dmp-grid-{{ section.id }}">
+
+    {%- comment -%}============ LEFT CARD ============{%- endcomment -%}
+    <div class="dmp-card-{{ section.id }}">
+
+      {%- if section.settings.left_image != blank -%}
+        <img
+          class="dmp-card__bg"
+          src="{{ section.settings.left_image | image_url: width: 1600 }}"
+          alt="{{ section.settings.left_image.alt | escape | default: 'Left panel' }}"
+          loading="eager"
+        >
+      {%- else -%}
+        <div class="dmp-card__bg-placeholder">
+          {{ 'product-1' | placeholder_svg_tag }}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.left_overlay_opacity > 0 -%}
+        <div class="dmp-card__overlay" style="background:{{ section.settings.left_overlay_color }};opacity:{{ section.settings.left_overlay_opacity | divided_by: 100.0 }};"></div>
+      {%- endif -%}
+
+      <div class="dmp-marquee-wrap-{{ section.id }} dmp-pos-{{ section.settings.left_marquee_pos }}">
+        <div class="dmp-marquee-track-{{ section.id }} dmp-track-left-{{ section.id }}">
+          {%- assign left_badges = section.blocks | where: 'type', 'left_logo' -%}
+          {%- if left_badges.size > 0 -%}
+            {%- for _pass in (1..6) -%}
+              {%- for block in left_badges -%}
+                <div class="dmp-badge-{{ section.id }}{% if block.settings.logo_image == blank %} dmp-badge--fallback{% endif %}" {{ block.shopify_attributes }}>
+                  {%- if block.settings.logo_image != blank -%}
+                    <img
+                      src="{{ block.settings.logo_image | image_url: width: 300 }}"
+                      alt="{{ block.settings.logo_image.alt | escape | default: 'Logo' }}"
+                      loading="lazy"
+                    >
+                  {%- else -%}
+                    <span class="dmp-badge__title">{{ block.settings.badge_title | default: 'Uniquely' }}</span>
+                    <span class="dmp-badge__sub">{{ block.settings.badge_subtitle | default: 'You' }}</span>
+                  {%- endif -%}
+                </div>
+              {%- endfor -%}
+            {%- endfor -%}
+          {%- else -%}
+            {%- for i in (1..12) -%}
+              <div class="dmp-badge-{{ section.id }} dmp-badge--fallback">
+                <span class="dmp-badge__title">Uniquely</span>
+                <span class="dmp-badge__sub">You</span>
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+        </div>
+      </div>
+
+    </div>
+
+    {%- comment -%}============ RIGHT CARD ============{%- endcomment -%}
+    <div class="dmp-card-{{ section.id }}">
+
+      {%- if section.settings.right_image != blank -%}
+        <img
+          class="dmp-card__bg"
+          src="{{ section.settings.right_image | image_url: width: 1600 }}"
+          alt="{{ section.settings.right_image.alt | escape | default: 'Right panel' }}"
+          loading="eager"
+        >
+      {%- else -%}
+        <div class="dmp-card__bg-placeholder">
+          {{ 'product-2' | placeholder_svg_tag }}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.right_overlay_opacity > 0 -%}
+        <div class="dmp-card__overlay" style="background:{{ section.settings.right_overlay_color }};opacity:{{ section.settings.right_overlay_opacity | divided_by: 100.0 }};"></div>
+      {%- endif -%}
+
+      <div class="dmp-marquee-wrap-{{ section.id }} dmp-pos-{{ section.settings.right_marquee_pos }}">
+        <div class="dmp-marquee-track-{{ section.id }} dmp-track-right-{{ section.id }}">
+          {%- assign right_badges = section.blocks | where: 'type', 'right_logo' -%}
+          {%- if right_badges.size > 0 -%}
+            {%- for _pass in (1..6) -%}
+              {%- for block in right_badges -%}
+                <div class="dmp-badge-{{ section.id }}{% if block.settings.logo_image == blank %} dmp-badge--fallback{% endif %}" {{ block.shopify_attributes }}>
+                  {%- if block.settings.logo_image != blank -%}
+                    <img
+                      src="{{ block.settings.logo_image | image_url: width: 300 }}"
+                      alt="{{ block.settings.logo_image.alt | escape | default: 'Logo' }}"
+                      loading="lazy"
+                    >
+                  {%- else -%}
+                    <span class="dmp-badge__title">{{ block.settings.badge_title | default: 'Uniquely' }}</span>
+                    <span class="dmp-badge__sub">{{ block.settings.badge_subtitle | default: 'You' }}</span>
+                  {%- endif -%}
+                </div>
+              {%- endfor -%}
+            {%- endfor -%}
+          {%- else -%}
+            {%- for i in (1..12) -%}
+              <div class="dmp-badge-{{ section.id }} dmp-badge--fallback">
+                <span class="dmp-badge__title">Uniquely</span>
+                <span class="dmp-badge__sub">You</span>
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Dual Marquee Panels",
+  "tag": "section",
+  "class": "dual-marquee-panels",
+  "max_blocks": 60,
+  "settings": [
+
+    {
+      "type": "header",
+      "content": "SECTION LAYOUT"
+    },
+    {
+      "type": "color",
+      "id": "section_bg_color",
+      "label": "Section Background Color",
+      "default": "#f0f0f0"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "Padding Top",
+      "min": 0, "max": 120, "step": 4, "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "Padding Bottom",
+      "min": 0, "max": 120, "step": 4, "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "section_horizontal_padding",
+      "label": "Side Padding",
+      "min": 0, "max": 100, "step": 4, "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "panel_gap",
+      "label": "Gap Between Cards",
+      "min": 0, "max": 60, "step": 2, "unit": "px",
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "CARD SIZE AND SHADOW"
+    },
+    {
+      "type": "range",
+      "id": "card_height",
+      "label": "Card Height Desktop",
+      "min": 200, "max": 900, "step": 10, "unit": "px",
+      "default": 500
+    },
+    {
+      "type": "range",
+      "id": "card_height_mobile",
+      "label": "Card Height Mobile",
+      "min": 150, "max": 600, "step": 10, "unit": "px",
+      "default": 320
+    },
+    {
+      "type": "select",
+      "id": "card_shadow",
+      "label": "Card Shadow",
+      "options": [
+        { "value": "none",                                          "label": "None" },
+        { "value": "0 2px 8px rgba(0,0,0,0.15)",                   "label": "Small" },
+        { "value": "0 6px 20px rgba(0,0,0,0.20)",                  "label": "Medium" },
+        { "value": "0 12px 40px rgba(0,0,0,0.28)",                 "label": "Large" },
+        { "value": "0 20px 60px rgba(0,0,0,0.40)",                 "label": "Extra Large" }
+      ],
+      "default": "0 12px 40px rgba(0,0,0,0.28)"
+    },
+
+    {
+      "type": "header",
+      "content": "LEFT CARD — Background Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "left_image",
+      "label": "Left Card Background Image"
+    },
+    {
+      "type": "color",
+      "id": "left_overlay_color",
+      "label": "Left Overlay Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "left_overlay_opacity",
+      "label": "Left Overlay Opacity",
+      "min": 0, "max": 80, "step": 5, "unit": "%",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "LEFT CARD — Marquee"
+    },
+    {
+      "type": "select",
+      "id": "left_marquee_pos",
+      "label": "Left Marquee Position",
+      "options": [
+        { "value": "top",    "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "marquee_speed_left",
+      "label": "Left Marquee Speed (lower = faster)",
+      "min": 4, "max": 80, "step": 1, "unit": "s",
+      "default": 18
+    },
+    {
+      "type": "select",
+      "id": "marquee_dir_left",
+      "label": "Left Marquee Direction",
+      "options": [
+        { "value": "ltr", "label": "Left to Right" },
+        { "value": "rtl", "label": "Right to Left" }
+      ],
+      "default": "rtl"
+    },
+
+    {
+      "type": "header",
+      "content": "RIGHT CARD — Background Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "right_image",
+      "label": "Right Card Background Image"
+    },
+    {
+      "type": "color",
+      "id": "right_overlay_color",
+      "label": "Right Overlay Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "right_overlay_opacity",
+      "label": "Right Overlay Opacity",
+      "min": 0, "max": 80, "step": 5, "unit": "%",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "RIGHT CARD — Marquee"
+    },
+    {
+      "type": "select",
+      "id": "right_marquee_pos",
+      "label": "Right Marquee Position",
+      "options": [
+        { "value": "top",    "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "marquee_speed_right",
+      "label": "Right Marquee Speed (lower = faster)",
+      "min": 4, "max": 80, "step": 1, "unit": "s",
+      "default": 22
+    },
+    {
+      "type": "select",
+      "id": "marquee_dir_right",
+      "label": "Right Marquee Direction",
+      "options": [
+        { "value": "ltr", "label": "Left to Right" },
+        { "value": "rtl", "label": "Right to Left" }
+      ],
+      "default": "ltr"
+    },
+
+    {
+      "type": "header",
+      "content": "BADGE AND MARQUEE SHARED SETTINGS"
+    },
+    {
+      "type": "range",
+      "id": "badge_size",
+      "label": "Badge Size Desktop",
+      "min": 48, "max": 300, "step": 4, "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "badge_size_mobile",
+      "label": "Badge Size Mobile",
+      "min": 36, "max": 140, "step": 4, "unit": "px",
+      "default": 68
+    },
+    {
+      "type": "range",
+      "id": "badge_gap",
+      "label": "Gap Between Badges",
+      "min": 4, "max": 80, "step": 2, "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "marquee_vertical_padding",
+      "label": "Marquee Strip Vertical Padding",
+      "min": 0, "max": 40, "step": 2, "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "marquee_offset_top",
+      "label": "Top Marquee Offset from Top Edge",
+      "min": 0, "max": 200, "step": 4, "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "marquee_offset_bottom",
+      "label": "Bottom Marquee Offset from Bottom Edge",
+      "min": 0, "max": 200, "step": 4, "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause Marquee on Hover",
+      "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "MARQUEE EDGE FADE"
+    },
+    {
+      "type": "checkbox",
+      "id": "edge_fade",
+      "label": "Enable Edge Fade",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "fade_color",
+      "label": "Fade Color (match card bg)",
+      "default": "#ffffff"
+    },
+
+    {
+      "type": "header",
+      "content": "FALLBACK TEXT BADGE (when no image)"
+    },
+    {
+      "type": "color",
+      "id": "fallback_badge_bg",
+      "label": "Fallback Badge Background",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "fallback_badge_border",
+      "label": "Fallback Badge Border",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "fallback_badge_text",
+      "label": "Fallback Badge Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "fallback_badge_accent",
+      "label": "Fallback Badge Accent Color",
+      "default": "#c9a96e"
+    }
+
+  ],
+
+  "blocks": [
+    {
+      "type": "left_logo",
+      "name": "Left Marquee — Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "logo_image",
+          "label": "Logo Image"
+        },
+        {
+          "type": "text",
+          "id": "badge_title",
+          "label": "Fallback Title (if no image)",
+          "default": "Uniquely"
+        },
+        {
+          "type": "text",
+          "id": "badge_subtitle",
+          "label": "Fallback Subtitle (if no image)",
+          "default": "You"
+        }
+      ]
+    },
+    {
+      "type": "right_logo",
+      "name": "Right Marquee — Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "logo_image",
+          "label": "Logo Image"
+        },
+        {
+          "type": "text",
+          "id": "badge_title",
+          "label": "Fallback Title (if no image)",
+          "default": "Uniquely"
+        },
+        {
+          "type": "text",
+          "id": "badge_subtitle",
+          "label": "Fallback Subtitle (if no image)",
+          "default": "You"
+        }
+      ]
+    }
+  ],
+
+  "presets": [
+    {
+      "name": "Dual Marquee Panels",
+      "blocks": [
+        { "type": "left_logo",  "settings": { "badge_title": "Uniquely", "badge_subtitle": "You" } },
+        { "type": "left_logo",  "settings": { "badge_title": "Uniquely", "badge_subtitle": "You" } },
+        { "type": "left_logo",  "settings": { "badge_title": "Uniquely", "badge_subtitle": "You" } },
+        { "type": "left_logo",  "settings": { "badge_title": "Uniquely", "badge_subtitle": "You" } },
+        { "type": "left_logo",  "settings": { "badge_title": "Uniquely", "badge_subtitle": "You" } },
+        { "type": "right_logo", "settings": { "badge_title": "Uniquely", "badge_subtitle": "You" } },
+        { "type": "right_logo", "settings": { "badge_title": "Uniquely", "badge_subtitle": "You" } },
+        { "type": "right_logo", "settings": { "badge_title": "Uniquely", "badge_subtitle": "You" } },
+        { "type": "right_logo", "settings": { "badge_title": "Uniquely", "badge_subtitle": "You" } },
+        { "type": "right_logo", "settings": { "badge_title": "Uniquely", "badge_subtitle": "You" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

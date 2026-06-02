@@ -1,3 +1,5 @@
+
+
 <script type="application/ld+json">
   {{ closest.product | structured_data }}
 </script>
@@ -359,22 +361,15 @@
   }
 {% endstylesheet %}
 <style>
-  @media screen and (min-width: 992px) {
+  @media screen and (min-width: 768px) {
+    .content-for-layout {
+      flex-direction: row;
+    }
+    #shopify-section-template--21334009413686__main.shopify-section {
+      flex-grow: 1 !important;  
+    }
     .content-for-layout>.shopify-section:last-child {
-      flex: 280px !important;
-      flex-shrink: 0 !important;
-      flex-grow: 0 !important;
-    }
-    #MainContent > #shopify-section-{{ section.id }}.shopify-section {
-      flex: 1 !important;
-    }
-      .content-for-layout {
-        flex-direction: row !important;
-        --flex-direction-desktop: row;
-      }
-    }
-    .template-product-block-desktop-style {
-      --resource-list-columns: 280px !important;
+        flex-grow: 0 !important;
     }
   }
 </style>

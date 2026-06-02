@@ -1,447 +1,258 @@
-{% comment %}
-  Footer Section — Matches screenshot
-  Logo left with copyright below · Newsletter right with menu links
-{% endcomment %}
 
-<style>
-  
 
-  .ft-wrap {
-    background-color: {{ section.settings.background_color | default: '#0d5c66' }};
-    color: #ffffff;
-    font-family: var(--primary-font);
-  }
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<div
+  class="section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }}"
+>
+  {% liquid
+    assign total_blocks = section.blocks.size
 
-  .ft-inner {
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 0 48px;
-  }
+    # Grid layout calculations
+    assign grid_columns = total_blocks | at_most: 4
 
-  /* ── Main body ── */
-  .ft-body {
-    padding: 52px 0 48px;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    gap: 40px;
-  }
+    # Calculate last row counts using modulo arithmetic
+    # last_row_count = (total_blocks - 1) % N + 1
+    assign last_row_count = total_blocks | minus: 1 | modulo: 4 | plus: 1
+    assign tablet_last_row_count = total_blocks | minus: 1 | modulo: 2 | plus: 1
 
-  /* ── LEFT: Brand ── */
-  .ft-brand {
-    flex: 0 0 auto;
-    min-width: 0;
-  }
+    # Check if there are orphaned elements (single item in last row)
+    assign has_isolated_grid_item_desktop = false
+    assign has_isolated_grid_item_tablet = false
 
-  .ft-logo-link {
-    display: inline-block;
-    text-decoration: none;
-    color: #fff;
-    line-height: 1.1;
-  }
+    if total_blocks > 4 and last_row_count == 1
+      assign has_isolated_grid_item_desktop = true
+    endif
 
-  .ft-logo-script {
-    font-family: var(--primary-font);
-    font-size: 26px;
-    font-weight: 700;
-  }
-
-  .ft-logo-bold {
-    font-family: var(--primary-font);
-    font-size: 26px;
-    font-weight: 800;
-    letter-spacing: -0.01em;
-  }
-
-  .ft-logo-img {
-    display: block;
-    width: {{ section.settings.logo_width | default: 120 }}px;
-    height: {% if section.settings.logo_height > 0 %}{{ section.settings.logo_height }}px{% else %}auto{% endif %};
-    object-fit: contain;
-    max-width: 100%;
-  }
-
-  .ft-copy {
-    font-size: 13px;
-    color: rgba(255,255,255,0.4);
-    margin: 12px 0 0;
-    text-align: center;
-  }
-
-  /* ── RIGHT: Newsletter ── */
-  .ft-right {
-    flex: 0 0 48%;
-    min-width: 0;
-  }
-
-  .ft-nl-heading {
-    font-size: 28px;
-    font-weight: 700;
-    color: #fff;
-    margin: 0 0 8px;
-    line-height: 1.25;
-    letter-spacing: -0.01em;
-  }
-
-  .ft-nl-sub {
-    font-size: 16px;
-    color: rgba(255,255,255,0.7);
-    margin: 0 0 18px;
-    line-height: 1.5;
-  }
-
-  /* Single-bar: input + arrow button */
-  .ft-nl-bar {
-    display: flex;
-    align-items: stretch;
-    background: #fff;
-    border-radius: 50px;
-    overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-  }
-
-  /* Override theme global input styles */
-  .ft-wrap .ft-nl-bar input.ft-nl-input,
-  .ft-wrap .ft-nl-bar input.ft-nl-input:not([type='checkbox'],[type='radio']) {
-    flex: 1 1 0;
-    min-width: 0;
-    background: transparent !important;
-    background-color: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    outline: none !important;
-    padding: 20px 22px;
-    font-size: 20px;
-    color: #333 !important;
-    font-family: inherit;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-
-  .ft-wrap .ft-nl-bar input.ft-nl-input::placeholder {
-    color: #aaa !important;
-    opacity: 1;
-  }
-
-  .ft-wrap .ft-nl-bar input.ft-nl-input:focus,
-  .ft-wrap .ft-nl-bar input.ft-nl-input:focus-visible {
-    background: transparent !important;
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-  }
-
-  /* Arrow button */
-  .ft-nl-btn {
-    flex-shrink: 0;
-    background: #fff;
-    border: none;
-    border-radius: 0;
-    padding: 0 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #0a4a52;
-    transition: background 0.2s, color 0.2s;
-  }
-
-  .ft-nl-btn:hover { background: #f5f5f5; }
-  .ft-nl-btn:disabled { opacity: 0.5; cursor: default; }
-
-  .ft-nl-btn svg {
-    width: 20px;
-    height: 20px;
-    display: block;
-  }
-
-  .ft-nl-msg {
-    font-size: 12px;
-    margin-top: 8px;
-    min-height: 16px;
-    display: none;
-  }
-
-  .ft-nl-msg.ok  { display: block; color: #7de8c8; }
-  .ft-nl-msg.err { display: block; color: #f8a08a; }
-
-  /* ── Menu Links below Newsletter ── */
-  .ft-menu-links {
-    margin-top: 24px;
-    display: flex;
-    align-items: center;
-    gap: 8px 24px;
-    flex-wrap: wrap;
-  }
-
-  .ft-menu-links.align-left {
-    justify-content: flex-start;
-  }
-
-  .ft-menu-links.align-right {
-    justify-content: flex-end;
-  }
-
-  .ft-menu-links a {
-    font-size: 14px;
-    color: rgba(255,255,255,0.75);
-    text-decoration: none;
-    transition: color 0.2s;
-    white-space: nowrap;
-    font-weight: 500;
-  }
-
-  .ft-menu-links a:hover { 
-    color: #fff; 
-  }
-
-  .ft-menu-links-sep {
-    width: 1px;
-    height: 14px;
-    background: rgba(255,255,255,0.25);
-    display: inline-block;
-    flex-shrink: 0;
-  }
-
-  /* ═══════════
-     Tablet / Mobile
-  ═══════════ */
-  @media (max-width: 900px) {
-    .ft-inner { padding: 0 28px; }
-
-    .ft-body {
-      flex-direction: column;
-      align-items: flex-start;
-      padding: 40px 0 32px;
-      gap: 32px;
-    }
-
-    .ft-right { flex: 0 0 100%; width: 100%; }
-
-    .ft-nl-heading { font-size: 24px; }
-    .ft-nl-sub { font-size: 15px; }
-  }
-
-  @media (max-width: 600px) {
-    .ft-inner { padding: 0 18px; }
-
-    .ft-nl-heading { font-size: 22px; }
-    .ft-nl-sub { font-size: 14px; }
-    
-    .ft-menu-links {
-      gap: 6px 16px;
-    }
-
-    .ft-menu-links a {
-      font-size: 13px;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .ft-nl-btn, .ft-menu-links a { transition: none; }
-  }
-</style>
-
-<footer id="footer-{{ section.id }}" style="margin-top:{{ section.settings.margin_top }}px;">
-  <div class="ft-wrap">
-    <div class="ft-inner">
-
-      <!-- Main body -->
-      <div class="ft-body">
-
-        <!-- Logo / Brand -->
-        <div class="ft-brand">
-          <a href="/" class="ft-logo-link" aria-label="{{ shop.name }}">
-            {% if section.settings.logo != blank %}
-              <img
-                src="{{ section.settings.logo | image_url: width: 400 }}"
-                alt="{{ shop.name }}"
-                class="ft-logo-img"
-                loading="lazy"
-              >
-            {% else %}
-              <span class="ft-logo-script">{{ section.settings.logo_script }}</span
-              ><span class="ft-logo-bold"> {{ section.settings.logo_bold }}</span>
-            {% endif %}
-          </a>
-          
-          <!-- Copyright text below logo -->
-          <p class="ft-copy">
-            &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}.{% if section.settings.copyright_text != blank %} {{ section.settings.copyright_text }}{% endif %}
-          </p>
-        </div>
-
-        <!-- Newsletter -->
-        <div class="ft-right">
-          <h3 class="ft-nl-heading">{{ section.settings.nl_heading | default: 'Join the club' }}</h3>
-          <p class="ft-nl-sub">{{ section.settings.nl_sub | default: 'Get exclusive deals and early access to new products.' }}</p>
-
-          <div class="ft-nl-bar">
-            <input
-              type="email"
-              class="ft-nl-input"
-              id="ft-nl-email-{{ section.id }}"
-              placeholder="{{ section.settings.nl_placeholder | default: 'Email address' }}"
-              autocomplete="email"
-              aria-label="Email address"
-            >
-            <button
-              type="button"
-              class="ft-nl-btn"
-              id="ft-nl-btn-{{ section.id }}"
-              onclick="ftSubscribe('{{ section.id }}')"
-              aria-label="Subscribe"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <line x1="5" y1="12" x2="19" y2="12"/>
-                <polyline points="12 5 19 12 12 19"/>
-              </svg>
-            </button>
-          </div>
-          <p class="ft-nl-msg" id="ft-nl-msg-{{ section.id }}" aria-live="polite"></p>
-
-          <!-- Menu Links below Newsletter -->
-          {% if section.settings.menu_links != blank %}
-            <nav class="ft-menu-links align-{{ section.settings.menu_links_align | default: 'left' }}" aria-label="Footer navigation">
-              {% assign menu = linklists[section.settings.menu_links].links %}
-              {% for link in menu %}
-                <a href="{{ link.url }}">{{ link.title }}</a>
-                {% unless forloop.last %}
-                  <span class="ft-menu-links-sep" aria-hidden="true"></span>
-                {% endunless %}
-              {% endfor %}
-            </nav>
-          {% endif %}
-        </div>
-
-      </div>
-      <!-- /ft-body -->
-
-    </div>
+    if total_blocks == 5
+      assign has_isolated_grid_item_tablet = true
+    endif
+  %}
+  <div
+    class="
+      footer-content
+      spacing-style
+      {% if has_isolated_grid_item_desktop %}footer-content--isolated-grid-item-desktop{% endif %}
+      {% if has_isolated_grid_item_tablet %}footer-content--isolated-grid-item-tablet{% endif %}
+    "
+    style="
+      {%  render 'spacing-style', settings: section.settings %}
+      --footer-gap: {{ section.settings.gap }}px;
+      --grid-columns: {{ grid_columns }};
+      --last-row-count: {{ last_row_count }};
+      --tablet-last-row-count: {{ tablet_last_row_count }};
+    "
+  >
+    {% content_for 'blocks' %}
   </div>
-</footer>
+</div>
 
-<script>
-  function ftSubscribe(id) {
-    var inp = document.getElementById('ft-nl-email-' + id);
-    var msg = document.getElementById('ft-nl-msg-' + id);
-    var btn = document.getElementById('ft-nl-btn-' + id);
-    var email = inp.value.trim();
+{% stylesheet %}
+  .footer-content {
+    contain: content;
+    content-visibility: auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--footer-gap);
+    align-items: start;
+  }
 
-    msg.className = 'ft-nl-msg';
-    msg.textContent = '';
+  .footer-content .menu__heading__default {
+    font-weight: var(--font-heading--weight);
+  }
 
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      msg.textContent = 'Please enter a valid email address.';
-      msg.classList.add('err');
-      return;
+  @media screen and (min-width: 750px) and (max-width: 989px) {
+    .footer-content {
+      grid-template-columns: repeat(min(var(--grid-columns), 3), 1fr);
+      grid-auto-flow: row;
     }
 
-    var origHTML = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a10 10 0 0 1 0 20"/></svg>';
+    .footer-content[style*='--grid-columns: 4'] {
+      grid-template-columns: repeat(2, 1fr);
+    }
 
-    var body = new URLSearchParams();
-    body.set('form_type', 'customer');
-    body.set('utf8', '✓');
-    body.set('contact[email]', email);
-    body.set('contact[tags]', 'newsletter');
-
-    fetch('/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: body.toString(),
-      redirect: 'follow',
-    })
-      .then(function (r) {
-        if (r.status < 500) {
-          msg.textContent = "You're subscribed — thanks!";
-          msg.classList.add('ok');
-          inp.value = '';
-        } else {
-          throw new Error();
-        }
-      })
-      .catch(function () {
-        msg.textContent = 'Could not subscribe right now. Please try again.';
-        msg.classList.add('err');
-      })
-      .finally(function () {
-        btn.disabled = false;
-        btn.innerHTML = origHTML;
-      });
+    .footer-content--isolated-grid-item-tablet > :last-child {
+      grid-column: 1 / -1;
+    }
   }
-</script>
+
+  @media screen and (min-width: 990px) {
+    .footer-content {
+      grid-template-columns: repeat(var(--grid-columns), 1fr);
+    }
+
+    /* Single item centered */
+    .footer-content[style*='--grid-columns: 1'] {
+      justify-items: center;
+    }
+
+    .footer-content--isolated-grid-item-desktop > :last-child {
+      grid-column: 1 / -1;
+    }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
-  "name": "Footer",
-  "tag": "footer",
-  "class": "section-footer",
+  "name": "t:names.footer",
+  "class": "section-wrapper",
+  "blocks": [
+    {
+      "type": "_divider"
+    },
+    {
+      "type": "@app"
+    },
+    {
+      "type": "button"
+    },
+    {
+      "type": "follow-on-shop"
+    },
+    {
+      "type": "group"
+    },
+    {
+      "type": "icon"
+    },
+    {
+      "type": "image"
+    },
+    {
+      "type": "menu"
+    },
+    {
+      "type": "payment-icons"
+    },
+    {
+      "type": "text"
+    },
+    {
+      "type": "logo"
+    },
+    {
+      "type": "jumbo-text"
+    },
+    {
+      "type": "social-links"
+    },
+    {
+      "type": "email-signup"
+    }
+  ],
+  "enabled_on": {
+    "groups": ["footer"]
+  },
   "settings": [
-    { "type": "header", "content": "Brand" },
-    { "type": "image_picker", "id": "logo", "label": "Logo Image (overrides text)" },
-    {
-      "type": "range",
-      "id": "logo_width",
-      "min": 60,
-      "max": 400,
-      "step": 10,
-      "unit": "px",
-      "label": "Logo Width",
-      "default": 120
-    },
-    {
-      "type": "range",
-      "id": "logo_height",
-      "min": 0,
-      "max": 200,
-      "step": 4,
-      "unit": "px",
-      "label": "Logo Height (0 = auto)",
-      "default": 0
-    },
-    { "type": "text", "id": "logo_script", "label": "Logo — Script part", "default": "Uniquely" },
-    { "type": "text", "id": "logo_bold", "label": "Logo — Bold part", "default": "YOU" },
-    { "type": "text", "id": "copyright_text", "label": "Copyright suffix", "default": "All rights reserved." },
-    { "type": "header", "content": "Newsletter" },
-    { "type": "text", "id": "nl_heading", "label": "Heading", "default": "Join the club" },
-    { "type": "text", "id": "nl_sub", "label": "Subtext", "default": "Get exclusive deals and early access to new products." },
-    { "type": "text", "id": "nl_placeholder", "label": "Input placeholder", "default": "Email address" },
-    { "type": "header", "content": "Menu Links (Below Newsletter)" },
-    {
-      "type": "link_list",
-      "id": "menu_links",
-      "label": "Menu",
-      "info": "Links displayed horizontally below the newsletter section."
-    },
     {
       "type": "select",
-      "id": "menu_links_align",
-      "label": "Menu Links Alignment",
+      "id": "section_width",
+      "label": "t:settings.width",
       "options": [
-        { "value": "left", "label": "Left" },
-        { "value": "right", "label": "Right" }
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
       ],
-      "default": "left"
+      "default": "page-width"
     },
-    { "type": "header", "content": "Styling" },
-    { "type": "color", "id": "background_color", "label": "Background Color", "default": "#0d5c66" },
     {
       "type": "range",
-      "id": "margin_top",
+      "id": "gap",
+      "label": "t:settings.gap",
       "min": 0,
       "max": 100,
-      "step": 4,
+      "step": 1,
       "unit": "px",
-      "label": "Margin Top",
       "default": 0
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 20
     }
   ],
   "presets": [
-    { "name": "Footer" }
+    {
+      "name": "t:names.footer",
+      "category": "t:categories.footer",
+      "settings": {
+        "gap": 20,
+        "color_scheme": "scheme-1",
+        "padding-block-start": 36,
+        "padding-block-end": 36
+      },
+      "blocks": {
+        "newsletter-group": {
+          "type": "group",
+          "settings": {
+            "content_direction": "column",
+            "vertical_on_mobile": true,
+            "horizontal_alignment": "flex-start",
+            "vertical_alignment": "center",
+            "gap": 6,
+            "width": "fill",
+            "inherit_color_scheme": true
+          },
+          "blocks": {
+            "newsletter-heading": {
+              "type": "text",
+              "settings": {
+                "text": "t:html_defaults.join_our_email_list",
+                "width": "100%",
+                "alignment": "left",
+                "type_preset": "h3"
+              }
+            },
+            "newsletter-text": {
+              "type": "text",
+              "settings": {
+                "text": "t:html_defaults.get_exclusive_deals_and_early_access_to_new_products",
+                "width": "100%",
+                "alignment": "left",
+                "type_preset": "rte"
+              }
+            }
+          },
+          "block_order": ["newsletter-heading", "newsletter-text"]
+        },
+        "newsletter-form": {
+          "type": "email-signup",
+          "settings": {
+            "width": "fill"
+          }
+        }
+      },
+      "block_order": ["newsletter-group", "newsletter-form"]
+    }
   ]
 }
 {% endschema %}

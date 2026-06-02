@@ -45,12 +45,8 @@
 >
   {% assign localization_label = 'content.localization_region_and_language' | t %}
 
-  {%- liquid
-    assign _form_id = form_id | default: 'LocalizationForm'
-    assign _form_id = 'LocalizationForm-' | append: _form_id
-  -%}
   {%- form 'localization',
-    id: _form_id,
+    id: 'LocalizationForm',
     class: 'localization-form',
     ref: 'form',
     return_to: back,
@@ -158,11 +154,15 @@
                   tabindex="-1"
                   ref="countryListItems[]"
                   on:click="/selectCountry/{{ country.iso_code }}"
-                  style="--bg-flag: url({{ country | image_url: width: 32 }});"
                 >
                   <span class="svg-wrapper icon-checkmark">
                     {{- 'icon-checkmark.svg' | inline_asset_content -}}
                   </span>
+                  <span
+                    class="localization-form__country-flag"
+                    style="background-image: url({{- country | image_url: width: 32 }});"
+                    aria-hidden="true"
+                  ></span>
                   <span class="country">{{- country.name }}</span>
                   <span
                     class="localization-form__currency"
@@ -214,11 +214,15 @@
                 tabindex="-1"
                 ref="countryListItems[]"
                 on:click="/selectCountry/{{ country.iso_code }}"
-                style="--bg-flag: url({{ country | image_url: width: 32 }});"
               >
                 <span class="svg-wrapper icon-checkmark">
                   {{- 'icon-checkmark.svg' | inline_asset_content -}}
                 </span>
+                <span
+                  class="localization-form__country-flag"
+                  style="background-image: url({{- country | image_url: width: 32 }});"
+                  aria-hidden="true"
+                ></span>
                 <span class="country">{{- country.name }}</span>
                 <span
                   class="localization-form__currency"
