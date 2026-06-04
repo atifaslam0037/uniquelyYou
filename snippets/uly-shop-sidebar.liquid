@@ -14,7 +14,7 @@
 
 <aside
   id="uly-shop-sidebar"
-  class="uly-shop-sidebar color-{{ section.settings.color_scheme }}"
+  class="uly-shop-sidebar color-{{ section.settings.color_scheme }}{% if request.page_type == 'index' %} uly-shop-sidebar--home{% else %} uly-shop-sidebar--other{% endif %}"
   aria-label="{{ drawer_label | escape }}"
   aria-hidden="true"
   hidden

@@ -41,6 +41,7 @@
         "text_twGGkJ": {
           "type": "text",
           "name": "Description",
+          "disabled": true,
           "settings": {
             "text": "{{ closest.collection.description }}",
             "width": "fit-content",
@@ -82,7 +83,7 @@
         "section_width": "page-width",
         "section_height": "",
         "section_height_custom": 50,
-        "color_scheme": "scheme-1",
+        "color_scheme": "scheme-ed483b17-b297-415c-a8d5-51a6862f8eb4",
         "background_media": "none",
         "video_position": "cover",
         "background_image_position": "cover",
@@ -238,7 +239,7 @@
         "columns_gap_vertical": 24,
         "padding-inline-start": 0,
         "padding-inline-end": 0,
-        "color_scheme": "scheme-1",
+        "color_scheme": "scheme-ed483b17-b297-415c-a8d5-51a6862f8eb4",
         "padding-block-start": 0,
         "padding-block-end": 32
       }
