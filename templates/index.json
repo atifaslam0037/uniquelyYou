@@ -707,6 +707,7 @@
           ]
         }
       },
+      "disabled": true,
       "name": "t:names.products_carousel",
       "settings": {
         "collection": "dogs",
@@ -1185,6 +1186,7 @@
           ]
         }
       },
+      "disabled": true,
       "name": "Featured collection",
       "settings": {
         "collection": "cats",
@@ -1653,6 +1655,7 @@
           ]
         }
       },
+      "disabled": true,
       "name": "t:names.products_grid",
       "settings": {
         "collection": "people",
