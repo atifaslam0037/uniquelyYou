@@ -10,8 +10,8 @@
 
   unless onboarding
     assign first_product = collection.products.first
-    assign second_product = collection.products[1]
 
+    # Primary image — first product's featured media
     if first_product != blank
       if first_product.featured_media != blank
         assign first_image = first_product.featured_media.preview_image
@@ -20,13 +20,9 @@
       endif
     endif
 
-    if second_product != blank
-      if second_product.featured_media != blank
-        assign second_image = second_product.featured_media.preview_image
-      else
-        assign second_image = second_product.featured_image
-      endif
-    elsif first_product != blank and first_product.media.size > 1
+    # Hover image — first product's SECOND media (same product, second photo)
+    # Falls back to nothing if the product only has one image
+    if first_product != blank and first_product.media.size > 1
       assign second_image = first_product.media[1].preview_image
     endif
   endunless
@@ -53,185 +49,417 @@
     assign ratio = 1
   endif
 
-  assign sizes = '(min-width: 750px) 50vw, 100vw'
-  if section.settings.layout_type
-    case section.settings.layout_type
-      when 'grid', 'carousel'
-        assign calculated_width = 100 | divided_by: section.settings.columns | append: 'vw'
-        assign sizes = '(min-width: 750px) [calc-width], 100vw' | replace: '[calc-width]', calculated_width
-    endcase
-  endif
+  assign sizes  = '(min-width: 750px) 50vw, 100vw'
+  assign widths = '240, 352, 832, 1200, 1920'
 
-  assign widths = '240, 352, 832, 1200, 1600, 1920, 2560, 3840'
   assign has_hover_image = false
   if second_image != blank and first_image != blank
     assign has_hover_image = true
   endif
+
+  # Swatch detection
+  assign product_has_swatches = false
+  unless onboarding
+    if first_product != blank
+      for product_option in first_product.options_with_values
+        assign swatch_count = product_option.values | map: 'swatch' | compact | size
+        if swatch_count > 0
+          assign product_has_swatches = true
+        endif
+      endfor
+    endif
+  endunless
 %}
 
-{% capture card_image %}
-  {% style %}
-    .collection-card[data-block-id="{{ block.id }}"] {
-      --ratio: {{ ratio }};
-    }
-  {% endstyle %}
+{% style %}
+  .collection-card[data-block-id="{{ block.id }}"] {
+    --ratio: {{ ratio }};
+  }
+{% endstyle %}
 
-  <div
-    class="
-      custom-collection-card__gallery
-      collection-card__image
-      resource-image
-      spacing-style
-      border-style
-      {% if has_hover_image %}custom-collection-card__gallery--has-hover{% endif %}
-    "
-    style="
-      {% render 'spacing-style', settings: block_settings %}
-      {% render 'border-override', settings: block_settings %}
-    "
-  >
-    {%- if block_settings.toggle_overlay -%}
-      {% render 'overlay', settings: block_settings %}
-    {%- endif -%}
+{%- comment -%}
+  custom-collection-card is a flex-column wrapper.
+  Its first child is the standard collection-card (image + theme blocks).
+  Its second child is our footer (swatches + button) — always BELOW the image,
+  completely outside collection-card so "placement: on_image" never affects it.
+{%- endcomment -%}
+<custom-collection-card>
 
-    {% if first_image != blank %}
-      <div class="custom-collection-card__images">
-        {{
-          first_image
-          | image_url: width: 3840
-          | image_tag:
-            widths: widths,
-            class: 'resource-image__image custom-collection-card__image custom-collection-card__image--primary',
-            sizes: sizes,
-            loading: 'lazy'
-        }}
-        {% if has_hover_image %}
+  {%- comment -%} ── 1. Image area ────────────────────────────────────── {%- endcomment -%}
+  {% capture card_image %}
+    <div
+      class="
+        custom-cc__gallery
+        collection-card__image
+        resource-image
+        spacing-style
+        border-style
+        {% if has_hover_image %}custom-cc__gallery--has-hover{% endif %}
+      "
+      style="
+        {% render 'spacing-style', settings: block_settings %}
+        {% render 'border-override', settings: block_settings %}
+      "
+      data-gallery
+    >
+      {%- if block_settings.toggle_overlay -%}
+        {% render 'overlay', settings: block_settings %}
+      {%- endif -%}
+
+      {% if first_image != blank %}
+        <div class="custom-cc__images">
           {{
-            second_image
-            | image_url: width: 3840
+            first_image
+            | image_url: width: 1920
             | image_tag:
               widths: widths,
-              class: 'resource-image__image custom-collection-card__image custom-collection-card__image--secondary',
+              class: 'resource-image__image custom-cc__img custom-cc__img--primary',
               sizes: sizes,
               loading: 'lazy'
           }}
-        {% endif %}
-      </div>
-    {% else %}
-      <div class="resource-image resource-image--placeholder collection-card__image--placeholder">
-        {% liquid
-          assign block_parts = block.id | split: '-'
-          assign content_index = block_parts.last | default: 0
-          assign variant = content_index | modulo: 4 | plus: 1
-          assign placeholder_name = 'collection-apparel-' | append: variant
-        %}
-        <div class="resource-image__image">
-          {{ placeholder_name | placeholder_svg_tag }}
+          {% if has_hover_image %}
+            {{
+              second_image
+              | image_url: width: 1920
+              | image_tag:
+                widths: widths,
+                class: 'resource-image__image custom-cc__img custom-cc__img--secondary',
+                sizes: sizes,
+                loading: 'lazy'
+            }}
+          {% endif %}
         </div>
-      </div>
-    {% endif %}
-  </div>
-{% endcapture %}
+      {% else %}
+        <div class="resource-image resource-image--placeholder collection-card__image--placeholder">
+          {% liquid
+            assign block_parts     = block.id | split: '-'
+            assign content_index   = block_parts.last | default: 0
+            assign placeholder_num = content_index | modulo: 4 | plus: 1
+            assign placeholder_name = 'collection-apparel-' | append: placeholder_num
+          %}
+          <div class="resource-image__image">
+            {{ placeholder_name | placeholder_svg_tag }}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  {% endcapture %}
 
-{% capture children %}
-  {% content_for 'blocks', closest.collection: collection %}
-  {% if first_product != blank %}
-    {% content_for 'block',
-      type: 'swatches',
-      id: 'static-collection-swatches',
-      closest.product: first_product,
-      parent_block_id: block.id
-    %}
-  {% endif %}
+  {%- comment -%}
+    children = theme editor blocks only (title, text, etc.)
+    Swatches + button live in custom-cc__footer OUTSIDE collection-card.
+  {%- endcomment -%}
+  {% capture children %}
+    {% content_for 'blocks', closest.collection: collection %}
+  {% endcapture %}
+
+  {% render 'collection-card',
+    card_image: card_image,
+    children: children,
+    block: block,
+    collection: collection,
+    section: section
+  %}
+
+  {%- comment -%} ── 2. Footer (always below the image) ────────────────── {%- endcomment -%}
   {% unless onboarding %}
-    <div class="custom-collection-card__button">
-      <a href="{{ collection.url }}" class="button custom-collection-card__cta">
-        Shop New Arrival
-      </a>
+    <div class="custom-cc__footer">
+
+      {%- comment -%} Swatches row {%- endcomment -%}
+      {% if product_has_swatches and first_product != blank %}
+        <div class="custom-cc__swatches-row" data-swatches-row>
+          {% for product_option in first_product.options_with_values %}
+            {% liquid
+              assign swatch_count = product_option.values | map: 'swatch' | compact | size
+            %}
+            {% if swatch_count == 0 %}{% continue %}{% endif %}
+
+            {% liquid
+              assign swatch_option_position = product_option.position
+              assign swatch_option_key = 'option' | append: swatch_option_position
+            %}
+
+            <div class="custom-cc__swatches-list">
+              {% for product_option_value in product_option.values %}
+                {% liquid
+                  assign featured_media = product_option_value.variant.featured_media
+
+                  if featured_media == blank
+                    for variant in first_product.variants
+                      if variant[swatch_option_key] == product_option_value.name and variant.featured_media != blank
+                        assign featured_media = variant.featured_media
+                        break
+                      endif
+                    endfor
+                  endif
+
+                  assign preview_url = ''
+                  if featured_media != blank
+                    assign preview_url = featured_media.preview_image | image_url: width: 1920
+                  endif
+                %}
+                <button
+                  class="custom-cc__swatch-btn"
+                  aria-label="{{ product_option_value.name | escape }}"
+                  {% if preview_url != blank %}data-preview-src="{{ preview_url }}"{% endif %}
+                  type="button"
+                >
+                  {% render 'swatch',
+                    swatch: product_option_value.swatch,
+                    variant_image: featured_media,
+                    label: product_option_value.name
+                  %}
+                </button>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {%- comment -%} CTA button — transparent outline {%- endcomment -%}
+      <div class="custom-cc__cta-row">
+        <a href="{{ collection.url }}" class="custom-cc__cta-btn">
+          Shop New Arrival
+        </a>
+      </div>
+
     </div>
   {% endunless %}
-{% endcapture %}
 
-{% render 'collection-card',
-  card_image: card_image,
-  children: children,
-  block: block,
-  collection: collection,
-  section: section
-%}
+</custom-collection-card>
 
 {% stylesheet %}
-  .custom-collection-card__gallery {
-    position: relative;
+  /* ─────────────────────────────────────────────────────────
+     custom-collection-card: flex column wrapper
+     Mimics .collection-card's flex-item behaviour in the grid
+     so the section layout doesn't break.
+  ───────────────────────────────────────────────────────── */
+  custom-collection-card {
     display: flex;
+    flex-direction: column;
+    flex: 1 1 var(--card-width-small);
+    min-width: 0;
+  }
+
+  /* Inner collection-card fills the available width but doesn't stretch vertically */
+  custom-collection-card > .collection-card {
+    flex: 0 0 auto;
     width: 100%;
-    height: 100%;
+  }
+
+  /* ── Gallery / image area ──────────────────────────────── */
+  .custom-cc__gallery {
+    position: relative;
+    display: block;
+    width: 100%;
     overflow: hidden;
     aspect-ratio: var(--ratio);
   }
 
-  .custom-collection-card__images {
+  .custom-cc__images {
     position: relative;
     width: 100%;
     height: 100%;
   }
 
-  .custom-collection-card__image {
+  .custom-cc__img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.4s ease;
   }
 
-  .custom-collection-card__image--secondary {
+  /* Secondary & preview images hidden by default */
+  .custom-cc__img--secondary,
+  .custom-cc__img--preview {
     opacity: 0;
   }
 
-  @media (hover: hover) and (pointer: fine) {
-    .custom-collection-card__gallery--has-hover:hover .custom-collection-card__image--primary {
-      opacity: 0;
-    }
-
-    .custom-collection-card__gallery--has-hover:hover .custom-collection-card__image--secondary {
-      opacity: 1;
-    }
+  .custom-cc__img--preview {
+    transition: opacity 0.35s ease;
   }
 
-  .custom-collection-card__button {
-    width: 100%;
+  /*
+   * JS-driven hover states on the gallery element:
+   *
+   *  state-hover  → card is hovered → show 2nd product image
+   *  state-swatch → swatch is hovered → show variant image
+   *
+   * state-swatch rules come AFTER state-hover at the same
+   * specificity, so they win when both classes are present.
+   */
+  .custom-cc__gallery.state-hover .custom-cc__img--primary {
+    opacity: 0;
+  }
+  .custom-cc__gallery.state-hover .custom-cc__img--secondary {
+    opacity: 1;
+  }
+
+  .custom-cc__gallery.state-swatch .custom-cc__img--primary,
+  .custom-cc__gallery.state-swatch .custom-cc__img--secondary {
+    opacity: 0;
+  }
+  .custom-cc__gallery.state-swatch .custom-cc__img--preview {
+    opacity: 1;
+  }
+
+  /* ── Footer (always below the card image) ────────────────  */
+  .custom-cc__footer {
     display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 8px;
+    width: 100%;
     pointer-events: auto;
   }
 
-  .custom-collection-card__cta {
+  /* ── Swatches ─────────────────────────────────────────── */
+  .custom-cc__swatches-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .custom-cc__swatches-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .custom-cc__swatch-btn {
+    all: unset;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    position: relative;
+    z-index: 2;
+  }
+
+  .custom-cc__swatch-btn:focus-visible {
+    outline: 2px solid var(--color-foreground, #000);
+    outline-offset: 2px;
+    border-radius: 50%;
+  }
+
+  /* ── CTA button — transparent outline ────────────────── */
+  .custom-cc__cta-row {
+    width: 100%;
+    display: flex;
+  }
+
+  .custom-cc__cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 10px 20px;
+    font-family: var(--font-body--family, inherit);
+    font-size: var(--font-size--body-sm, 0.8125rem);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     text-decoration: none;
+    color: var(--color-foreground, #000);
+    background: transparent;
+    border: 1px solid currentColor;
+    cursor: pointer;
+    transition: color 0.25s ease, background 0.25s ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .custom-cc__cta-btn:hover {
+      color: var(--color-background, #fff);
+      background: var(--color-foreground, #000);
+    }
   }
 {% endstylesheet %}
+
+<script>
+  (function () {
+    'use strict';
+
+    class CustomCollectionCard extends HTMLElement {
+      connectedCallback () {
+        const gallery  = this.querySelector('[data-gallery]');
+        const primary  = this.querySelector('.custom-cc__img--primary');
+        const hasHover = gallery && gallery.classList.contains('custom-cc__gallery--has-hover');
+
+        if (!gallery || !primary) return;
+
+        // Create ONE shared <img> for swatch preview, inside the images wrapper
+        const imagesWrap = primary.parentNode;
+        const preview = document.createElement('img');
+        preview.className = 'resource-image__image custom-cc__img custom-cc__img--preview';
+        preview.alt = '';
+        preview.loading = 'lazy';
+        imagesWrap.appendChild(preview);
+
+        let cardHovered   = false;
+        let swatchHovered = false;
+
+        function applyState () {
+          if (swatchHovered) {
+            gallery.classList.remove('state-hover');
+            gallery.classList.add('state-swatch');
+          } else if (cardHovered && hasHover) {
+            gallery.classList.add('state-hover');
+            gallery.classList.remove('state-swatch');
+          } else {
+            gallery.classList.remove('state-hover', 'state-swatch');
+          }
+        }
+
+        // Listen on the whole custom element (covers image + footer area below)
+        this.addEventListener('pointerenter', () => {
+          cardHovered = true;
+          applyState();
+        });
+        this.addEventListener('pointerleave', () => {
+          cardHovered  = false;
+          swatchHovered = false;  // also clear swatch so no stale state
+          applyState();
+        });
+
+        // Swatch-level hover — overrides card hover
+        this.querySelectorAll('.custom-cc__swatch-btn[data-preview-src]').forEach(btn => {
+          btn.addEventListener('pointerenter', () => {
+            const src = btn.dataset.previewSrc;
+            if (src && preview.getAttribute('src') !== src) {
+              preview.setAttribute('src', src);
+            }
+            swatchHovered = true;
+            applyState();
+          });
+
+          btn.addEventListener('pointerleave', () => {
+            swatchHovered = false;
+            applyState();
+          });
+        });
+      }
+    }
+
+    if (!customElements.get('custom-collection-card')) {
+      customElements.define('custom-collection-card', CustomCollectionCard);
+    }
+  })();
+</script>
 
 {% schema %}
 {
   "name": "Custom collection card",
   "blocks": [
-    {
-      "type": "text"
-    },
-    {
-      "type": "spacer"
-    },
-    {
-      "type": "button"
-    },
-    {
-      "type": "group"
-    },
-    {
-      "type": "collection-title"
-    },
-    {
-      "type": "swatches"
-    }
+    { "type": "text" },
+    { "type": "spacer" },
+    { "type": "button" },
+    { "type": "group" },
+    { "type": "collection-title" }
   ],
   "tag": null,
   "settings": [
@@ -249,22 +477,10 @@
       "label": "t:settings.aspect_ratio",
       "info": "t:info.aspect_ratio_adjusted",
       "options": [
-        {
-          "value": "adapt",
-          "label": "t:options.auto"
-        },
-        {
-          "value": "portrait",
-          "label": "t:options.portrait"
-        },
-        {
-          "value": "square",
-          "label": "t:options.square"
-        },
-        {
-          "value": "landscape",
-          "label": "t:options.landscape"
-        }
+        { "value": "adapt",     "label": "t:options.auto" },
+        { "value": "portrait",  "label": "t:options.portrait" },
+        { "value": "square",    "label": "t:options.square" },
+        { "value": "landscape", "label": "t:options.landscape" }
       ],
       "default": "portrait"
     },
@@ -286,14 +502,8 @@
       "id": "overlay_style",
       "label": "t:settings.overlay_style",
       "options": [
-        {
-          "value": "solid",
-          "label": "t:options.solid"
-        },
-        {
-          "value": "gradient",
-          "label": "t:options.gradient"
-        }
+        { "value": "solid",    "label": "t:options.solid" },
+        { "value": "gradient", "label": "t:options.gradient" }
       ],
       "default": "solid",
       "visible_if": "{{ block.settings.toggle_overlay }}"
@@ -303,14 +513,8 @@
       "id": "gradient_direction",
       "label": "t:settings.gradient_direction",
       "options": [
-        {
-          "value": "to top",
-          "label": "t:options.up"
-        },
-        {
-          "value": "to bottom",
-          "label": "t:options.down"
-        }
+        { "value": "to top",    "label": "t:options.up" },
+        { "value": "to bottom", "label": "t:options.down" }
       ],
       "default": "to top",
       "visible_if": "{{ block.settings.toggle_overlay and block.settings.overlay_style == 'gradient' }}"
@@ -324,14 +528,8 @@
       "id": "placement",
       "label": "t:settings.placement",
       "options": [
-        {
-          "value": "on_image",
-          "label": "t:options.on_image"
-        },
-        {
-          "value": "below_image",
-          "label": "t:options.below_image"
-        }
+        { "value": "on_image",    "label": "t:options.on_image" },
+        { "value": "below_image", "label": "t:options.below_image" }
       ],
       "default": "below_image"
     },
@@ -340,18 +538,9 @@
       "id": "horizontal_alignment",
       "label": "t:settings.alignment",
       "options": [
-        {
-          "value": "flex-start",
-          "label": "t:options.left"
-        },
-        {
-          "value": "center",
-          "label": "t:options.center"
-        },
-        {
-          "value": "flex-end",
-          "label": "t:options.right"
-        }
+        { "value": "flex-start", "label": "t:options.left" },
+        { "value": "center",     "label": "t:options.center" },
+        { "value": "flex-end",   "label": "t:options.right" }
       ],
       "default": "flex-start"
     },
@@ -360,18 +549,9 @@
       "id": "vertical_alignment",
       "label": "t:settings.position",
       "options": [
-        {
-          "value": "flex-start",
-          "label": "t:options.top"
-        },
-        {
-          "value": "center",
-          "label": "t:options.center"
-        },
-        {
-          "value": "flex-end",
-          "label": "t:options.bottom"
-        }
+        { "value": "flex-start", "label": "t:options.top" },
+        { "value": "center",     "label": "t:options.center" },
+        { "value": "flex-end",   "label": "t:options.bottom" }
       ],
       "default": "center",
       "visible_if": "{{ block.settings.placement == \"on_image\" }}"
@@ -395,14 +575,8 @@
       "id": "border",
       "label": "t:settings.style",
       "options": [
-        {
-          "value": "none",
-          "label": "t:options.none"
-        },
-        {
-          "value": "solid",
-          "label": "t:options.solid"
-        }
+        { "value": "none",  "label": "t:options.none" },
+        { "value": "solid", "label": "t:options.solid" }
       ],
       "default": "none"
     },
